@@ -1,32 +1,45 @@
-import React, { useRef } from 'react';
-import { Upload } from 'lucide-react';
-import Papa from 'papaparse';
-import { toast } from 'react-hot-toast';
+import React, { useRef } from "react";
+import { Upload } from "lucide-react";
+import Papa from "papaparse";
+import { toast } from "react-hot-toast";
+import { v4 as uuidv4 } from "uuid";
 
 interface RosterCSVImportProps {
   onImportComplete: (players: any[]) => void;
 }
 
-const RosterCSVImport: React.FC<RosterCSVImportProps> = ({ onImportComplete }) => {
+const RosterCSVImport: React.FC<RosterCSVImportProps> = ({
+  onImportComplete,
+}) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const validateCsvData = (data: any[]) => {
-    const requiredColumns = ['Jersey #', 'Name', 'Position', 'Year', 'Rating', 'Development Trait', 'Notes'];
+    const requiredColumns = [
+      "Jersey #",
+      "Name",
+      "Position",
+      "Year",
+      "Rating",
+      "Development Trait",
+      "Notes",
+    ];
     const headers = Object.keys(data[0] || {});
-    
-    const missingColumns = requiredColumns.filter(col => !headers.includes(col));
+
+    const missingColumns = requiredColumns.filter(
+      (col) => !headers.includes(col)
+    );
     if (missingColumns.length > 0) {
-      throw new Error(`Missing required columns: ${missingColumns.join(', ')}`);
+      throw new Error(`Missing required columns: ${missingColumns.join(", ")}`);
     }
 
-    return data.map(row => ({
-      jerseyNumber: row['Jersey #']?.toString() || '',
-      name: row['Name'] || '',
-      position: row['Position'] || '',
-      year: row['Year'] || '',
-      rating: row['Rating']?.toString() || '',
-      devTrait: row['Development Trait'] || 'Normal',
-      notes: row['Notes'] || ''
+    return data.map((row) => ({
+      jerseyNumber: row["Jersey #"]?.toString() || "",
+      name: row["Name"] || "",
+      position: row["Position"] || "",
+      year: row["Year"] || "",
+      rating: row["Rating"]?.toString() || "",
+      devTrait: row["Development Trait"] || "Normal",
+      notes: row["Notes"] || "",
     }));
   };
 
@@ -39,26 +52,29 @@ const RosterCSVImport: React.FC<RosterCSVImportProps> = ({ onImportComplete }) =
       complete: (results) => {
         try {
           const validatedData = validateCsvData(results.data);
-          const playersToImport = validatedData.map(player => ({
+          const playersToImport = validatedData.map((player) => ({
             ...player,
-            id: Date.now() + Math.random()
+            id: uuidv4(),
+            isRedshirted: false, // Adding default value for consistency
           }));
-          
+
           onImportComplete(playersToImport);
-          toast.success('Roster imported successfully');
-          
+          toast.success("Roster imported successfully");
+
           // Reset file input
           if (fileInputRef.current) {
-            fileInputRef.current.value = '';
+            fileInputRef.current.value = "";
           }
         } catch (error) {
-          toast.error(error instanceof Error ? error.message : 'Invalid CSV format');
+          toast.error(
+            error instanceof Error ? error.message : "Invalid CSV format"
+          );
         }
       },
       error: (error) => {
-        toast.error('Error parsing CSV file');
-        console.error('CSV Parse Error:', error);
-      }
+        toast.error("Error parsing CSV file");
+        console.error("CSV Parse Error:", error);
+      },
     });
   };
 

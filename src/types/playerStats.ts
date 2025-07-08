@@ -1,10 +1,17 @@
 // src/types/playerStats.ts
 
-export type StatCategory = 'Passing' | 'Rushing' | 'Receiving' | 'Defense' | 'Kicking' | 'Punting' | 'Returns';
+export type StatCategory =
+  | "Passing"
+  | "Rushing"
+  | "Receiving"
+  | "Defense"
+  | "Kicking"
+  | "Punting"
+  | "Returns";
 
 export interface PlayerStat {
   id: string; // Unique ID for the stat entry
-  playerId?: number; // Optional - for linking to roster
+  playerId?: string; // Optional - for linking to roster
   playerName: string; // CONSISTENT field name for player name
   year: number; // The season year for these stats
   category: StatCategory;

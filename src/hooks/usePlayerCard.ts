@@ -1,21 +1,23 @@
 // src/hooks/usePlayerCard.ts
-import { useState } from 'react';
+import { useState } from "react";
 
 // Extended Player interface to match what PlayerCard expects
 interface ExtendedPlayer {
-  id: number;
+  id: string;
   name: string;
   position: string;
   year: string;
   rating: string;
   jerseyNumber: string;
-  devTrait?: 'Normal' | 'Impact' | 'Star' | 'Elite';
+  devTrait?: "Normal" | "Impact" | "Star" | "Elite";
   notes?: string;
   isRedshirted?: boolean;
 }
 
 export const usePlayerCard = () => {
-  const [selectedPlayer, setSelectedPlayer] = useState<ExtendedPlayer | null>(null);
+  const [selectedPlayer, setSelectedPlayer] = useState<ExtendedPlayer | null>(
+    null
+  );
   const [isOpen, setIsOpen] = useState(false);
 
   const openPlayerCard = (player: ExtendedPlayer) => {
