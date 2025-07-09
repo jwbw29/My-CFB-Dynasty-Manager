@@ -45,6 +45,7 @@ const getCurrentDynastyData = (): Record<string, any> | null => {
   if (!dynastyId) return null;
   const dynastyData = safeLocalStorage.getItem(`dynasty_${dynastyId}`);
   try {
+    // console.log("🚀 ~ dynastyData:", dynastyData);
     return dynastyData ? JSON.parse(dynastyData) : {};
   } catch (e) {
     console.error("Failed to parse dynasty data", e);
@@ -456,6 +457,8 @@ export const generateYearRecord = (
 export const getTop25History = (): Top25History => {
   const dynastyData = getCurrentDynastyData();
   // Data is now stored under a 'top25History' key within the dynasty object
+  
+  // console.log("🚀 ~ getTop25History ~ dynastyData?.top25History:", dynastyData?.top25History)
   return dynastyData?.top25History || {};
 };
 
