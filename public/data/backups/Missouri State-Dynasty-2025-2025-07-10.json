@@ -1,6 +1,6 @@
 {
   "version": "1.0.1",
-  "exportedAt": "2025-07-10T14:23:52.581Z",
+  "exportedAt": "2025-07-10T17:22:26.650Z",
   "dynastyData": {
     "coachProfile": {
       "coachName": "Ricky Sykes Jr",
@@ -1053,6 +1053,17 @@
         "significance": "Medium",
         "id": 1752156821823,
         "year": 2025
+      },
+      {
+        "category": "bowl",
+        "type": "StaffDNA Cure Bowl",
+        "name": "StaffDNA Cure Bowl",
+        "description": "24-22",
+        "opponent": "#21 Tulane",
+        "location": "Orlando, FL",
+        "significance": "Medium",
+        "id": 1752164338172,
+        "year": 2025
       }
     ],
     "top25History": {
@@ -1546,12 +1557,12 @@
       }
     },
     "yearStats_2025": {
-      "wins": 11,
+      "wins": 12,
       "losses": 2,
       "conferenceWins": 8,
       "conferenceLosses": 1,
-      "pointsScored": 413,
-      "pointsAgainst": 209,
+      "pointsScored": 437,
+      "pointsAgainst": 231,
       "playersDrafted": 0,
       "conferenceStanding": "",
       "bowlGame": "",
@@ -1699,8 +1710,8 @@
         "week": 17,
         "location": "neutral",
         "opponent": "Tulane",
-        "result": "N/A",
-        "score": "-10"
+        "result": "Win",
+        "score": "24-22"
       },
       {
         "id": 18,
