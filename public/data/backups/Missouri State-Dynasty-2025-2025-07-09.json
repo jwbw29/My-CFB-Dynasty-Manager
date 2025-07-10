@@ -1,6 +1,6 @@
 {
   "version": "1.0.1",
-  "exportedAt": "2025-07-10T13:18:11.869Z",
+  "exportedAt": "2025-07-10T03:33:04.526Z",
   "dynastyData": {
     "coachProfile": {
       "coachName": "Ricky Sykes Jr",
@@ -954,19 +954,7 @@
     "allTransfers": [],
     "allAwards": [],
     "yearRecords": [],
-    "allTrophies": [
-      {
-        "category": "conference",
-        "type": "Conference Championship",
-        "name": "Conference Championship",
-        "description": "21-10",
-        "opponent": "#10 USF",
-        "location": "C-USA CHAMPIONSHIP",
-        "significance": "High",
-        "id": 1752153412365,
-        "year": 2025
-      }
-    ],
+    "allTrophies": [],
     "top25History": {
       "2025": {
         "0": [
@@ -1247,223 +1235,19 @@
             "record": " "
           },
           {
-            "name": "",
-            "record": " "
-          }
-        ],
-        "15": [
-          {
-            "name": "Air Force",
-            "record": " "
-          },
-          {
-            "name": "Akron",
-            "record": " "
-          },
-          {
-            "name": "Miami (FL)",
-            "record": " "
-          },
-          {
-            "name": "Pittsburgh",
-            "record": " "
-          },
-          {
-            "name": "Oklahoma",
-            "record": " "
-          },
-          {
-            "name": "Kansas State",
-            "record": " "
-          },
-          {
-            "name": "Boise State",
-            "record": " "
-          },
-          {
-            "name": "Duke",
-            "record": " "
-          },
-          {
-            "name": "BYU",
-            "record": " "
-          },
-          {
-            "name": "South Florida",
-            "record": " "
-          },
-          {
-            "name": "Navy",
-            "record": " "
-          },
-          {
-            "name": "Oregon",
-            "record": " "
-          },
-          {
-            "name": "UNLV",
-            "record": " "
-          },
-          {
-            "name": "Alabama",
-            "record": " "
-          },
-          {
-            "name": "USC",
-            "record": " "
-          },
-          {
-            "name": "SMU",
-            "record": " "
-          },
-          {
-            "name": "Illinois",
-            "record": " "
-          },
-          {
-            "name": "Penn State",
-            "record": " "
-          },
-          {
-            "name": "Vanderbilt",
-            "record": " "
-          },
-          {
-            "name": "Mississippi State",
-            "record": " "
-          },
-          {
             "name": "Missouri State",
-            "record": " "
-          },
-          {
-            "name": "Tulane",
-            "record": " "
-          },
-          {
-            "name": "Arizona State",
-            "record": " "
-          },
-          {
-            "name": "Virginia",
-            "record": " "
-          },
-          {
-            "name": "",
-            "record": " "
-          }
-        ],
-        "17": [
-          {
-            "name": "Air Force",
-            "record": " "
-          },
-          {
-            "name": "Akron",
-            "record": " "
-          },
-          {
-            "name": "Miami (FL)",
-            "record": " "
-          },
-          {
-            "name": "Pittsburgh",
-            "record": " "
-          },
-          {
-            "name": "Oklahoma",
-            "record": " "
-          },
-          {
-            "name": "Kansas State",
-            "record": " "
-          },
-          {
-            "name": "Boise State",
-            "record": " "
-          },
-          {
-            "name": "Duke",
-            "record": " "
-          },
-          {
-            "name": "BYU",
-            "record": " "
-          },
-          {
-            "name": "South Florida",
-            "record": " "
-          },
-          {
-            "name": "Navy",
-            "record": " "
-          },
-          {
-            "name": "Oregon",
-            "record": " "
-          },
-          {
-            "name": "UNLV",
-            "record": " "
-          },
-          {
-            "name": "Alabama",
-            "record": " "
-          },
-          {
-            "name": "USC",
-            "record": " "
-          },
-          {
-            "name": "SMU",
-            "record": " "
-          },
-          {
-            "name": "Illinois",
-            "record": " "
-          },
-          {
-            "name": "Missouri State",
-            "record": " "
-          },
-          {
-            "name": "Vanderbilt",
-            "record": " "
-          },
-          {
-            "name": "Mississippi State",
-            "record": " "
-          },
-          {
-            "name": "Tulane",
-            "record": " "
-          },
-          {
-            "name": "",
-            "record": " "
-          },
-          {
-            "name": "Arizona State",
-            "record": " "
-          },
-          {
-            "name": "Virginia",
-            "record": " "
-          },
-          {
-            "name": "",
             "record": " "
           }
         ]
       }
     },
     "yearStats_2025": {
-      "wins": 11,
-      "losses": 2,
-      "conferenceWins": 8,
-      "conferenceLosses": 1,
-      "pointsScored": 413,
-      "pointsAgainst": 209,
+      "wins": 10,
+      "losses": 1,
+      "conferenceWins": 3,
+      "conferenceLosses": 0,
+      "pointsScored": 370,
+      "pointsAgainst": 174,
       "playersDrafted": 0,
       "conferenceStanding": "",
       "bowlGame": "",
@@ -1587,16 +1371,16 @@
         "week": 14,
         "location": "@",
         "opponent": "Liberty",
-        "result": "Loss",
-        "score": "22-25"
+        "result": "N/A",
+        "score": ""
       },
       {
         "id": 15,
         "week": 15,
-        "location": "@",
-        "opponent": "South Florida",
-        "result": "Win",
-        "score": "21-10"
+        "location": "vs",
+        "opponent": "",
+        "result": "N/A",
+        "score": ""
       },
       {
         "id": 16,
@@ -1610,9 +1394,9 @@
         "id": 17,
         "week": 17,
         "location": "vs",
-        "opponent": "Tulane",
+        "opponent": "",
         "result": "N/A",
-        "score": "-10"
+        "score": ""
       },
       {
         "id": 18,
