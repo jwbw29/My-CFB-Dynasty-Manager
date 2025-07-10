@@ -1,7 +1,7 @@
 // This file should contain type definitions relating to player stats (either stat's themselves or awards)
 
 export interface Award {
-  id: string;
+  id: number;
   playerName: string;
   awardName: string;
   year: number;
