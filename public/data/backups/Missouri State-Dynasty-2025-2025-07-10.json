@@ -1,6 +1,6 @@
 {
   "version": "1.0.1",
-  "exportedAt": "2025-07-10T17:22:26.650Z",
+  "exportedAt": "2025-07-10T21:21:45.909Z",
   "dynastyData": {
     "coachProfile": {
       "coachName": "Ricky Sykes Jr",
@@ -58,17 +58,6 @@
         "isRedshirted": false
       },
       {
-        "id": "1bd9a06f-6200-4f65-b41a-c2628f82f560",
-        "jerseyNumber": "14",
-        "name": "T. Anderson",
-        "position": "CB",
-        "year": "SR (RS)",
-        "rating": "72",
-        "devTrait": "Normal",
-        "notes": "",
-        "isRedshirted": false
-      },
-      {
         "id": "c8e17c46-d30f-46d9-be59-8f1b483b0f6d",
         "jerseyNumber": "5",
         "name": "N. Barrett",
@@ -86,17 +75,6 @@
         "position": "CB",
         "year": "FR",
         "rating": "68",
-        "devTrait": "Normal",
-        "notes": "",
-        "isRedshirted": false
-      },
-      {
-        "id": "6f91c002-c5a8-4a44-8d15-b77e4474155b",
-        "jerseyNumber": "10",
-        "name": "D. Simmons",
-        "position": "CB",
-        "year": "SR",
-        "rating": "66",
         "devTrait": "Normal",
         "notes": "",
         "isRedshirted": false
@@ -168,45 +146,12 @@
         "isRedshirted": false
       },
       {
-        "id": "675ddbed-269b-4703-82e5-f1e245f8f6bf",
-        "jerseyNumber": "90",
-        "name": "S. Smithson",
-        "position": "DT",
-        "year": "SR",
-        "rating": "64",
-        "devTrait": "Normal",
-        "notes": "",
-        "isRedshirted": false
-      },
-      {
         "id": "46b83daa-8acc-4f92-9ec0-165d4e7c28d0",
         "jerseyNumber": "94",
         "name": "T. Harris III",
         "position": "DT",
         "year": "FR",
         "rating": "61",
-        "devTrait": "Normal",
-        "notes": "",
-        "isRedshirted": false
-      },
-      {
-        "id": "41de6874-8c09-4866-a6d2-fdc3015fa689",
-        "jerseyNumber": "16",
-        "name": "J. O'Neal",
-        "position": "FS",
-        "year": "SR",
-        "rating": "74",
-        "devTrait": "Normal",
-        "notes": "",
-        "isRedshirted": false
-      },
-      {
-        "id": "b77c1e7e-0a21-4ffa-9cf8-3a00b2087aa3",
-        "jerseyNumber": "37",
-        "name": "K. Renfro",
-        "position": "FS",
-        "year": "SR",
-        "rating": "68",
         "devTrait": "Normal",
         "notes": "",
         "isRedshirted": false
@@ -240,17 +185,6 @@
         "position": "FS",
         "year": "FR",
         "rating": "61",
-        "devTrait": "Normal",
-        "notes": "",
-        "isRedshirted": false
-      },
-      {
-        "id": "6c927822-b6a6-4207-9c84-7f0fcfea1c2f",
-        "jerseyNumber": "2",
-        "name": "S. Lawrence",
-        "position": "RB",
-        "year": "SR",
-        "rating": "81",
         "devTrait": "Normal",
         "notes": "",
         "isRedshirted": false
@@ -355,34 +289,12 @@
         "isRedshirted": false
       },
       {
-        "id": "862945ce-5b4c-446c-a4b2-9b3f8a393491",
-        "jerseyNumber": "17",
-        "name": "D. Townley Jr.",
-        "position": "LEDGE",
-        "year": "SR",
-        "rating": "72",
-        "devTrait": "Normal",
-        "notes": "",
-        "isRedshirted": false
-      },
-      {
         "id": "7df793a6-4a38-434e-9c16-779721091817",
         "jerseyNumber": "30",
         "name": "C. Wiest",
         "position": "LEDGE",
         "year": "SO",
         "rating": "65",
-        "devTrait": "Normal",
-        "notes": "",
-        "isRedshirted": false
-      },
-      {
-        "id": "0356256d-f76c-4ba4-8f54-5d7d471322b5",
-        "jerseyNumber": "70",
-        "name": "J. Curtis",
-        "position": "LG",
-        "year": "SR",
-        "rating": "64",
         "devTrait": "Normal",
         "notes": "",
         "isRedshirted": false
@@ -443,17 +355,6 @@
         "isRedshirted": false
       },
       {
-        "id": "605ec210-a922-4274-9839-3a64e2aa9c44",
-        "jerseyNumber": "44",
-        "name": "K. Young",
-        "position": "MIKE",
-        "year": "SR",
-        "rating": "68",
-        "devTrait": "Normal",
-        "notes": "",
-        "isRedshirted": false
-      },
-      {
         "id": "a2403fa1-0f45-42d9-863b-b1dd0f88254b",
         "jerseyNumber": "52",
         "name": "T. Hunter-Bell",
@@ -482,17 +383,6 @@
         "position": "P",
         "year": "FR (RS)",
         "rating": "70",
-        "devTrait": "Normal",
-        "notes": "",
-        "isRedshirted": false
-      },
-      {
-        "id": "8d4bb5c1-f00c-4ea5-8f91-8cd9e5dd416d",
-        "jerseyNumber": "12",
-        "name": "J. Clark",
-        "position": "QB",
-        "year": "SR",
-        "rating": "78",
         "devTrait": "Normal",
         "notes": "",
         "isRedshirted": false
@@ -542,33 +432,11 @@
         "isRedshirted": false
       },
       {
-        "id": "c75b8525-c17c-4207-8d38-cff5e0c46d7e",
-        "jerseyNumber": "43",
-        "name": "C. Dietlin",
-        "position": "REDGE",
-        "year": "SR",
-        "rating": "68",
-        "devTrait": "Normal",
-        "notes": "",
-        "isRedshirted": false
-      },
-      {
         "id": "3d0c1710-b7a5-40b2-97f6-9fb89479d94c",
         "jerseyNumber": "97",
         "name": "A. Link",
         "position": "REDGE",
         "year": "SO (RS)",
-        "rating": "68",
-        "devTrait": "Normal",
-        "notes": "",
-        "isRedshirted": false
-      },
-      {
-        "id": "dfb7eceb-677e-465f-aa38-b6f08e03663d",
-        "jerseyNumber": "99",
-        "name": "R. Williams",
-        "position": "REDGE",
-        "year": "SR",
         "rating": "68",
         "devTrait": "Normal",
         "notes": "",
@@ -581,17 +449,6 @@
         "position": "REDGE",
         "year": "SO",
         "rating": "50",
-        "devTrait": "Normal",
-        "notes": "",
-        "isRedshirted": false
-      },
-      {
-        "id": "1857e332-aa3b-4d33-a8a5-a3755c8c30e1",
-        "jerseyNumber": "58",
-        "name": "H. Lillibridge",
-        "position": "RG",
-        "year": "SR",
-        "rating": "73",
         "devTrait": "Normal",
         "notes": "",
         "isRedshirted": false
@@ -652,28 +509,6 @@
         "isRedshirted": false
       },
       {
-        "id": "cb3cc73d-b275-43e0-aa3d-606bd1540bfb",
-        "jerseyNumber": "19",
-        "name": "J. Brooks",
-        "position": "SAM",
-        "year": "SR",
-        "rating": "69",
-        "devTrait": "Normal",
-        "notes": "",
-        "isRedshirted": false
-      },
-      {
-        "id": "6a05103c-1ac8-4b0c-bcbc-55dd67b1ccce",
-        "jerseyNumber": "24",
-        "name": "E. Valentine",
-        "position": "SAM",
-        "year": "SR",
-        "rating": "67",
-        "devTrait": "Normal",
-        "notes": "",
-        "isRedshirted": false
-      },
-      {
         "id": "07c3c221-a9d6-4757-b16d-b0693191c9fa",
         "jerseyNumber": "18",
         "name": "M. Holliday",
@@ -696,39 +531,6 @@
         "isRedshirted": false
       },
       {
-        "id": "4267566c-5321-4bd8-9fdb-ff4236bfb91f",
-        "jerseyNumber": "4",
-        "name": "T. McGee",
-        "position": "SS",
-        "year": "SR",
-        "rating": "73",
-        "devTrait": "Normal",
-        "notes": "",
-        "isRedshirted": false
-      },
-      {
-        "id": "95bdb01d-2eed-4439-aaff-1bcd134b7666",
-        "jerseyNumber": "3",
-        "name": "K. Anderson",
-        "position": "SS",
-        "year": "SR",
-        "rating": "72",
-        "devTrait": "Normal",
-        "notes": "",
-        "isRedshirted": false
-      },
-      {
-        "id": "27081038-6096-4160-a8a0-c45792bcf23f",
-        "jerseyNumber": "41",
-        "name": "G. Alexis",
-        "position": "SS",
-        "year": "SR",
-        "rating": "70",
-        "devTrait": "Normal",
-        "notes": "",
-        "isRedshirted": false
-      },
-      {
         "id": "792908ed-c77a-4064-8797-7acc289b2d3e",
         "jerseyNumber": "88",
         "name": "J. Askren",
@@ -740,33 +542,11 @@
         "isRedshirted": false
       },
       {
-        "id": "ce652868-bb38-4099-a7fd-92d17d2189a9",
-        "jerseyNumber": "87",
-        "name": "G. Clinton",
-        "position": "TE",
-        "year": "SR",
-        "rating": "73",
-        "devTrait": "Normal",
-        "notes": "",
-        "isRedshirted": false
-      },
-      {
         "id": "6937ec68-5a33-451e-9834-7ba215c574fb",
         "jerseyNumber": "85",
         "name": "D. Hipp",
         "position": "TE",
         "year": "FR (RS)",
-        "rating": "66",
-        "devTrait": "Normal",
-        "notes": "",
-        "isRedshirted": false
-      },
-      {
-        "id": "4f4bb907-e73e-4e94-b12f-51a827f7d1af",
-        "jerseyNumber": "81",
-        "name": "G. Kahler",
-        "position": "TE",
-        "year": "SR (RS)",
         "rating": "66",
         "devTrait": "Normal",
         "notes": "",
@@ -806,34 +586,12 @@
         "isRedshirted": false
       },
       {
-        "id": "61706e5c-2bda-4c34-84a0-355408f66fa6",
-        "jerseyNumber": "21",
-        "name": "J. Cooper",
-        "position": "WILL",
-        "year": "SR",
-        "rating": "68",
-        "devTrait": "Normal",
-        "notes": "",
-        "isRedshirted": false
-      },
-      {
         "id": "7d08b93d-f054-4443-b9ea-de11d0d97078",
         "jerseyNumber": "32",
         "name": "H. Malone",
         "position": "WILL",
         "year": "FR (RS)",
         "rating": "67",
-        "devTrait": "Normal",
-        "notes": "",
-        "isRedshirted": false
-      },
-      {
-        "id": "d4642bbe-c82b-4401-aa7d-d23182c1d14a",
-        "jerseyNumber": "5",
-        "name": "J. BlackStrain",
-        "position": "WR",
-        "year": "SR",
-        "rating": "75",
         "devTrait": "Normal",
         "notes": "",
         "isRedshirted": false
@@ -856,17 +614,6 @@
         "position": "WR",
         "year": "JR",
         "rating": "71",
-        "devTrait": "Normal",
-        "notes": "",
-        "isRedshirted": false
-      },
-      {
-        "id": "eba01adc-65af-4ad8-8c32-92dd3b526423",
-        "jerseyNumber": "1",
-        "name": "D. Luke",
-        "position": "WR",
-        "year": "SR",
-        "rating": "70",
         "devTrait": "Normal",
         "notes": "",
         "isRedshirted": false
@@ -949,22 +696,486 @@
         "isRedshirted": false
       }
     ],
-    "playerStats": [],
-    "allRecruits": [],
+    "playerStats": [
+      {
+        "playerName": "J. Clark",
+        "year": 2025,
+        "category": "Passing",
+        "id": "1752168873430",
+        "completions": 286,
+        "attempts": 433,
+        "passyards": 4213,
+        "passtd": 32,
+        "passint": 26,
+        "long": 84
+      },
+      {
+        "playerName": "J. Joyner",
+        "year": 2025,
+        "category": "Rushing",
+        "id": "1752168914240",
+        "carries": 182,
+        "rushyards": 774,
+        "rushtd": 18,
+        "fumbles": 1,
+        "yac": 228,
+        "long": 29
+      },
+      {
+        "playerName": "K. Davis",
+        "year": 2025,
+        "category": "Rushing",
+        "id": "1752168936203",
+        "carries": 75,
+        "rushyards": 406,
+        "rushtd": 9,
+        "fumbles": 0,
+        "yac": 162,
+        "long": 50
+      },
+      {
+        "playerName": "J. Robinson",
+        "year": 2025,
+        "category": "Receiving",
+        "id": "1752169008227",
+        "receptions": 96,
+        "recyards": 1792,
+        "rectd": 16,
+        "rac": 578,
+        "long": 84
+      },
+      {
+        "playerName": "R. Johnson",
+        "year": 2025,
+        "category": "Receiving",
+        "id": "1752169030705",
+        "receptions": 41,
+        "recyards": 688,
+        "rectd": 1,
+        "rac": 242,
+        "long": 80
+      },
+      {
+        "playerName": "J. Askren",
+        "year": 2025,
+        "category": "Receiving",
+        "id": "1752169050299",
+        "receptions": 41,
+        "recyards": 529,
+        "rectd": 3,
+        "rac": 167,
+        "long": 49
+      },
+      {
+        "playerName": "J. Joyner",
+        "year": 2025,
+        "category": "Receiving",
+        "id": "1752169268534",
+        "receptions": 44,
+        "recyards": 372,
+        "rectd": 1,
+        "rac": 330,
+        "long": 35
+      },
+      {
+        "playerName": "L. O'Reilly",
+        "year": 2025,
+        "category": "Receiving",
+        "id": "1752169286149",
+        "receptions": 22,
+        "recyards": 312,
+        "rectd": 5,
+        "rac": 68,
+        "long": 29
+      },
+      {
+        "playerName": "J. BlackStrain",
+        "year": 2025,
+        "category": "Receiving",
+        "id": "1752169302364",
+        "receptions": 11,
+        "recyards": 296,
+        "rectd": 3,
+        "rac": 88,
+        "long": 66
+      },
+      {
+        "playerName": "K. Davis",
+        "year": 2025,
+        "category": "Receiving",
+        "id": "1752169315322",
+        "receptions": 22,
+        "recyards": 165,
+        "rectd": 3,
+        "rac": 130,
+        "long": 14
+      },
+      {
+        "playerName": "B. McQueen",
+        "year": 2025,
+        "category": "Receiving",
+        "id": "1752169330429",
+        "receptions": 2,
+        "recyards": 24,
+        "rectd": 0,
+        "rac": 4,
+        "long": 17
+      },
+      {
+        "playerName": "H. Lillibridge",
+        "year": 2025,
+        "category": "Blocking",
+        "id": "1752171719079",
+        "sacksallowed": 0,
+        "gp": 14,
+        "dp": 801
+      },
+      {
+        "playerName": "C. Loaiza",
+        "year": 2025,
+        "category": "Blocking",
+        "id": "1752171731200",
+        "sacksallowed": 3,
+        "gp": 14,
+        "dp": 801
+      },
+      {
+        "playerName": "E. Nnabugwu",
+        "year": 2025,
+        "category": "Blocking",
+        "id": "1752171745104",
+        "sacksallowed": 3,
+        "gp": 14,
+        "dp": 801
+      },
+      {
+        "playerName": "B. Liedtke",
+        "year": 2025,
+        "category": "Blocking",
+        "id": "1752171768264",
+        "sacksallowed": 2,
+        "gp": 14,
+        "dp": 799
+      },
+      {
+        "playerName": "C. Hudson",
+        "year": 2025,
+        "category": "Blocking",
+        "id": "1752171775989",
+        "sacksallowed": 3,
+        "gp": 14,
+        "dp": 730
+      },
+      {
+        "playerName": "M. Cross",
+        "year": 2025,
+        "category": "Blocking",
+        "id": "1752171788004",
+        "sacksallowed": 0,
+        "gp": 14,
+        "dp": 70
+      },
+      {
+        "playerName": "J. Curtis",
+        "year": 2025,
+        "category": "Blocking",
+        "id": "1752171805486",
+        "sacksallowed": 0,
+        "gp": 14,
+        "dp": 63
+      },
+      {
+        "playerName": "B. Thompson",
+        "year": 2025,
+        "category": "Blocking",
+        "id": "1752171821109",
+        "gp": 14,
+        "dp": 61
+      },
+      {
+        "playerName": "K. Anderson",
+        "year": 2025,
+        "category": "Defense",
+        "id": "1752171882551",
+        "solo": 40,
+        "assists": 10,
+        "tfl": 2,
+        "sacks": 0.5
+      },
+      {
+        "playerName": "J. Lloyd",
+        "year": 2025,
+        "category": "Defense",
+        "id": "1752171903148",
+        "solo": 37,
+        "assists": 13,
+        "tfl": 3,
+        "defint": 1,
+        "forcedfumbles": 1
+      },
+      {
+        "playerName": "T. Anderson",
+        "year": 2025,
+        "category": "Defense",
+        "id": "1752171920068",
+        "solo": 34,
+        "assists": 13,
+        "tfl": 1,
+        "defint": 1
+      },
+      {
+        "playerName": "D. Wesolak",
+        "year": 2025,
+        "category": "Defense",
+        "id": "1752171961546",
+        "solo": 35,
+        "assists": 11,
+        "tfl": 14,
+        "sacks": 5.5,
+        "forcedfumbles": 2
+      },
+      {
+        "playerName": "D. Townley Jr.",
+        "year": 2025,
+        "category": "Defense",
+        "id": "1752171996779",
+        "solo": 28,
+        "assists": 11,
+        "tfl": 14,
+        "sacks": 6
+      },
+      {
+        "playerName": "H. Smith",
+        "year": 2025,
+        "category": "Defense",
+        "id": "1752172022641",
+        "solo": 15,
+        "assists": 3,
+        "tfl": 6,
+        "sacks": 2,
+        "forcedfumbles": 1
+      },
+      {
+        "playerName": "M. Toney",
+        "year": 2025,
+        "category": "Defense",
+        "id": "1752172041661",
+        "solo": 16,
+        "assists": 5,
+        "tfl": 4
+      },
+      {
+        "playerName": "T. McGee",
+        "year": 2025,
+        "category": "Defense",
+        "id": "1752172072068",
+        "solo": 29,
+        "assists": 9,
+        "tfl": 3,
+        "forcedfumbles": 1
+      },
+      {
+        "playerName": "Y. Obeid",
+        "year": 2025,
+        "category": "Kicking",
+        "id": "1752172102835",
+        "fgmade": 4,
+        "fgattempted": 7,
+        "long": 49,
+        "xpmade": 55,
+        "xpattempted": 55
+      }
+    ],
+    "allRecruits": [
+      {
+        "name": "John Doe",
+        "stars": "5",
+        "position": "QB",
+        "rating": "84",
+        "potential": "Elite",
+        "id": 1752182496326,
+        "recruitedYear": 2025
+      }
+    ],
     "allTransfers": [],
     "allAwards": [],
     "yearRecords": [
       {
         "year": 2025,
-        "overallRecord": "0-0",
-        "conferenceRecord": "0-0",
-        "bowlGame": "",
-        "bowlResult": "",
-        "pointsFor": "0",
-        "pointsAgainst": "0",
-        "natChamp": "",
-        "heisman": "",
-        "schedule": [],
+        "overallRecord": "12-2",
+        "conferenceRecord": "8-1",
+        "pointsFor": "437",
+        "pointsAgainst": "231",
+        "schedule": [
+          {
+            "id": 0,
+            "week": 0,
+            "location": "vs",
+            "opponent": "FIU",
+            "result": "Win",
+            "score": "38-13"
+          },
+          {
+            "id": 1,
+            "week": 1,
+            "location": "@",
+            "opponent": "Missouri",
+            "result": "Win",
+            "score": "21-19"
+          },
+          {
+            "id": 2,
+            "week": 2,
+            "location": "vs",
+            "opponent": "Marshall",
+            "result": "Win",
+            "score": "42-13"
+          },
+          {
+            "id": 3,
+            "week": 3,
+            "location": "@",
+            "opponent": "Delaware",
+            "result": "Win",
+            "score": "34-7"
+          },
+          {
+            "id": 4,
+            "week": 4,
+            "location": "@",
+            "opponent": "Army",
+            "result": "Win",
+            "score": "20-15"
+          },
+          {
+            "id": 5,
+            "week": 5,
+            "location": " ",
+            "opponent": "BYE",
+            "result": "Bye",
+            "score": ""
+          },
+          {
+            "id": 6,
+            "week": 6,
+            "location": "@",
+            "opponent": "North Texas",
+            "result": "Win",
+            "score": "42-6"
+          },
+          {
+            "id": 7,
+            "week": 7,
+            "location": " ",
+            "opponent": "BYE",
+            "result": "Bye",
+            "score": ""
+          },
+          {
+            "id": 8,
+            "week": 8,
+            "location": "vs",
+            "opponent": "Bowling Green",
+            "result": "Win",
+            "score": "34-20"
+          },
+          {
+            "id": 9,
+            "week": 9,
+            "location": "@",
+            "opponent": "Ball State",
+            "result": "Win",
+            "score": "42-10"
+          },
+          {
+            "id": 10,
+            "week": 10,
+            "location": "vs",
+            "opponent": "Northwestern",
+            "result": "Loss",
+            "score": "21-26"
+          },
+          {
+            "id": 11,
+            "week": 11,
+            "location": "vs",
+            "opponent": "East Carolina",
+            "result": "Win",
+            "score": "46-18"
+          },
+          {
+            "id": 12,
+            "week": 12,
+            "location": "vs",
+            "opponent": "UTEP",
+            "result": "Win",
+            "score": "30-27"
+          },
+          {
+            "id": 13,
+            "week": 13,
+            "location": " ",
+            "opponent": "BYE",
+            "result": "Bye",
+            "score": ""
+          },
+          {
+            "id": 14,
+            "week": 14,
+            "location": "@",
+            "opponent": "Liberty",
+            "result": "Loss",
+            "score": "22-25"
+          },
+          {
+            "id": 15,
+            "week": 15,
+            "location": "@",
+            "opponent": "South Florida",
+            "result": "Win",
+            "score": "21-10"
+          },
+          {
+            "id": 16,
+            "week": 16,
+            "location": " ",
+            "opponent": "BYE",
+            "result": "Bye",
+            "score": ""
+          },
+          {
+            "id": 17,
+            "week": 17,
+            "location": "neutral",
+            "opponent": "Tulane",
+            "result": "Win",
+            "score": "24-22"
+          },
+          {
+            "id": 18,
+            "week": 18,
+            "location": "vs",
+            "opponent": "",
+            "result": "N/A",
+            "score": ""
+          },
+          {
+            "id": 19,
+            "week": 19,
+            "location": "vs",
+            "opponent": "",
+            "result": "N/A",
+            "score": ""
+          },
+          {
+            "id": 20,
+            "week": 20,
+            "location": "vs",
+            "opponent": "",
+            "result": "N/A",
+            "score": ""
+          }
+        ],
         "recruits": [],
         "transfers": [],
         "playerAwards": [
@@ -1038,8 +1249,14 @@
             "id": 1752155598459
           }
         ],
+        "bowlGame": "Cure Bowl",
+        "bowlResult": "Win",
+        "natChamp": "Oklahoma",
+        "heisman": "Cade Klubnik - QB - SR - Clemson",
         "recruitingClassPlacement": "",
-        "playersDrafted": []
+        "playersDrafted": [],
+        "finalRanking": "#19",
+        "conferenceFinish": "1st"
       }
     ],
     "allTrophies": [
@@ -1551,6 +1768,108 @@
           },
           {
             "name": "Tulsa",
+            "record": " "
+          }
+        ],
+        "21": [
+          {
+            "name": "Oklahoma",
+            "record": " "
+          },
+          {
+            "name": "Miami (FL)",
+            "record": " "
+          },
+          {
+            "name": "Kansas State",
+            "record": " "
+          },
+          {
+            "name": "Oregon",
+            "record": " "
+          },
+          {
+            "name": "Boise State",
+            "record": " "
+          },
+          {
+            "name": "Alabama",
+            "record": " "
+          },
+          {
+            "name": "Navy",
+            "record": " "
+          },
+          {
+            "name": "Georgia",
+            "record": " "
+          },
+          {
+            "name": "Duke",
+            "record": " "
+          },
+          {
+            "name": "Texas Tech",
+            "record": " "
+          },
+          {
+            "name": "BYU",
+            "record": " "
+          },
+          {
+            "name": "Pittsburgh",
+            "record": " "
+          },
+          {
+            "name": "Vanderbilt",
+            "record": " "
+          },
+          {
+            "name": "South Florida",
+            "record": " "
+          },
+          {
+            "name": "Texas",
+            "record": " "
+          },
+          {
+            "name": "Wisconsin",
+            "record": " "
+          },
+          {
+            "name": "Arizona State",
+            "record": " "
+          },
+          {
+            "name": "Georgia Southern",
+            "record": " "
+          },
+          {
+            "name": "Missouri State",
+            "record": " "
+          },
+          {
+            "name": "West Virginia",
+            "record": " "
+          },
+          {
+            "name": "Mississippi State",
+            "record": " "
+          },
+          {
+            "name": "kansas",
+            "record": " "
+          },
+          {
+            "name": "Virginia",
+            "record": " "
+          },
+          {
+            "name": "Tulane",
+            "record": " "
+          },
+          {
+            "name": "Liberty",
             "record": " "
           }
         ]
