@@ -1,6 +1,6 @@
 {
   "version": "1.0.1",
-  "exportedAt": "2025-07-10T13:18:11.869Z",
+  "exportedAt": "2025-07-10T14:23:52.581Z",
   "dynastyData": {
     "coachProfile": {
       "coachName": "Ricky Sykes Jr",
@@ -953,17 +953,105 @@
     "allRecruits": [],
     "allTransfers": [],
     "allAwards": [],
-    "yearRecords": [],
+    "yearRecords": [
+      {
+        "year": 2025,
+        "overallRecord": "0-0",
+        "conferenceRecord": "0-0",
+        "bowlGame": "",
+        "bowlResult": "",
+        "pointsFor": "0",
+        "pointsAgainst": "0",
+        "natChamp": "",
+        "heisman": "",
+        "schedule": [],
+        "recruits": [],
+        "transfers": [],
+        "playerAwards": [
+          {
+            "playerName": "J. Robinson",
+            "awardName": "Best Receiver",
+            "year": 2025,
+            "id": 1752155472376
+          },
+          {
+            "playerName": "J. Robinson",
+            "awardName": "All-American",
+            "year": 2025,
+            "team": "1st Team",
+            "id": 1752155492484
+          },
+          {
+            "playerName": "J. Joyner",
+            "awardName": "All-American",
+            "year": 2025,
+            "team": "Freshman",
+            "id": 1752155508933
+          },
+          {
+            "playerName": "J. Askren",
+            "awardName": "All-American",
+            "year": 2025,
+            "team": "Freshman",
+            "id": 1752155522689
+          },
+          {
+            "playerName": "J. Robinson",
+            "awardName": "All-Conference",
+            "year": 2025,
+            "team": "1st Team",
+            "id": 1752155549120
+          },
+          {
+            "playerName": "J. Joyner",
+            "awardName": "All-Conference",
+            "year": 2025,
+            "team": "1st Team",
+            "id": 1752155561062
+          },
+          {
+            "playerName": "J. Joyner",
+            "awardName": "All-Conference",
+            "year": 2025,
+            "team": "Freshman",
+            "id": 1752155566492
+          },
+          {
+            "playerName": "D. Wesolak",
+            "awardName": "All-Conference",
+            "year": 2025,
+            "team": "2nd Team",
+            "id": 1752155576184
+          },
+          {
+            "playerName": "J. Askren",
+            "awardName": "All-Conference",
+            "year": 2025,
+            "team": "Freshman",
+            "id": 1752155587464
+          },
+          {
+            "playerName": "B. Thompson",
+            "awardName": "All-Conference",
+            "year": 2025,
+            "team": "Freshman",
+            "id": 1752155598459
+          }
+        ],
+        "recruitingClassPlacement": "",
+        "playersDrafted": []
+      }
+    ],
     "allTrophies": [
       {
         "category": "conference",
         "type": "Conference Championship",
         "name": "Conference Championship",
         "description": "21-10",
-        "opponent": "#10 USF",
+        "opponent": "#10 South Florida",
         "location": "C-USA CHAMPIONSHIP",
-        "significance": "High",
-        "id": 1752153412365,
+        "significance": "Medium",
+        "id": 1752156821823,
         "year": 2025
       }
     ],
@@ -1355,26 +1443,6 @@
         ],
         "17": [
           {
-            "name": "Air Force",
-            "record": " "
-          },
-          {
-            "name": "Akron",
-            "record": " "
-          },
-          {
-            "name": "Miami (FL)",
-            "record": " "
-          },
-          {
-            "name": "Pittsburgh",
-            "record": " "
-          },
-          {
-            "name": "Oklahoma",
-            "record": " "
-          },
-          {
             "name": "Kansas State",
             "record": " "
           },
@@ -1383,7 +1451,23 @@
             "record": " "
           },
           {
+            "name": "Navy",
+            "record": " "
+          },
+          {
+            "name": "Georgia",
+            "record": " "
+          },
+          {
             "name": "Duke",
+            "record": " "
+          },
+          {
+            "name": "Texas Tech",
+            "record": " "
+          },
+          {
+            "name": "Miami (FL)",
             "record": " "
           },
           {
@@ -1391,19 +1475,11 @@
             "record": " "
           },
           {
-            "name": "South Florida",
-            "record": " "
-          },
-          {
-            "name": "Navy",
-            "record": " "
-          },
-          {
             "name": "Oregon",
             "record": " "
           },
           {
-            "name": "UNLV",
+            "name": "Pittsburgh",
             "record": " "
           },
           {
@@ -1411,15 +1487,27 @@
             "record": " "
           },
           {
-            "name": "USC",
+            "name": "Oklahoma",
             "record": " "
           },
           {
-            "name": "SMU",
+            "name": "Vanderbilt",
             "record": " "
           },
           {
-            "name": "Illinois",
+            "name": "South Florida",
+            "record": " "
+          },
+          {
+            "name": "kansas",
+            "record": " "
+          },
+          {
+            "name": "Texas",
+            "record": " "
+          },
+          {
+            "name": "Wisconsin",
             "record": " "
           },
           {
@@ -1427,7 +1515,7 @@
             "record": " "
           },
           {
-            "name": "Vanderbilt",
+            "name": "Georgia Southern",
             "record": " "
           },
           {
@@ -1439,7 +1527,7 @@
             "record": " "
           },
           {
-            "name": "",
+            "name": "Wake Forest",
             "record": " "
           },
           {
@@ -1447,11 +1535,11 @@
             "record": " "
           },
           {
-            "name": "Virginia",
+            "name": "West Virginia",
             "record": " "
           },
           {
-            "name": "",
+            "name": "Tulsa",
             "record": " "
           }
         ]
@@ -1609,7 +1697,7 @@
       {
         "id": 17,
         "week": 17,
-        "location": "vs",
+        "location": "neutral",
         "opponent": "Tulane",
         "result": "N/A",
         "score": "-10"
