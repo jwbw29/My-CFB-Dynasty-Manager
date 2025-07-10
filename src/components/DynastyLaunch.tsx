@@ -267,13 +267,6 @@ const DynastyLaunch: React.FC<DynastyLaunchProps> = ({ onDynastySelected }) => {
         localStorage.setItem(key, JSON.stringify([]))
       );
 
-      localStorage.setItem(
-        "top25Rankings",
-        JSON.stringify(
-          Array.from({ length: 25 }, () => ({ name: "", previousRank: null }))
-        )
-      );
-
       const emptySchedule = Array.from({ length: 21 }, (_, i) => ({
         id: i,
         week: i,
