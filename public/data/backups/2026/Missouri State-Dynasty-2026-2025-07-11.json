@@ -1,6 +1,6 @@
 {
   "version": "1.0.1",
-  "exportedAt": "2025-07-11T05:11:24.257Z",
+  "exportedAt": "2025-07-11T15:57:40.531Z",
   "dynastyData": {
     "coachProfile": {
       "coachName": "Ricky Sykes Jr",
@@ -2201,6 +2201,108 @@
             "name": "Illinois",
             "record": " "
           }
+        ],
+        "2": [
+          {
+            "name": "Georgia",
+            "record": " "
+          },
+          {
+            "name": "Oregon",
+            "record": " "
+          },
+          {
+            "name": "Miami (FL)",
+            "record": " "
+          },
+          {
+            "name": "Kansas State",
+            "record": " "
+          },
+          {
+            "name": "Alabama",
+            "record": " "
+          },
+          {
+            "name": "Texas",
+            "record": " "
+          },
+          {
+            "name": "Duke",
+            "record": " "
+          },
+          {
+            "name": "Arizona State",
+            "record": " "
+          },
+          {
+            "name": "Pittsburgh",
+            "record": " "
+          },
+          {
+            "name": "Texas Tech",
+            "record": " "
+          },
+          {
+            "name": "Wisconsin",
+            "record": " "
+          },
+          {
+            "name": "BYU",
+            "record": " "
+          },
+          {
+            "name": "LSU",
+            "record": " "
+          },
+          {
+            "name": "Navy",
+            "record": " "
+          },
+          {
+            "name": "Penn State",
+            "record": " "
+          },
+          {
+            "name": "Oklahoma",
+            "record": " "
+          },
+          {
+            "name": "Michigan",
+            "record": " "
+          },
+          {
+            "name": "Boise State",
+            "record": " "
+          },
+          {
+            "name": "Mississippi State",
+            "record": " "
+          },
+          {
+            "name": "Vanderbilt",
+            "record": " "
+          },
+          {
+            "name": "Illinois",
+            "record": " "
+          },
+          {
+            "name": "Florida",
+            "record": " "
+          },
+          {
+            "name": "UCF",
+            "record": " "
+          },
+          {
+            "name": "SMU",
+            "record": " "
+          },
+          {
+            "name": "USC",
+            "record": " "
+          }
         ]
       }
     },
@@ -2388,11 +2490,11 @@
     ],
     "yearStats_2026": {
       "wins": 0,
-      "losses": 0,
+      "losses": 2,
       "conferenceWins": 0,
       "conferenceLosses": 0,
-      "pointsScored": 0,
-      "pointsAgainst": 0,
+      "pointsScored": 28,
+      "pointsAgainst": 60,
       "playersDrafted": 0,
       "conferenceStanding": "",
       "bowlGame": "",
@@ -2404,16 +2506,16 @@
         "week": 0,
         "location": "vs",
         "opponent": "Oregon",
-        "result": "N/A",
-        "score": ""
+        "result": "Loss",
+        "score": "21-23"
       },
       {
         "id": 1,
         "week": 1,
         "location": "@",
         "opponent": "Texas",
-        "result": "N/A",
-        "score": ""
+        "result": "Loss",
+        "score": "7-37"
       },
       {
         "id": 2,
