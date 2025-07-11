@@ -1,6 +1,6 @@
 {
   "version": "1.0.1",
-  "exportedAt": "2025-07-11T15:57:40.531Z",
+  "exportedAt": "2025-07-11T17:45:49.838Z",
   "dynastyData": {
     "coachProfile": {
       "coachName": "Ricky Sykes Jr",
@@ -267,17 +267,6 @@
         "isRedshirted": false
       },
       {
-        "id": "7288d785-15b9-4507-9364-43a43c7acd9a",
-        "jerseyNumber": "36",
-        "name": "Y. Obeid",
-        "position": "K",
-        "year": "SO",
-        "rating": "76",
-        "devTrait": "Normal",
-        "notes": "",
-        "isRedshirted": false
-      },
-      {
         "id": "0c61e403-0977-4575-b83a-697dbede9493",
         "jerseyNumber": "37",
         "name": "J. Deal",
@@ -339,17 +328,6 @@
         "position": "LT",
         "year": "SO",
         "rating": "65",
-        "devTrait": "Normal",
-        "notes": "",
-        "isRedshirted": false
-      },
-      {
-        "id": "cbab420d-0f6a-4f5d-bb38-71feab4fd802",
-        "jerseyNumber": "6",
-        "name": "J. Lloyd",
-        "position": "MIKE",
-        "year": "JR (RS)",
-        "rating": "70",
         "devTrait": "Normal",
         "notes": "",
         "isRedshirted": false
@@ -597,17 +575,6 @@
         "isRedshirted": false
       },
       {
-        "id": "70130239-d0cc-48e0-a4a8-6e470c35eeaf",
-        "jerseyNumber": "84",
-        "name": "J. Robinson",
-        "position": "WR",
-        "year": "JR",
-        "rating": "74",
-        "devTrait": "Normal",
-        "notes": "",
-        "isRedshirted": false
-      },
-      {
         "id": "b0406820-e07f-4a22-adcc-1cbd760664dd",
         "jerseyNumber": "9",
         "name": "R. Johnson",
@@ -635,28 +602,6 @@
         "name": "B. McQueen",
         "position": "WR",
         "year": "FR (RS)",
-        "rating": "68",
-        "devTrait": "Normal",
-        "notes": "",
-        "isRedshirted": false
-      },
-      {
-        "id": "b9af0fba-3443-464f-9822-31833f5512f8",
-        "jerseyNumber": "13",
-        "name": "L. O'Reilly",
-        "position": "WR",
-        "year": "JR",
-        "rating": "68",
-        "devTrait": "Normal",
-        "notes": "",
-        "isRedshirted": false
-      },
-      {
-        "id": "25d5e87e-2a3d-4280-af40-75ab156c7701",
-        "jerseyNumber": "11",
-        "name": "S. Reese",
-        "position": "WR",
-        "year": "JR",
         "rating": "68",
         "devTrait": "Normal",
         "notes": "",
@@ -2301,6 +2246,108 @@
           },
           {
             "name": "USC",
+            "record": " "
+          }
+        ],
+        "3": [
+          {
+            "name": "Georgia",
+            "record": " "
+          },
+          {
+            "name": "Miami (FL)",
+            "record": " "
+          },
+          {
+            "name": "Kansas State",
+            "record": " "
+          },
+          {
+            "name": "Duke",
+            "record": " "
+          },
+          {
+            "name": "Arizona State",
+            "record": " "
+          },
+          {
+            "name": "Pittsburgh",
+            "record": " "
+          },
+          {
+            "name": "Michigan",
+            "record": " "
+          },
+          {
+            "name": "Texas Tech",
+            "record": " "
+          },
+          {
+            "name": "Wisconsin",
+            "record": " "
+          },
+          {
+            "name": "Oregon",
+            "record": " "
+          },
+          {
+            "name": "LSU",
+            "record": " "
+          },
+          {
+            "name": "Navy",
+            "record": " "
+          },
+          {
+            "name": "Penn State",
+            "record": " "
+          },
+          {
+            "name": "Florida",
+            "record": " "
+          },
+          {
+            "name": "Alabama",
+            "record": " "
+          },
+          {
+            "name": "Oklahoma",
+            "record": " "
+          },
+          {
+            "name": "Boise State",
+            "record": " "
+          },
+          {
+            "name": "Texas",
+            "record": " "
+          },
+          {
+            "name": "Illinois",
+            "record": " "
+          },
+          {
+            "name": "SMU",
+            "record": " "
+          },
+          {
+            "name": "USC",
+            "record": " "
+          },
+          {
+            "name": "Louisville",
+            "record": " "
+          },
+          {
+            "name": "BYU",
+            "record": " "
+          },
+          {
+            "name": "North Carolina",
+            "record": " "
+          },
+          {
+            "name": "Ole Miss",
             "record": " "
           }
         ]
