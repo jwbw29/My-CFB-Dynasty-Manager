@@ -396,7 +396,7 @@ const TeamHome: React.FC = () => {
 
   const recentGames = useMemo(() => {
     // Filter out only the 'Not Played' games.
-    return currentSchedule.filter((game) => game.result !== "N/A").slice(-5);
+    return currentSchedule.filter((game) => game.result !== "N/A" && game.result !== "Bye").slice(-5);
   }, [currentSchedule]);
   const upcomingGames = useMemo(() => {
     if (!currentSchedule || currentSchedule.length === 0) return [];

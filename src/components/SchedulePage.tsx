@@ -400,6 +400,15 @@ const SchedulePage = () => {
       const profile = getCoachProfile();
       setTeamName(profile?.schoolName || "Your Team");
       const schedule = getSchedule(year);
+      // console.log("Loading schedule:", {
+      //   year,
+      //   scheduleLength: schedule.length,
+      //   completedGames: schedule.filter(
+      //     (g) => g.result !== "N/A" && g.result !== "Bye"
+      //   ).length,
+      //   schedule: schedule,
+      // });
+
       if (schedule.length === 0) {
         const newSchedule: Game[] = Array.from({ length: 21 }, (_, i) => ({
           id: i,
@@ -413,10 +422,29 @@ const SchedulePage = () => {
         setCurrentSchedule(newSchedule);
       } else {
         setCurrentSchedule(schedule);
+
+        // Calculate the initial active week based on the loaded schedule
+        const lastCompleted = [...schedule]
+          .reverse()
+          .find((g) => g.result !== "N/A" && g.result !== "Bye");
+
+        const calculatedWeek = lastCompleted
+          ? Math.min(lastCompleted.week + 1, 21)
+          : 0;
+
+        // console.log("Initial week calculation:", {
+        //   lastCompleted,
+        //   calculatedWeek,
+        //   currentActiveWeek: activeWeek,
+        // });
+
+        if (calculatedWeek > activeWeek) {
+          setActiveWeek(calculatedWeek);
+        }
       }
     };
     fetchData();
-  }, [dataVersion]);
+  }, [dataVersion, activeWeek, setActiveWeek]);
 
   // --- NEW FUNCTION TO GET RANK FROM CONTEXT, TO BE PASSED DOWN ---
   const getRankForTeam = useCallback(
@@ -432,10 +460,17 @@ const SchedulePage = () => {
 
   const handleUpdateGame = useCallback(
     (week: number, field: UpdateableField, value: any) => {
+      // console.log("handleUpdateGame called with:", { week, field, value });
+
       setCurrentSchedule((prevSchedule) => {
+        // console.log("Previous schedule state:", prevSchedule);
+
         const updatedSchedule = [...prevSchedule];
         const gameIndex = updatedSchedule.findIndex((g) => g.week === week);
-        if (gameIndex === -1) return prevSchedule;
+        if (gameIndex === -1) {
+          // console.error("Game not found for week:", week);
+          return prevSchedule;
+        }
 
         const gameToUpdate = { ...updatedSchedule[gameIndex] };
 
@@ -467,17 +502,35 @@ const SchedulePage = () => {
 
         updatedSchedule[gameIndex] = gameToUpdate;
 
+        // Add this to see all game results
+        // console.log(
+        //   "All game results:",
+        //   updatedSchedule.map((g) => ({ week: g.week, result: g.result }))
+        // );
+
         const lastCompletedGame = [...updatedSchedule]
           .reverse()
-          .find((g) => g.result !== "N/A");
+          .find((g) => g.result !== "N/A" && g.result !== "Bye");
+
+        // console.log("Last completed game found:", lastCompletedGame);
+
         const newActiveWeek = lastCompletedGame
           ? Math.min(lastCompletedGame.week + 1, 21)
           : 0;
 
-        if (newActiveWeek !== activeWeek) {
+        // console.log("Week calculation:", {
+        //   currentActiveWeek: activeWeek,
+        //   newActiveWeek,
+        //   lastCompletedGameWeek: lastCompletedGame?.week,
+        // });
+
+        // Only update if we're moving forward in weeks
+        if (newActiveWeek > activeWeek) {
+          // console.log("Updating active week to:", newActiveWeek);
           setActiveWeek(newActiveWeek);
         }
 
+        // Always save schedule changes
         saveScheduleNow(updatedSchedule);
 
         return updatedSchedule;
