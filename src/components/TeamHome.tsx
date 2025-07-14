@@ -18,21 +18,15 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { TeamLogo, ConferenceLogo } from "@/components/ui/TeamLogo";
-import { getTeamWithLogo } from "@/utils/logoUtils";
 import {
   getCurrentYear,
-  setCurrentYear,
-  getSchedule,
   setSchedule,
   calculateStats,
-  generateYearRecord,
   setYearRecord,
   getCoachProfile,
   getPlayers,
   getPlayerStats,
-  getTeamRankForWeek,
-  getTop25History,
-  setTop25History,
+  getSchedule,
   getYearRecord,
   prepareNextSeason,
   getRecruits,
@@ -41,7 +35,6 @@ import {
 } from "@/utils/localStorage";
 import { validateYear } from "@/utils/validationUtils";
 import { toast } from "react-hot-toast";
-import { Calendar, Edit } from "lucide-react";
 import { Game, YearRecord } from "@/types/yearRecord";
 import { PlayerStat } from "@/types/playerStats";
 import { Player } from "@/types/playerTypes";
@@ -49,9 +42,9 @@ import TeamOverviewCard from "@/components/TeamOverviewCard";
 import { usePlayerCard } from "@/hooks/usePlayerCard";
 import PlayerCard from "./PlayerCard";
 import { useDynasty } from "@/contexts/DynastyContext";
-import { Top25History } from "@/hooks/useTop25Rankings";
 import { getTeamData } from "@/utils/fbsTeams";
 
+// --- HELPER INTERFACES ---
 interface LocationRecord {
   wins: number;
   losses: number;
@@ -65,23 +58,144 @@ interface StatLeaders {
   tacklesLeader?: PlayerStat;
 }
 
+// --- COMPONENT: GameDisplayRow (Moved outside TeamHome for performance) ---
+interface GameDisplayRowProps {
+  game: Game;
+  keyPrefix: string;
+  scheduleTeamName: string;
+  getRankForTeam: (teamNameToRank: string, week: number) => number | null;
+}
+
+const TeamDisplay: React.FC<{ name: string; rank: number | null }> = ({
+  name,
+  rank,
+}) => (
+  <div className="flex items-center gap-2 min-w-0">
+    <span className="text-sm min-w-0">
+      {rank && (
+        <span className="font-bold text-muted-foreground">#{rank} </span>
+      )}
+      {name}
+    </span>
+  </div>
+);
+
+const GameDisplayRow: React.FC<GameDisplayRowProps> = ({
+  game,
+  keyPrefix,
+  scheduleTeamName,
+  getRankForTeam,
+}) => {
+  if (game.opponent === "BYE") {
+    return (
+      <div className="flex items-center p-3 sm:p-4 hover:bg-muted/50 transition-colors">
+        <div className="w-10 sm:w-10 text-center shrink-0">
+          <div className="text-xs sm:text-sm text-muted-foreground">Week</div>
+          <div className="text-base sm:text-xl font-bold">{game.week}</div>
+        </div>
+        <div className="flex items-center justify-center gap-2 flex-1">
+          <span className="text-gray-500 font-semibold">BYE WEEK</span>
+        </div>
+      </div>
+    );
+  }
+
+  // Determine the two teams and the location text.
+  const teamA = {
+    name: scheduleTeamName,
+    rank: getRankForTeam(scheduleTeamName, game.week),
+  };
+  const teamB = {
+    name: game.opponent,
+    rank: getRankForTeam(game.opponent, game.week),
+  };
+  const locationText = game.location === "@" ? "at" : "vs";
+  const [firstTeam, secondTeam] =
+    game.location === "@" ? [teamB, teamA] : [teamA, teamB];
+
+  return (
+    <div className="grid grid-cols-[auto_auto_1fr_auto_auto_1fr_auto] items-center gap-2 p-3 sm:p-4 hover:bg-muted/50 transition-colors">
+      {/* Week */}
+      <div className="text-center shrink-0">
+        <div className="text-xs sm:text-sm text-muted-foreground">Week</div>
+        <div className="text-base sm:text-md font-bold">{game.week}</div>
+      </div>
+
+      {/* First Team Logo */}
+      <div className="justify-end">
+        <TeamLogo teamName={firstTeam.name} size="md" />
+      </div>
+
+      {/* First Team Name */}
+      <div className="text-center justify-end">
+        <TeamDisplay name={firstTeam.name} rank={firstTeam.rank} />
+      </div>
+
+      {/* Location Text */}
+      <div className="text-center text-muted-foreground text-sm font-semibold">
+        {locationText}
+      </div>
+
+      {/* Second Team Logo */}
+      <div className="justify-end">
+        <TeamLogo teamName={secondTeam.name} size="md" />
+      </div>
+
+      {/* Second Team Name */}
+      <div className="text-center justify-normal">
+        <TeamDisplay name={secondTeam.name} rank={secondTeam.rank} />
+      </div>
+
+      {/* Score/Result */}
+      {keyPrefix === "recent" && (
+        <div className="text-center ml-2 w-16 shrink-0">
+          <div
+            className={`text-base sm:text-lg font-bold ${
+              game.result === "Win" ? "text-green-600" : "text-red-600"
+            }`}
+          >
+            {game.score}
+          </div>
+          <div
+            className={`text-xs sm:text-sm ${
+              game.result === "Win" ? "text-green-500" : "text-red-500"
+            }`}
+          >
+            {game.result}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+// --- MAIN COMPONENT: TeamHome ---
 const TeamHome: React.FC = () => {
   const router = useRouter();
   const [teamName, setTeamName] = useState<string>("Team");
   const [currentYear, setYear] = useState<number>(() => getCurrentYear());
   const [currentSchedule, setCurrentSchedule] = useState<Game[]>([]);
   const [players, setPlayers] = useState<Player[]>([]);
-  const [currentYearRecord, setCurrentYearRecord] = useState<YearRecord | null>(
-    null
-  );
   const [isLoading, setIsLoading] = useState(true);
   const { selectedPlayer, isOpen, openPlayerCard, closePlayerCard } =
     usePlayerCard();
-  const [teamRank, setTeamRank] = useState<number | null>(null);
-  const { saveDynastyData, refreshData } = useDynasty();
-  const [top25History, setTop25HistoryState] = useState<Top25History>({});
-  const { dataVersion } = useDynasty();
-  const [currentWeek, setCurrentWeek] = useState(0);
+
+  const {
+    currentDynastyId,
+    dataVersion,
+    activeWeek,
+    setActiveWeek,
+    getRankingsForWeek,
+    saveDynastyData,
+    refreshData,
+  } = useDynasty();
+
+  const teamRank = useMemo(() => {
+    if (!teamName || teamName === "Team") return null;
+    const rankings = getRankingsForWeek(currentYear, activeWeek);
+    const rankIndex = rankings.findIndex((t) => t.name === teamName);
+    return rankIndex !== -1 ? rankIndex + 1 : null;
+  }, [teamName, currentYear, activeWeek, getRankingsForWeek]);
 
   const teamData = useMemo(() => {
     return teamName ? getTeamData(teamName) : null;
@@ -90,48 +204,28 @@ const TeamHome: React.FC = () => {
   useEffect(() => {
     const fetchData = () => {
       setIsLoading(true);
-      if (typeof window === "undefined") return;
+      const yearToFetch = getCurrentYear();
+      const profile = getCoachProfile();
+      const schoolName = profile?.schoolName || "Team";
+      const schedule = getSchedule(yearToFetch);
 
-      try {
-        const yearToFetch = getCurrentYear();
-        const profile = getCoachProfile();
-        const schoolName = profile?.schoolName || "Team";
-        const schedule = getSchedule(yearToFetch);
+      // --- THIS IS THE CRITICAL CHANGE: REMOVE THE WEEK CALCULATION & SETTER ---
+      // We no longer calculate or set the active week from here.
+      // TeamHome is now only a "reader" of the activeWeek from the context.
+      // const lastPlayedGame = [...schedule]...
+      // const calculatedWeek = ...
+      // setActiveWeek(calculatedWeek); // <-- DELETE THIS LINE
 
-        // Calculate the current week based on the last played game
-        const lastPlayedGameIndex = [...schedule]
-          .reverse()
-          .findIndex((g) => g.result !== "N/A" && g.result !== "Bye");
-        const calculatedWeek =
-          lastPlayedGameIndex !== -1
-            ? schedule.length - 1 - lastPlayedGameIndex + 1
-            : 0;
-        const finalWeek = Math.min(calculatedWeek, 21); // Cap at 21
-        setCurrentWeek(finalWeek);
-
-        const rank = getTeamRankForWeek(schoolName, yearToFetch, finalWeek);
-
-        setTeamName(schoolName);
-        setYear(yearToFetch);
-        setCurrentSchedule(schedule);
-        setCurrentYearRecord(getYearRecord(yearToFetch));
-        setPlayers(getPlayers());
-        setTeamRank(rank);
-      } catch (error) {
-        console.error("Error loading data:", error);
-        toast.error("Failed to load initial data.");
-      } finally {
-        setIsLoading(false);
-      }
+      setTeamName(schoolName);
+      setYear(yearToFetch);
+      setCurrentSchedule(schedule);
+      setPlayers(getPlayers());
+      setIsLoading(false);
     };
 
     fetchData();
-
-    // Re-fetch data when focus returns to the window to catch external changes
     window.addEventListener("focus", fetchData);
-    return () => {
-      window.removeEventListener("focus", fetchData);
-    };
+    return () => window.removeEventListener("focus", fetchData);
   }, [dataVersion]);
 
   const handlePlayerNameClick = useCallback(
@@ -141,10 +235,13 @@ const TeamHome: React.FC = () => {
         (p) => p.name === statLeader.playerName
       );
       if (playerFromRoster) {
-        openPlayerCard(playerFromRoster);
+        openPlayerCard({
+          ...playerFromRoster,
+          id: String(playerFromRoster.id),
+        });
       } else {
         const basicPlayer = {
-          id: Date.now(),
+          id: String(Date.now()),
           name: statLeader.playerName,
           position: "Unknown",
           year: "Graduated",
@@ -224,22 +321,24 @@ const TeamHome: React.FC = () => {
 
   const derivedStats = useMemo(() => {
     const stats = calculateStats(currentSchedule, teamName);
-
-    const { wins, losses } = stats;
-    const { conferenceWins, conferenceLosses } = stats;
-
+    const {
+      wins,
+      losses,
+      conferenceWins,
+      conferenceLosses,
+      pointsScored,
+      pointsAgainst,
+    } = stats;
     const totalGamesPlayed = wins + losses;
     const ppg =
-      totalGamesPlayed > 0 ? (stats.pointsScored || 0) / totalGamesPlayed : 0;
+      totalGamesPlayed > 0 ? (pointsScored || 0) / totalGamesPlayed : 0;
     const pa =
-      totalGamesPlayed > 0 ? (stats.pointsAgainst || 0) / totalGamesPlayed : 0;
+      totalGamesPlayed > 0 ? (pointsAgainst || 0) / totalGamesPlayed : 0;
     const diff = ppg - pa;
     const winPct = totalGamesPlayed > 0 ? wins / totalGamesPlayed : 0;
     const totalConfGames = conferenceWins + conferenceLosses;
     const confWinPct = totalConfGames > 0 ? conferenceWins / totalConfGames : 0;
-
-    // Correct progress value for the "Current Week" card's circle
-    const weekProgress = currentWeek / 21;
+    const weekProgress = activeWeek / 21;
 
     return {
       wins,
@@ -250,14 +349,14 @@ const TeamHome: React.FC = () => {
       pa: pa.toFixed(1),
       diff: diff.toFixed(1),
       diffSign: diff >= 0 ? "+" : "",
-      winPct: winPct, // Pass the raw win percentage for the record card
+      winPct: winPct,
       winPctFormatted: `.${Math.round(winPct * 1000)
         .toString()
         .padStart(3, "0")}`,
       confWinPctFormatted: `${(confWinPct * 100).toFixed(1)}%`,
-      weekProgressValue: weekProgress * 289, // For the "Current Week" circle
+      weekProgressValue: weekProgress * 289,
     };
-  }, [currentSchedule, teamName, currentWeek]);
+  }, [currentSchedule, teamName, activeWeek]);
 
   const endYear = useCallback(() => {
     const nextYear = currentYear + 1;
@@ -266,31 +365,23 @@ const TeamHome: React.FC = () => {
       return;
     }
     try {
-      // Get the most up-to-date version of the record from storage
       const finalRecord = getYearRecord(currentYear);
-      const finalStats = calculateStats(currentSchedule, teamName); // Use the live schedule for stats
-
-      // --- MODIFICATION START: Ensure all data is included in the final record ---
+      const finalStats = calculateStats(currentSchedule, teamName);
       const completeFinalRecord: YearRecord = {
         ...finalRecord,
         overallRecord: `${finalStats.wins}-${finalStats.losses}`,
         conferenceRecord: `${finalStats.conferenceWins}-${finalStats.conferenceLosses}`,
         pointsFor: String(finalStats.pointsScored),
         pointsAgainst: String(finalStats.pointsAgainst),
-        schedule: currentSchedule, // Explicitly save the final state of the schedule
+        schedule: currentSchedule,
         recruits: getRecruits(currentYear),
         transfers: getTransfers(currentYear),
         playerAwards: getYearAwards(currentYear),
       };
 
-      // Save the fully populated record for the year being ended
       setYearRecord(currentYear, completeFinalRecord);
-      // --- MODIFICATION END ---
-
       prepareNextSeason(nextYear);
-      setCurrentYear(nextYear);
       saveDynastyData();
-
       refreshData();
 
       toast.success(
@@ -303,22 +394,24 @@ const TeamHome: React.FC = () => {
     }
   }, [currentYear, currentSchedule, teamName, saveDynastyData, refreshData]);
 
-  const recentGames = useMemo(
-    () =>
-      currentSchedule
-        .filter((game) => game.result !== "N/A" && game.result !== "Bye")
-        .slice(-5),
-    [currentSchedule]
-  );
-  const upcomingGames = useMemo(
-    () =>
-      currentSchedule
-        .filter(
-          (game) =>
-            game.result === "N/A" && game.opponent && game.opponent !== "BYE"
-        )
-        .slice(0, 5),
-    [currentSchedule]
+  const recentGames = useMemo(() => {
+    // Filter out only the 'Not Played' games.
+    return currentSchedule.filter((game) => game.result !== "N/A").slice(-5);
+  }, [currentSchedule]);
+  const upcomingGames = useMemo(() => {
+    if (!currentSchedule || currentSchedule.length === 0) return [];
+    return currentSchedule
+      .filter((game) => game.result === "N/A" && game.opponent)
+      .slice(0, 5);
+  }, [currentSchedule]);
+
+  const getRankForTeam = useCallback(
+    (teamNameToRank: string, week: number): number | null => {
+      const rankings = getRankingsForWeek(currentYear, week);
+      const rankIndex = rankings.findIndex((t) => t.name === teamNameToRank);
+      return rankIndex !== -1 ? rankIndex + 1 : null;
+    },
+    [currentYear, getRankingsForWeek]
   );
 
   if (isLoading) {
@@ -328,79 +421,6 @@ const TeamHome: React.FC = () => {
       </div>
     );
   }
-
-  const GameDisplayRow: React.FC<{ game: Game; keyPrefix: string }> = ({
-    game,
-    keyPrefix,
-  }) => {
-    const userTeamRank = teamName
-      ? getTeamRankForWeek(teamName, currentYear, game.week)
-      : null;
-    const userTeamDisplayName = userTeamRank
-      ? `#${userTeamRank} ${teamName}`
-      : teamName;
-    const opponentRank = game.opponent
-      ? getTeamRankForWeek(game.opponent, currentYear, game.week)
-      : null;
-    const opponentDisplayName = opponentRank
-      ? `#${opponentRank} ${game.opponent}`
-      : game.opponent;
-
-    return (
-      <div
-        key={`${keyPrefix}-${game.id || game.week}`}
-        className="flex items-center p-3 sm:p-4 hover:bg-muted/50 transition-colors"
-      >
-        <div className="w-12 sm:w-16 text-center">
-          <div className="text-xs sm:text-sm text-muted-foreground">Week</div>
-          <div className="text-lg sm:text-xl font-bold">{game.week}</div>
-        </div>
-        <div className="flex items-center gap-2 flex-1 ml-3 sm:ml-4">
-          {teamData && <TeamLogo teamName={teamData.name} size="sm" />}
-          <span className="font-medium">{userTeamDisplayName}</span>
-          <span className="text-gray-400">
-            {game.location === "@" ? "at" : "vs"}
-          </span>
-          {game.opponent && game.opponent !== "BYE" && (
-            <>
-              <TeamLogo teamName={game.opponent} size="sm" />
-              <span>{opponentDisplayName}</span>
-            </>
-          )}
-          {game.opponent === "BYE" && (
-            <span className="text-gray-500">BYE WEEK</span>
-          )}
-          {!game.opponent && <span className="text-gray-500">TBD</span>}
-        </div>
-        {keyPrefix === "recent" && game.result !== "Bye" && (
-          <div className="text-right ml-2">
-            <div
-              className={`text-base sm:text-lg font-bold ${
-                game.result === "Win"
-                  ? "text-green-600 dark:text-green-400"
-                  : game.result === "Loss"
-                  ? "text-red-600 dark:text-red-400"
-                  : "text-muted-foreground"
-              }`}
-            >
-              {game.score || "N/A"}
-            </div>
-            <div
-              className={`text-xs sm:text-sm ${
-                game.result === "Win"
-                  ? "text-green-500 dark:text-green-400"
-                  : game.result === "Loss"
-                  ? "text-red-500 dark:text-red-400"
-                  : "text-muted-foreground"
-              }`}
-            >
-              {game.result}
-            </div>
-          </div>
-        )}
-      </div>
-    );
-  };
 
   return (
     <div className="space-y-6">
@@ -449,7 +469,6 @@ const TeamHome: React.FC = () => {
                     cx="50"
                     cy="50"
                   />
-                  {/* --- MODIFICATION START: Use winPct for this circle --- */}
                   <circle
                     className="stroke-current progress-circle-school"
                     strokeWidth="8"
@@ -464,7 +483,6 @@ const TeamHome: React.FC = () => {
                       color: "var(--school-primary)",
                     }}
                   />
-                  {/* --- MODIFICATION END --- */}
                 </svg>
                 <div className="absolute inset-0 flex flex-col items-center justify-center">
                   <div className="text-4xl sm:text-5xl font-bold mb-1">
@@ -523,6 +541,8 @@ const TeamHome: React.FC = () => {
                     key={`upcoming-${game.id || game.week}`}
                     game={game}
                     keyPrefix="upcoming"
+                    scheduleTeamName={teamName}
+                    getRankForTeam={getRankForTeam}
                   />
                 ))
               ) : (
@@ -545,6 +565,8 @@ const TeamHome: React.FC = () => {
                     key={`recent-${game.id || game.week}`}
                     game={game}
                     keyPrefix="recent"
+                    scheduleTeamName={teamName}
+                    getRankForTeam={getRankForTeam}
                   />
                 ))
               ) : (
@@ -575,7 +597,6 @@ const TeamHome: React.FC = () => {
                     cx="50"
                     cy="50"
                   />
-                  {/* --- MODIFICATION START: Use weekProgressValue for this circle --- */}
                   <circle
                     className="stroke-current progress-circle-school"
                     strokeWidth="8"
@@ -590,11 +611,10 @@ const TeamHome: React.FC = () => {
                       color: "var(--school-primary)",
                     }}
                   />
-                  {/* --- MODIFICATION END --- */}
                 </svg>
                 <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-2">
                   <span className="text-3xl sm:text-4xl font-bold">
-                    {currentWeek} / 21
+                    {activeWeek} / 21
                   </span>
                   <span className="text-xs sm:text-sm text-muted-foreground mt-1">
                     Weeks Completed

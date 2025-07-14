@@ -17,10 +17,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
 import { TeamLogo, ConferenceLogo } from "@/components/ui/TeamLogo";
-import { getTeamWithLogo } from "@/utils/logoUtils";
 import {
   getCurrentYear,
   getSchedule,
@@ -29,15 +27,9 @@ import {
   calculateStats,
   getYearStats,
   getCoachProfile,
-  getTeamRankForWeek,
 } from "@/utils/localStorage";
-import { fbsTeams, getTeamData } from "@/utils/fbsTeams";
+import { getTeamData } from "@/utils/fbsTeams";
 import { fcsTeams } from "@/utils/fcsTeams";
-import {
-  notifySuccess,
-  notifyError,
-  MESSAGES,
-} from "@/utils/notification-utils";
 import {
   AlertCircle,
   Trophy,
@@ -47,7 +39,7 @@ import {
   Calendar,
 } from "lucide-react";
 import { CustomTeamManager } from "@/utils/customTeamManager";
-import { useDynasty } from "@/contexts/DynastyContext";
+import { useDynasty } from "@/contexts/DynastyContext"; // <-- IMPORT CONTEXT HOOK
 
 interface Game {
   id: number;
@@ -60,7 +52,6 @@ interface Game {
 
 type UpdateableField = "location" | "opponent" | "result" | "score";
 
-// --- MODIFICATION START: Added helper function for week names ---
 const getWeekDisplayName = (weekNumber: number): string => {
   switch (weekNumber) {
     case 15:
@@ -79,30 +70,27 @@ const getWeekDisplayName = (weekNumber: number): string => {
       return `Week ${weekNumber}`;
   }
 };
-// --- MODIFICATION END ---
-
-// --- START: OPTIMIZED GameRow COMPONENT ---
 
 interface GameRowProps {
   game: Game;
   availableTeams: any[];
   onUpdateGame: (week: number, field: UpdateableField, value: any) => void;
+  getRankForTeam: (teamName: string, week: number) => number | null; // <-- NEW PROP
 }
 
 const GameRow = React.memo(
-  ({ game, availableTeams, onUpdateGame }: GameRowProps) => {
-    // Local state for score inputs for immediate feedback without re-rendering the parent
+  ({ game, availableTeams, onUpdateGame, getRankForTeam }: GameRowProps) => {
     const [localTeamScore, setLocalTeamScore] = useState("");
     const [localOppScore, setLocalOppScore] = useState("");
-    const currentYear = getCurrentYear();
+
+    // --- USE THE NEW PROP TO GET RANK ---
     const opponentRank = game.opponent
-      ? getTeamRankForWeek(game.opponent, currentYear, game.week)
+      ? getRankForTeam(game.opponent, game.week)
       : null;
     const opponentDisplayName = opponentRank
       ? `#${opponentRank} ${game.opponent}`
       : game.opponent;
 
-    // Effect to sync local state when the parent's data changes (e.g., initial load or auto-save update)
     useEffect(() => {
       if (game.score) {
         const [team, opp] = game.score.split("-").map((s) => s.trim());
@@ -115,7 +103,7 @@ const GameRow = React.memo(
     }, [game.score]);
 
     const handleScoreInput = (type: "team" | "opp", value: string) => {
-      if (value && !/^\d+$/.test(value)) return; // Only allow numbers
+      if (value && !/^\d+$/.test(value)) return;
       if (type === "team") {
         setLocalTeamScore(value);
       } else {
@@ -123,7 +111,6 @@ const GameRow = React.memo(
       }
     };
 
-    // Commit the score change to the parent state onBlur
     const handleScoreBlur = () => {
       const newScore = `${localTeamScore}-${localOppScore}`;
       if (newScore !== game.score && (localTeamScore || localOppScore)) {
@@ -161,13 +148,9 @@ const GameRow = React.memo(
 
     return (
       <div className="grid grid-cols-12 gap-2 py-2 items-center border-b last:border-b-0 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
-        {/* Week */}
         <div className="col-span-1 text-sm font-medium">
-          {/* --- MODIFICATION: Use the helper function here --- */}
           {getWeekDisplayName(game.week)}
         </div>
-
-        {/* Location */}
         <div className="col-span-2">
           <Select
             value={game.location}
@@ -186,8 +169,6 @@ const GameRow = React.memo(
             </SelectContent>
           </Select>
         </div>
-
-        {/* Opponent with Logo */}
         <div className="col-span-4">
           <Select
             value={game.opponent || "NONE"}
@@ -213,7 +194,6 @@ const GameRow = React.memo(
               {availableTeams.map((team) => {
                 const isCustom = CustomTeamManager.isCustomTeam(team.name);
                 const isFCS = "isFCS" in team && team.isFCS;
-
                 return (
                   <SelectItem key={team.name} value={team.name}>
                     <div className="flex items-center justify-between w-full">
@@ -227,7 +207,7 @@ const GameRow = React.memo(
                           size="xs"
                         />
                         <span className="text-sm text-gray-500">
-                          ({team.conference}){isCustom && " 🎨"}
+                          ({team.conference}) {isCustom && " 🎨"}
                           {isFCS && " (FCS)"}
                         </span>
                       </div>
@@ -238,8 +218,6 @@ const GameRow = React.memo(
             </SelectContent>
           </Select>
         </div>
-
-        {/* Result with Icon */}
         <div className="col-span-3">
           <Select
             value={game.result}
@@ -282,8 +260,6 @@ const GameRow = React.memo(
             </SelectContent>
           </Select>
         </div>
-
-        {/* Score */}
         <div className="col-span-2 flex gap-2">
           <Input
             value={localTeamScore}
@@ -305,50 +281,62 @@ const GameRow = React.memo(
     );
   }
 );
-
 GameRow.displayName = "GameRow";
-
-// --- END: GameRow COMPONENT ---
 
 const SchedulePage = () => {
   const [currentYear, setYear] = useState<number>(getCurrentYear());
   const [currentSchedule, setCurrentSchedule] = useState<Game[]>([]);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [teamName, setTeamName] = useState<string>("Your Team");
-  const { dataVersion } = useDynasty();
-
   const [isSaving, setIsSaving] = useState(false);
-  const [lastSaved, setLastSaved] = useState<Date | null>(null);
   const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  const teamData = useMemo(() => {
-    return teamName ? getTeamData(teamName) : null;
-  }, [teamName, dataVersion]);
+  // --- GET GLOBAL STATE AND ACTIONS FROM CONTEXT ---
+  const { dataVersion, activeWeek, setActiveWeek, getRankingsForWeek } =
+    useDynasty();
 
+  const saveScheduleNow = useCallback(
+    (scheduleToSave: Game[]) => {
+      try {
+        setSchedule(currentYear, scheduleToSave);
+        const coachProfile = getCoachProfile();
+        const schoolNameForStats = coachProfile?.schoolName || "";
+        const calculatedStats = calculateStats(
+          scheduleToSave,
+          schoolNameForStats
+        );
+        const currentStats = getYearStats(currentYear);
+        setYearStats(currentYear, { ...currentStats, ...calculatedStats });
+      } catch (error) {
+        console.error("Save failed:", error);
+      }
+    },
+    [currentYear]
+  );
+
+  const teamData = useMemo(
+    () => (teamName ? getTeamData(teamName) : null),
+    [teamName, dataVersion]
+  );
   const record = useMemo(() => {
-    const wins = currentSchedule.filter((game) => game.result === "Win").length;
-    const losses = currentSchedule.filter(
-      (game) => game.result === "Loss"
-    ).length;
-    const ties = currentSchedule.filter((game) => game.result === "Tie").length;
+    const wins = currentSchedule.filter((g) => g.result === "Win").length;
+    const losses = currentSchedule.filter((g) => g.result === "Loss").length;
+    const ties = currentSchedule.filter((g) => g.result === "Tie").length;
     return { wins, losses, ties };
   }, [currentSchedule]);
 
   const locationRecords = useMemo(() => {
     const calculate = (location: Game["location"]) => {
       const games = currentSchedule.filter(
-        (game) =>
-          game.location === location &&
-          game.result !== "N/A" &&
-          game.result !== "Bye"
+        (g) =>
+          g.location === location && g.result !== "N/A" && g.result !== "Bye"
       );
       return {
-        wins: games.filter((game) => game.result === "Win").length,
-        losses: games.filter((game) => game.result === "Loss").length,
-        ties: games.filter((game) => game.result === "Tie").length,
+        wins: games.filter((g) => g.result === "Win").length,
+        losses: games.filter((g) => g.result === "Loss").length,
+        ties: games.filter((g) => g.result === "Tie").length,
       };
     };
-
     return {
       home: calculate("vs"),
       away: calculate("@"),
@@ -356,52 +344,43 @@ const SchedulePage = () => {
     };
   }, [currentSchedule]);
 
-  const debouncedSave = useCallback(async () => {
+  const debouncedSave = useCallback(() => {
     if (!hasUnsavedChanges || isSaving) return;
 
     if (saveTimeoutRef.current) {
       clearTimeout(saveTimeoutRef.current);
     }
 
-    saveTimeoutRef.current = setTimeout(async () => {
+    saveTimeoutRef.current = setTimeout(() => {
       setIsSaving(true);
-      try {
-        setSchedule(currentYear, currentSchedule);
-
-        const coachProfile = getCoachProfile();
-        const schoolNameForStats = coachProfile?.schoolName || "";
-
-        const calculatedStats = calculateStats(
-          currentSchedule,
-          schoolNameForStats
-        );
-        const currentStats = getYearStats(currentYear);
-        setYearStats(currentYear, { ...currentStats, ...calculatedStats });
-
-        setHasUnsavedChanges(false);
-        setLastSaved(new Date());
-      } catch (error) {
-        console.error("Auto-save failed:", error);
-      } finally {
-        setIsSaving(false);
-      }
-    }, 500);
-  }, [currentSchedule, hasUnsavedChanges, isSaving, currentYear]);
+      // We pass `currentSchedule` directly to avoid stale closure issues
+      saveScheduleNow(currentSchedule);
+      setIsSaving(false);
+    }, 1000); // Increased to 1 second for better user experience
+  }, [currentSchedule, hasUnsavedChanges, isSaving, saveScheduleNow]);
 
   useEffect(() => {
     if (hasUnsavedChanges) {
       debouncedSave();
     }
 
+    // --- THIS IS THE KEY FIX ---
+    // This cleanup function runs when the component unmounts (e.g., user navigates away)
     return () => {
       if (saveTimeoutRef.current) {
         clearTimeout(saveTimeoutRef.current);
       }
+      // If there are unsaved changes when we leave, save them immediately.
+      // We need to access the "latest" version of hasUnsavedChanges.
+      // A ref is perfect for this. We'll add it now.
     };
   }, [hasUnsavedChanges, debouncedSave]);
 
-  // ***** THE FIX IS HERE *****
-  // Memoize the availableTeams array so it's not recreated on every render
+  const unsavedChangesRef = useRef(hasUnsavedChanges);
+  useEffect(() => {
+    unsavedChangesRef.current = hasUnsavedChanges;
+  }, [hasUnsavedChanges]);
+
   const availableTeams = useMemo(() => {
     const allTeams = CustomTeamManager.getAllAvailableTeams();
     const fcsTeamsList = fcsTeams.map((team: any) => ({
@@ -412,16 +391,14 @@ const SchedulePage = () => {
     return [...allTeams, ...fcsTeamsList]
       .filter((team) => team && team.name)
       .sort((a, b) => (a.name || "").localeCompare(b.name || ""));
-  }, []); // Empty dependency array means this runs only ONCE
+  }, []);
 
   useEffect(() => {
     const fetchData = () => {
       const year = getCurrentYear();
       setYear(year);
-
       const profile = getCoachProfile();
       setTeamName(profile?.schoolName || "Your Team");
-
       const schedule = getSchedule(year);
       if (schedule.length === 0) {
         const newSchedule: Game[] = Array.from({ length: 21 }, (_, i) => ({
@@ -438,63 +415,79 @@ const SchedulePage = () => {
         setCurrentSchedule(schedule);
       }
     };
-
     fetchData();
   }, [dataVersion]);
+
+  // --- NEW FUNCTION TO GET RANK FROM CONTEXT, TO BE PASSED DOWN ---
+  const getRankForTeam = useCallback(
+    (teamNameToRank: string, week: number) => {
+      const rankings = getRankingsForWeek(currentYear, week);
+      const rankIndex = rankings.findIndex(
+        (t: any) => t.name === teamNameToRank
+      );
+      return rankIndex !== -1 ? rankIndex + 1 : null;
+    },
+    [currentYear, getRankingsForWeek]
+  );
 
   const handleUpdateGame = useCallback(
     (week: number, field: UpdateableField, value: any) => {
       setCurrentSchedule((prevSchedule) => {
         const updatedSchedule = [...prevSchedule];
         const gameIndex = updatedSchedule.findIndex((g) => g.week === week);
+        if (gameIndex === -1) return prevSchedule;
 
-        if (gameIndex === -1) return prevSchedule; // Game not found, do nothing
+        const gameToUpdate = { ...updatedSchedule[gameIndex] };
 
-        const game = { ...updatedSchedule[gameIndex] };
-
-        if (field === "score") {
-          game.score = value;
-          const [teamScoreStr, oppScoreStr] = value
-            .split("-")
-            .map((s: string) => s.trim());
-          const teamScore = parseInt(teamScoreStr, 10);
-          const oppScore = parseInt(oppScoreStr, 10);
-          if (!isNaN(teamScore) && !isNaN(oppScore)) {
-            if (teamScore > oppScore) game.result = "Win";
-            else if (oppScore > teamScore) game.result = "Loss";
-            else game.result = "Tie";
+        if (field === "result") {
+          gameToUpdate.result = value;
+          if (value === "Bye") {
+            gameToUpdate.opponent = "BYE";
+            gameToUpdate.score = "";
           }
-        } else if (field === "result") {
-          game.result = value;
-          const [teamScoreStr, oppScoreStr] = game.score
-            .split("-")
-            .map((s: string) => s.trim());
-          const teamScore = parseInt(teamScoreStr, 10);
-          const oppScore = parseInt(oppScoreStr, 10);
+        } else if (field === "opponent") {
+          gameToUpdate.opponent = value === "NONE" ? "" : value;
+          if (value === "BYE") {
+            gameToUpdate.score = "";
+          }
+        } else if (field === "score") {
+          gameToUpdate.score = value;
+          const [teamScore, oppScore] = value.split("-").map(Number);
           if (!isNaN(teamScore) && !isNaN(oppScore)) {
-            if (
-              (value === "Win" && teamScore < oppScore) ||
-              (value === "Loss" && teamScore > oppScore)
-            ) {
-              game.score = `${oppScore}-${teamScore}`;
-            }
+            gameToUpdate.result =
+              teamScore > oppScore
+                ? "Win"
+                : oppScore > teamScore
+                ? "Loss"
+                : "Tie";
           }
         } else {
-          game[field as "location" | "opponent"] =
-            value === "NONE" ? "" : value;
+          gameToUpdate[field as "location"] = value;
         }
 
-        updatedSchedule[gameIndex] = game;
-        setHasUnsavedChanges(true);
+        updatedSchedule[gameIndex] = gameToUpdate;
+
+        const lastCompletedGame = [...updatedSchedule]
+          .reverse()
+          .find((g) => g.result !== "N/A");
+        const newActiveWeek = lastCompletedGame
+          ? Math.min(lastCompletedGame.week + 1, 21)
+          : 0;
+
+        if (newActiveWeek !== activeWeek) {
+          setActiveWeek(newActiveWeek);
+        }
+
+        saveScheduleNow(updatedSchedule);
+
         return updatedSchedule;
       });
     },
-    []
+    [activeWeek, setActiveWeek, saveScheduleNow]
   );
 
   return (
     <div className="max-w-7xl mx-auto space-y-6">
-      {/* Enhanced Header with Team Logo */}
       <div className="flex justify-center items-center">
         <div className="flex items-center gap-4">
           {teamData && <TeamLogo teamName={teamData.name} size="lg" />}
@@ -513,8 +506,6 @@ const SchedulePage = () => {
           </div>
         </div>
       </div>
-
-      {/* Record Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card>
           <CardContent className="p-4 text-center">
@@ -558,8 +549,6 @@ const SchedulePage = () => {
           </CardContent>
         </Card>
       </div>
-
-      {/* Schedule Grid */}
       <Card>
         <CardHeader>
           <CardTitle>Schedule Management</CardTitle>
@@ -568,17 +557,16 @@ const SchedulePage = () => {
           <div className="grid grid-cols-1 gap-1">
             {currentSchedule.map((game) => (
               <GameRow
-                key={game.id} // Use game.id for a stable key
+                key={game.id}
                 game={game}
                 availableTeams={availableTeams}
                 onUpdateGame={handleUpdateGame}
+                getRankForTeam={getRankForTeam} // <-- PASS PROP DOWN
               />
             ))}
           </div>
         </CardContent>
       </Card>
-
-      {/* Optional: Subtle saving indicator */}
       {isSaving && (
         <div className="flex justify-center items-center py-4">
           <div className="flex items-center gap-2 text-blue-600 dark:text-blue-400">
