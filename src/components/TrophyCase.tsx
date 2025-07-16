@@ -169,6 +169,7 @@ const TROPHY_CATEGORIES = {
     'Platypus Trophy',
     'Purdue Cannon',
     'Ram-Falcon Trophy',
+    'Red River Rivalry',
     'Secretary\'s Trophy',
     'Seminole War Canoe',
     'Shillelagh Trophy (ND-Purdue)',
