@@ -499,10 +499,15 @@ const Roster: React.FC = () => {
                             size="icon"
                             onClick={() => toggleRedshirtStatus(player.id)}
                             title={
-                              player.isRedshirted
+                              player.year.includes("(RS)")
+                                ? "Player has already used a redshirt"
+                                : player.isRedshirted
                                 ? "Remove Redshirt"
                                 : "Add Redshirt"
                             }
+                            // --- THIS IS THE FIX ---
+                            // Disable the button if the player's year indicates they've already been redshirted.
+                            disabled={player.year.includes("(RS)")}
                           >
                             <Shirt
                               className={`h-4 w-4 ${

@@ -72,7 +72,7 @@ export interface Player {
   jerseyNumber: string;
   devTrait?: "Normal" | "Impact" | "Star" | "Elite";
   notes?: string;
-  isRedshirted?: boolean;
+  isRedshirted: boolean;
 }
 
 export interface Recruit {
