@@ -13,17 +13,10 @@ import { fcsTeams } from '@/utils/fcsTeams';
 import { AlertCircle, Trophy, TrendingUp, TrendingDown, Minus, Calendar } from 'lucide-react';
 import { CustomTeamManager } from '@/utils/customTeamManager';
 import { useDynasty } from '@/contexts/DynastyContext'; // <-- IMPORT CONTEXT HOOK
+import { Game } from '@/types/yearRecord';
 
-interface Game {
-  id: number;
-  week: number;
-  location: '@' | 'vs' | 'neutral' | ' ';
-  opponent: string;
-  result: 'Win' | 'Loss' | 'Tie' | 'Bye' | 'N/A';
-  score: string;
-}
 
-type UpdateableField = 'location' | 'opponent' | 'result' | 'score';
+type UpdateableField = 'location' | 'opponent' | 'result' | 'score' | 'isUserControlled';
 
 const getWeekDisplayName = (weekNumber: number): string => {
   switch (weekNumber) {
@@ -99,9 +92,9 @@ const GameRow = React.memo(({ game, availableTeams, onUpdateGame, getRankForTeam
   };
 
   return (
-    <div className="grid grid-cols-12 gap-2 py-2 items-center border-b last:border-b-0 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
-      <div className="col-span-1 text-sm font-medium">{getWeekDisplayName(game.week)}</div>
-      <div className="col-span-2">
+    <div className="grid gap-2 py-2 items-center border-b last:border-b-0 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors" style={{gridTemplateColumns: '1fr 2fr 3fr 1fr 3fr 2fr'}}>
+      <div className="text-sm font-medium">{getWeekDisplayName(game.week)}</div>
+      <div>
         <Select value={game.location} onValueChange={(value) => onUpdateGame(game.week, 'location', value)}>
           <SelectTrigger className="h-8"><SelectValue placeholder="Location" /></SelectTrigger>
           <SelectContent>
@@ -112,7 +105,7 @@ const GameRow = React.memo(({ game, availableTeams, onUpdateGame, getRankForTeam
           </SelectContent>
         </Select>
       </div>
-      <div className="col-span-4">
+      <div>
          <Select value={game.opponent || 'NONE'} onValueChange={(value) => onUpdateGame(game.week, 'opponent', value)}>
             <SelectTrigger className="h-8">
               <SelectValue placeholder="Select opponent">
@@ -144,7 +137,19 @@ const GameRow = React.memo(({ game, availableTeams, onUpdateGame, getRankForTeam
             </SelectContent>
           </Select>
       </div>
-      <div className="col-span-3">
+      <div className="flex justify-center">
+        <div className="flex flex-col items-center gap-1">
+          <input
+            type="checkbox"
+            checked={game.isUserControlled || false}
+            onChange={(e) => onUpdateGame(game.week, 'isUserControlled', e.target.checked)}
+            className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+            disabled={!game.opponent || game.opponent === 'BYE'}
+          />
+          <span className="text-xs text-gray-500">User</span>
+        </div>
+      </div>
+      <div>
         <Select value={game.result} onValueChange={(value) => onUpdateGame(game.week, 'result', value)}>
           <SelectTrigger className={`h-8 ${getResultColor(game.result)}`}>
             <SelectValue placeholder="Result"><div className="flex items-center gap-2">{getResultIcon(game.result)}<span>{game.result}</span></div></SelectValue>
@@ -158,7 +163,7 @@ const GameRow = React.memo(({ game, availableTeams, onUpdateGame, getRankForTeam
           </SelectContent>
         </Select>
       </div>
-      <div className="col-span-2 flex gap-2">
+      <div className="flex gap-2">
         <Input value={localTeamScore} onChange={(e) => handleScoreInput('team', e.target.value)} onBlur={handleScoreBlur} placeholder="You" className="h-8 text-center w-20" />
         <span className="flex items-center">-</span>
         <Input value={localOppScore} onChange={(e) => handleScoreInput('opp', e.target.value)} onBlur={handleScoreBlur} placeholder="Opp." className="h-8 text-center w-20" />
@@ -312,6 +317,9 @@ const SchedulePage = () => {
         if (!isNaN(teamScore) && !isNaN(oppScore)) {
           gameToUpdate.result = teamScore > oppScore ? 'Win' : (oppScore > teamScore ? 'Loss' : 'Tie');
         }
+      }
+      else if (field === 'isUserControlled') {
+        gameToUpdate.isUserControlled = value;
       }
       else {
         gameToUpdate[field as 'location'] = value;

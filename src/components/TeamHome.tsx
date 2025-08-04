@@ -67,9 +67,10 @@ interface GameDisplayRowProps {
   getRankForTeam: (teamNameToRank: string, week: number) => number | null;
 }
 
-const TeamDisplay: React.FC<{ name: string; rank: number | null }> = ({
+const TeamDisplay: React.FC<{ name: string; rank: number | null; isUserControlled?: boolean }> = ({
   name,
   rank,
+  isUserControlled,
 }) => (
   <div className="flex items-center gap-2 min-w-0">
     <span className="text-sm min-w-0">
@@ -77,6 +78,9 @@ const TeamDisplay: React.FC<{ name: string; rank: number | null }> = ({
         <span className="font-bold text-muted-foreground">#{rank} </span>
       )}
       {name}
+      {isUserControlled && (
+        <span className="text-xs text-blue-600 font-medium"> (User)</span>
+      )}
     </span>
   </div>
 );
@@ -129,7 +133,7 @@ const GameDisplayRow: React.FC<GameDisplayRowProps> = ({
 
       {/* First Team Name */}
       <div className="text-center justify-end">
-        <TeamDisplay name={firstTeam.name} rank={firstTeam.rank} />
+        <TeamDisplay name={firstTeam.name} rank={firstTeam.rank} isUserControlled={firstTeam.name === game.opponent ? game.isUserControlled : false} />
       </div>
 
       {/* Location Text */}
@@ -144,7 +148,7 @@ const GameDisplayRow: React.FC<GameDisplayRowProps> = ({
 
       {/* Second Team Name */}
       <div className="text-center justify-normal">
-        <TeamDisplay name={secondTeam.name} rank={secondTeam.rank} />
+        <TeamDisplay name={secondTeam.name} rank={secondTeam.rank} isUserControlled={secondTeam.name === game.opponent ? game.isUserControlled : false} />
       </div>
 
       {/* Score/Result */}
