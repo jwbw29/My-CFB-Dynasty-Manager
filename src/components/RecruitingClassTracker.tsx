@@ -1,7 +1,7 @@
 // src/components/RecruitingClassTracker.tsx
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { Card, CardHeader, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -12,7 +12,7 @@ import { capitalizeName } from '@/utils';
 import { Recruit } from '@/types/playerTypes';
 import { generalPositions } from '@/types/playerTypes';
 import { notifySuccess, notifyError, MESSAGES } from '@/utils/notification-utils';
-import { Pencil, Trash2 } from 'lucide-react';
+import { Pencil, Trash2, CheckCircle, ChevronDown, ChevronUp } from 'lucide-react';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from './ui/alert-dialog';
 
 interface DevTraitBadgeProps {
@@ -21,6 +21,124 @@ interface DevTraitBadgeProps {
 
 const potentials = ['Elite', 'Star', 'Impact', 'Normal'];
 const starOptions = ['5', '4', '3', '2', '1'];
+
+interface RecruitingNeed {
+  position: string;
+  rating: string;
+  need: number;
+  signed: number;
+  targeted: number;
+}
+
+const offensivePositions: RecruitingNeed[] = [
+  { position: 'QB', rating: '', need: 0, signed: 0, targeted: 0 },
+  { position: 'HB', rating: '', need: 0, signed: 0, targeted: 0 },
+  { position: 'WR', rating: '', need: 0, signed: 0, targeted: 0 },
+  { position: 'TE', rating: '', need: 0, signed: 0, targeted: 0 },
+  { position: 'OT', rating: '', need: 0, signed: 0, targeted: 0 },
+  { position: 'OG', rating: '', need: 0, signed: 0, targeted: 0 },
+  { position: 'C', rating: '', need: 0, signed: 0, targeted: 0 },
+];
+
+const defensivePositions: RecruitingNeed[] = [
+  { position: 'EDGE', rating: '', need: 0, signed: 0, targeted: 0 },
+  { position: 'DT', rating: '', need: 0, signed: 0, targeted: 0 },
+  { position: 'SAM/WILL', rating: '', need: 0, signed: 0, targeted: 0 },
+  { position: 'MIKE', rating: '', need: 0, signed: 0, targeted: 0 },
+  { position: 'CB', rating: '', need: 0, signed: 0, targeted: 0 },
+  { position: 'FS/SS', rating: '', need: 0, signed: 0, targeted: 0 },
+  { position: 'K/P', rating: '', need: 0, signed: 0, targeted: 0 },
+];
+
+const getRowStatus = (need: number, signed: number, targeted: number) => {
+  if (signed >= need) return 'complete';
+  if (signed + targeted >= need) return 'ontrack';
+  return 'urgent';
+};
+
+const getTabIndex = (tableType: 'offensive' | 'defensive', positionIndex: number, fieldIndex: number) => {
+  const baseIndex = tableType === 'offensive' ? 100 : 200;
+  return baseIndex + (positionIndex * 10) + fieldIndex;
+};
+
+const RecruitingNeedsTable = React.memo<{ 
+  title: string; 
+  needs: RecruitingNeed[]; 
+  updateNeed: (position: string, field: 'rating' | 'need' | 'signed' | 'targeted', value: string | number) => void;
+  tableType: 'offensive' | 'defensive';
+}>(({ title, needs, updateNeed, tableType }) => (
+  <div className="w-full">
+    <div className="bg-red-500 text-white text-center py-2 font-semibold">
+      {title}
+    </div>
+    <div className="grid grid-cols-5 gap-0 border border-gray-300">
+      <div className="bg-gray-100 dark:bg-gray-800 p-2 text-center font-medium border-r border-gray-300">Position</div>
+      <div className="bg-gray-100 dark:bg-gray-800 p-2 text-center font-medium border-r border-gray-300">Rating</div>
+      <div className="bg-gray-100 dark:bg-gray-800 p-2 text-center font-medium border-r border-gray-300">Need</div>
+      <div className="bg-gray-100 dark:bg-gray-800 p-2 text-center font-medium border-r border-gray-300">Signed</div>
+      <div className="bg-gray-100 dark:bg-gray-800 p-2 text-center font-medium">Targeted</div>
+      
+      {needs.map((need, positionIndex) => {
+        const status = getRowStatus(need.need, need.signed, need.targeted);
+        const rowClass = status === 'complete' ? 'bg-green-100 dark:bg-green-900' : '';
+        
+        return (
+          <React.Fragment key={need.position}>
+            <div className={`p-2 text-center border-r border-b border-gray-300 flex items-center justify-center ${rowClass}`}>
+              {need.position}
+              {status === 'complete' && <CheckCircle className="h-4 w-4 text-green-600 ml-2" />}
+            </div>
+            <div className={`p-2 border-r border-b border-gray-300 ${rowClass}`}>
+              <Input
+                key={`${need.position}-rating`}
+                value={need.rating}
+                onChange={(e) => updateNeed(need.position, 'rating', e.target.value)}
+                className="w-full text-center border-0 bg-transparent p-1"
+                placeholder="A, B+, etc."
+                tabIndex={getTabIndex(tableType, positionIndex, 1)}
+              />
+            </div>
+            <div className={`p-2 border-r border-b border-gray-300 ${rowClass} ${status === 'ontrack' ? 'bg-yellow-100 dark:bg-yellow-900' : ''}`}>
+              <Input
+                key={`${need.position}-need`}
+                type="number"
+                value={need.need || ''}
+                onChange={(e) => updateNeed(need.position, 'need', parseInt(e.target.value) || 0)}
+                className="w-full text-center border-0 bg-transparent p-1"
+                min="0"
+                tabIndex={getTabIndex(tableType, positionIndex, 2)}
+              />
+            </div>
+            <div className={`p-2 border-r border-b border-gray-300 ${rowClass} ${status === 'urgent' ? 'bg-red-100 dark:bg-red-900' : ''}`}>
+              <Input
+                key={`${need.position}-signed`}
+                type="number"
+                value={need.signed || ''}
+                onChange={(e) => updateNeed(need.position, 'signed', parseInt(e.target.value) || 0)}
+                className="w-full text-center border-0 bg-transparent p-1"
+                min="0"
+                tabIndex={getTabIndex(tableType, positionIndex, 3)}
+              />
+            </div>
+            <div className={`p-2 border-b border-gray-300 ${rowClass} ${status === 'urgent' ? 'bg-red-100 dark:bg-red-900' : ''}`}>
+              <Input
+                key={`${need.position}-targeted`}
+                type="number"
+                value={need.targeted || ''}
+                onChange={(e) => updateNeed(need.position, 'targeted', parseInt(e.target.value) || 0)}
+                className="w-full text-center border-0 bg-transparent p-1"
+                min="0"
+                tabIndex={getTabIndex(tableType, positionIndex, 4)}
+              />
+            </div>
+          </React.Fragment>
+        );
+      })}
+    </div>
+  </div>
+));
+
+RecruitingNeedsTable.displayName = 'RecruitingNeedsTable';
 
 // NEW: Function to sort recruits by star rating (5 to 1)
 const sortRecruitsByStars = (recruits: Recruit[]): Recruit[] => {
@@ -44,6 +162,8 @@ const sortRecruitsByStars = (recruits: Recruit[]): Recruit[] => {
 const RecruitingClassTracker: React.FC = () => {
   const [currentYear] = useLocalStorage<number>('currentYear', new Date().getFullYear());
   const [allRecruits, setAllRecruits] = useLocalStorage<Recruit[]>('allRecruits', []);
+  const [offensiveNeeds, setOffensiveNeeds] = useLocalStorage<RecruitingNeed[]>('offensiveNeeds', offensivePositions);
+  const [defensiveNeeds, setDefensiveNeeds] = useLocalStorage<RecruitingNeed[]>('defensiveNeeds', defensivePositions);
   const [newRecruit, setNewRecruit] = useState<Omit<Recruit, 'id' | 'recruitedYear'>>({
     name: '',
     stars: '',
@@ -53,11 +173,28 @@ const RecruitingClassTracker: React.FC = () => {
   });
   const [editingId, setEditingId] = useState<number | null>(null);
   const [selectedYear, setSelectedYear] = useState<number>(currentYear);
+  const [isNeedsExpanded, setIsNeedsExpanded] = useState<boolean>(false);
 
   // NEW: Apply star rating sorting to displayed recruits
   const recruitsForSelectedYear = sortRecruitsByStars(
     allRecruits.filter(recruit => recruit.recruitedYear === selectedYear)
   );
+
+  const updateOffensiveNeed = useCallback((position: string, field: 'rating' | 'need' | 'signed' | 'targeted', value: string | number) => {
+    setOffensiveNeeds(prev => prev.map(need => 
+      need.position === position 
+        ? { ...need, [field]: value }
+        : need
+    ));
+  }, [setOffensiveNeeds]);
+
+  const updateDefensiveNeed = useCallback((position: string, field: 'rating' | 'need' | 'signed' | 'targeted', value: string | number) => {
+    setDefensiveNeeds(prev => prev.map(need => 
+      need.position === position 
+        ? { ...need, [field]: value }
+        : need
+    ));
+  }, [setDefensiveNeeds]);
 
   const DevTraitBadge: React.FC<DevTraitBadgeProps> = ({ trait }) => {
     const colors = {
@@ -115,6 +252,54 @@ const RecruitingClassTracker: React.FC = () => {
   return (
     <div className="space-y-6">
       <h1 className="text-3xl font-bold text-center">Recruiting Class Tracker</h1>
+
+      <Card>
+        <CardHeader 
+          className="text-xl font-semibold text-center cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+          onClick={() => setIsNeedsExpanded(!isNeedsExpanded)}
+        >
+          <div className="flex items-center justify-center gap-2">
+            <span>Recruiting Needs Analysis</span>
+            {isNeedsExpanded ? (
+              <ChevronUp className="h-5 w-5" />
+            ) : (
+              <ChevronDown className="h-5 w-5" />
+            )}
+          </div>
+        </CardHeader>
+        {isNeedsExpanded && (
+          <CardContent>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <RecruitingNeedsTable 
+                title="OFFENSIVE NEEDS" 
+                needs={offensiveNeeds} 
+                updateNeed={updateOffensiveNeed}
+                tableType="offensive"
+              />
+              <RecruitingNeedsTable 
+                title="DEFENSIVE NEEDS" 
+                needs={defensiveNeeds} 
+                updateNeed={updateDefensiveNeed}
+                tableType="defensive"
+              />
+            </div>
+            <div className="mt-4 text-sm text-gray-600 dark:text-gray-400 space-y-1">
+              <div className="flex items-center gap-2">
+                <div className="w-4 h-4 bg-red-100 dark:bg-red-900 border"></div>
+                <span>Red: Urgent - Need more recruits (Signed + Targeted &lt; Need)</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-4 h-4 bg-yellow-100 dark:bg-yellow-900 border"></div>
+                <span>Yellow: On Track - Have commitments to meet need (Signed + Targeted = Need)</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <CheckCircle className="h-4 w-4 text-green-600" />
+                <span>Green Check: Complete - Need fully signed (Signed = Need)</span>
+              </div>
+            </div>
+          </CardContent>
+        )}
+      </Card>
 
       <Card>
         <CardHeader className="text-xl font-semibold">
