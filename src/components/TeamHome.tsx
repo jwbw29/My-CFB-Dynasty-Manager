@@ -6,6 +6,9 @@ import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -67,11 +70,11 @@ interface GameDisplayRowProps {
   getRankForTeam: (teamNameToRank: string, week: number) => number | null;
 }
 
-const TeamDisplay: React.FC<{ name: string; rank: number | null; isUserControlled?: boolean }> = ({
-  name,
-  rank,
-  isUserControlled,
-}) => (
+const TeamDisplay: React.FC<{
+  name: string;
+  rank: number | null;
+  isUserControlled?: boolean;
+}> = ({ name, rank, isUserControlled }) => (
   <div className="flex items-center gap-2 min-w-0">
     <span className="text-sm min-w-0">
       {rank && (
@@ -133,7 +136,13 @@ const GameDisplayRow: React.FC<GameDisplayRowProps> = ({
 
       {/* First Team Name */}
       <div className="text-center justify-end">
-        <TeamDisplay name={firstTeam.name} rank={firstTeam.rank} isUserControlled={firstTeam.name === game.opponent ? game.isUserControlled : false} />
+        <TeamDisplay
+          name={firstTeam.name}
+          rank={firstTeam.rank}
+          isUserControlled={
+            firstTeam.name === game.opponent ? game.isUserControlled : false
+          }
+        />
       </div>
 
       {/* Location Text */}
@@ -148,7 +157,13 @@ const GameDisplayRow: React.FC<GameDisplayRowProps> = ({
 
       {/* Second Team Name */}
       <div className="text-center justify-normal">
-        <TeamDisplay name={secondTeam.name} rank={secondTeam.rank} isUserControlled={secondTeam.name === game.opponent ? game.isUserControlled : false} />
+        <TeamDisplay
+          name={secondTeam.name}
+          rank={secondTeam.rank}
+          isUserControlled={
+            secondTeam.name === game.opponent ? game.isUserControlled : false
+          }
+        />
       </div>
 
       {/* Score/Result */}
@@ -193,6 +208,10 @@ const TeamHome: React.FC = () => {
     getRankingsForWeek,
     saveDynastyData,
     refreshData,
+    readyToAdvance,
+    nextAdvance,
+    setReadyToAdvance,
+    setNextAdvance,
   } = useDynasty();
 
   const teamRank = useMemo(() => {
@@ -240,10 +259,10 @@ const TeamHome: React.FC = () => {
         (p) => p.name === statLeader.playerName
       );
       if (playerFromRoster) {
-        openPlayerCard(playerFromRoster);
+        openPlayerCard({...playerFromRoster, id: playerFromRoster.id.toString()});
       } else {
         const basicPlayer = {
-          id: Date.now(),
+          id: Date.now().toString(),
           name: statLeader.playerName,
           position: "Unknown",
           year: "Graduated",
@@ -450,7 +469,45 @@ const TeamHome: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Advance Schedule Controls */}
+      <Card>
+        <CardHeader>
+          <h3 className="text-xl font-semibold">Advance Schedule</h3>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="ready-to-advance"
+                checked={readyToAdvance}
+                onCheckedChange={(checked) => {
+                  setReadyToAdvance(checked === true);
+                  saveDynastyData();
+                }}
+              />
+              <Label htmlFor="ready-to-advance">Ready to Advance</Label>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="next-advance">Next Advance</Label>
+              <Input
+                id="next-advance"
+                type="date"
+                value={nextAdvance}
+                onChange={(e) => {
+                  setNextAdvance(e.target.value);
+                  saveDynastyData();
+                }}
+              />
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Team Overview */}
       <TeamOverviewCard players={players} teamName={teamName} />
+
+      {/* Team Details Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <Card>
           <CardHeader className="text-xl font-semibold pb-2 text-center">

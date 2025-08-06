@@ -32,6 +32,12 @@ interface DynastyContextType {
     rankings: RankedTeam[]
   ) => void;
   getRankingsForWeek: (year: number, week: number) => RankedTeam[];
+
+  // --- ADVANCE SCHEDULE FIELDS ---
+  readyToAdvance: boolean;
+  nextAdvance: string;
+  setReadyToAdvance: (ready: boolean) => void;
+  setNextAdvance: (date: string) => void;
 }
 
 const DynastyContext = createContext<DynastyContextType | undefined>(undefined);
@@ -60,6 +66,10 @@ export const DynastyProvider: React.FC<DynastyProviderProps> = ({
   const [activeWeek, setActiveWeekState] = useState(0);
   const [top25History, setTop25HistoryState] = useState<Top25History>({});
 
+  // --- ADVANCE SCHEDULE STATE ---
+  const [readyToAdvance, setReadyToAdvanceState] = useState(false);
+  const [nextAdvance, setNextAdvanceState] = useState("");
+
   const refreshData = () => setDataVersion((v) => v + 1);
 
   // Load data when a dynasty is selected
@@ -67,6 +77,23 @@ export const DynastyProvider: React.FC<DynastyProviderProps> = ({
     if (currentDynastyId) {
       const history = getTop25History();
       setTop25HistoryState(history);
+
+      // Load advance schedule fields
+      const dynastyData = localStorage.getItem(`dynasty_${currentDynastyId}`);
+      if (dynastyData) {
+        try {
+          const data = JSON.parse(dynastyData);
+          setReadyToAdvanceState(data.readyToAdvance || false);
+          setNextAdvanceState(data.nextAdvance || "");
+        } catch (e) {
+          console.error("Error loading dynasty advance schedule data:", e);
+          setReadyToAdvanceState(false);
+          setNextAdvanceState("");
+        }
+      } else {
+        setReadyToAdvanceState(false);
+        setNextAdvanceState("");
+      }
 
       // We let TeamHome or SchedulePage determine the initial active week
       // because it's based on game progress.
@@ -92,6 +119,16 @@ export const DynastyProvider: React.FC<DynastyProviderProps> = ({
 
   const advanceWeek = () => {
     setActiveWeekState((prev) => Math.min(prev + 1, 21));
+  };
+
+  const setReadyToAdvance = (ready: boolean) => {
+    setReadyToAdvanceState(ready);
+    refreshData();
+  };
+
+  const setNextAdvance = (date: string) => {
+    setNextAdvanceState(date);
+    refreshData();
   };
 
   const updateRankingsForWeek = useCallback(
@@ -166,6 +203,10 @@ export const DynastyProvider: React.FC<DynastyProviderProps> = ({
       // This ensures the most up-to-date version is saved, preventing data loss.
       dynastyData.top25History = top25History;
 
+      // 3.1. Add advance schedule fields
+      dynastyData.readyToAdvance = readyToAdvance;
+      dynastyData.nextAdvance = nextAdvance;
+
       // 4. Gather dynamic, year-specific and dynasty-specific keys from localStorage.
       Object.keys(localStorage).forEach((key) => {
         if (
@@ -218,7 +259,7 @@ export const DynastyProvider: React.FC<DynastyProviderProps> = ({
     } catch (error) {
       console.error("Error saving dynasty data:", error);
     }
-  }, [currentDynastyId, top25History]);
+  }, [currentDynastyId, top25History, readyToAdvance, nextAdvance]);
 
   const value: DynastyContextType = {
     currentDynastyId,
@@ -235,6 +276,11 @@ export const DynastyProvider: React.FC<DynastyProviderProps> = ({
     advanceWeek,
     updateRankingsForWeek,
     getRankingsForWeek,
+    // --- ADVANCE SCHEDULE VALUES ---
+    readyToAdvance,
+    nextAdvance,
+    setReadyToAdvance,
+    setNextAdvance,
   };
 
   return (

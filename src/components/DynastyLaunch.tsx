@@ -48,6 +48,8 @@ import {
   Trash2,
   Play,
   Upload,
+  CheckCircle,
+  Clock,
 } from "lucide-react";
 import { TeamLogo } from "@/components/ui/TeamLogo";
 import Papa from "papaparse";
@@ -501,6 +503,22 @@ const DynastyLaunch: React.FC<DynastyLaunchProps> = ({ onDynastySelected }) => {
     };
   };
 
+  const getDynastyAdvanceSchedule = (dynastyId: string): { readyToAdvance: boolean; nextAdvance: string } => {
+    try {
+      const dynastyData = localStorage.getItem(`dynasty_${dynastyId}`);
+      if (!dynastyData) return { readyToAdvance: false, nextAdvance: "" };
+
+      const data = JSON.parse(dynastyData);
+      return {
+        readyToAdvance: data.readyToAdvance || false,
+        nextAdvance: data.nextAdvance || "",
+      };
+    } catch (error) {
+      console.error(`Error getting advance schedule for dynasty ${dynastyId}:`, error);
+      return { readyToAdvance: false, nextAdvance: "" };
+    }
+  };
+
   const calculateDynastyRecord = (dynastyId: string) => {
     try {
       const dynastyData = localStorage.getItem(`dynasty_${dynastyId}`);
@@ -606,6 +624,7 @@ const DynastyLaunch: React.FC<DynastyLaunchProps> = ({ onDynastySelected }) => {
                 const schoolInfo = getSchoolInfo(dynasty);
                 const actualRecord = calculateDynastyRecord(dynasty.id);
                 const teamRank = getLatestRank(dynasty.id, dynasty.schoolName);
+                const advanceSchedule = getDynastyAdvanceSchedule(dynasty.id);
 
                 return (
                   <Card key={dynasty.id} className="bg-white/10 ...">
@@ -647,6 +666,18 @@ const DynastyLaunch: React.FC<DynastyLaunchProps> = ({ onDynastySelected }) => {
                           Last Played: {formatDate(dynasty.lastPlayed)}
                         </span>
                       </div>
+                      <div className="flex items-center gap-2 text-blue-100">
+                        <CheckCircle className={`h-4 w-4 ${advanceSchedule.readyToAdvance ? 'text-green-400' : 'text-gray-400'}`} />
+                        <span>Ready to Advance: {advanceSchedule.readyToAdvance ? 'Yes' : 'No'}</span>
+                      </div>
+                      {advanceSchedule.nextAdvance && (
+                        <div className="flex items-center gap-2 text-blue-100">
+                          <Clock className="h-4 w-4" />
+                          <span>
+                            Next Advance: {new Date(advanceSchedule.nextAdvance).toLocaleDateString()}
+                          </span>
+                        </div>
+                      )}
                       <div className="flex gap-2 pt-2">
                         <Button
                           onClick={() => loadDynasty(dynasty)}

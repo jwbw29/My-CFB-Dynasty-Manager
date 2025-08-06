@@ -164,7 +164,7 @@ const PlayerStats: React.FC = () => {
     const player = rosterPlayers.find(p => p.name === playerName);
     if (player) {
       const playerForCard = {
-        id: player.id, name: player.name, position: player.position, year: player.year,
+        id: player.id.toString(), name: player.name, position: player.position, year: player.year,
         rating: player.rating, jerseyNumber: player.jerseyNumber,
         devTrait: (player.devTrait as 'Normal' | 'Impact' | 'Star' | 'Elite') || 'Normal',
         notes: player.notes || '', isRedshirted: false
@@ -172,7 +172,7 @@ const PlayerStats: React.FC = () => {
       openPlayerCard(playerForCard);
     } else {
       const basicPlayer = {
-        id: Date.now(), name: playerName, position: 'Unknown', year: 'Unknown',
+        id: Date.now().toString(), name: playerName, position: 'Unknown', year: 'Unknown',
         rating: 'Unknown', jerseyNumber: '0', devTrait: 'Normal' as const,
         notes: '', isRedshirted: false
       };

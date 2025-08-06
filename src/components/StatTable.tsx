@@ -90,7 +90,7 @@ const StatTable: React.FC<StatTableProps> = ({ category, viewType, stats, onAddS
             <TableCell>
               <Input
                 type="number"
-                value={newStat.year.toString()}
+                value={newStat.year?.toString() || ''}
                 onChange={(e) => setNewStat({ ...newStat, year: parseInt(e.target.value) || new Date().getFullYear() })}
                 placeholder="Year"
               />

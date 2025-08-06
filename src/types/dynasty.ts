@@ -10,4 +10,6 @@ export interface Dynasty {
   totalWins: number;
   totalLosses: number;
   championships: number;
+  readyToAdvance?: boolean;
+  nextAdvance?: string;
 }
