@@ -166,11 +166,14 @@ export const DynastyProvider: React.FC<DynastyProviderProps> = ({
       // This ensures the most up-to-date version is saved, preventing data loss.
       dynastyData.top25History = top25History;
 
-      // 4. Gather dynamic, year-specific keys (like schedules and stats) from localStorage.
+      // 4. Gather dynamic, year-specific and dynasty-specific keys from localStorage.
       Object.keys(localStorage).forEach((key) => {
         if (
           key &&
-          (key.startsWith("schedule_") || key.startsWith("yearStats_"))
+          (key.startsWith("schedule_") || 
+           key.startsWith("yearStats_") ||
+           key.startsWith(`offensiveNeeds_${currentDynastyId}`) ||
+           key.startsWith(`defensiveNeeds_${currentDynastyId}`))
         ) {
           const data = localStorage.getItem(key);
           if (data) {

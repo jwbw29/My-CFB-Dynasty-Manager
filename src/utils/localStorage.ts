@@ -397,14 +397,17 @@ export const clearActiveSessionData = (): void => {
 
   keysToRemove.forEach((key) => safeLocalStorage.removeItem(key));
 
-  // Also remove any dynamic schedule or year stats keys from the previous session
+  // Also remove any dynamic schedule, year stats, and recruiting needs keys from the previous session
   if (typeof window !== "undefined") {
     const keysToDelete: string[] = [];
     for (let i = 0; i < localStorage.length; i++) {
       const key = localStorage.key(i);
       if (
         key &&
-        (key.startsWith("schedule_") || key.startsWith("yearStats_"))
+        (key.startsWith("schedule_") || 
+         key.startsWith("yearStats_") ||
+         key.startsWith("offensiveNeeds_") ||
+         key.startsWith("defensiveNeeds_"))
       ) {
         keysToDelete.push(key);
       }

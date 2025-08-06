@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Table } from '@/components/ui/table';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import useLocalStorage from '@/hooks/useLocalStorage';
+import { useDynasty } from '@/contexts/DynastyContext';
 import { capitalizeName } from '@/utils';
 import { Recruit } from '@/types/playerTypes';
 import { generalPositions } from '@/types/playerTypes';
@@ -160,10 +161,17 @@ const sortRecruitsByStars = (recruits: Recruit[]): Recruit[] => {
 };
 
 const RecruitingClassTracker: React.FC = () => {
+  const { currentDynastyId } = useDynasty();
   const [currentYear] = useLocalStorage<number>('currentYear', new Date().getFullYear());
   const [allRecruits, setAllRecruits] = useLocalStorage<Recruit[]>('allRecruits', []);
-  const [offensiveNeeds, setOffensiveNeeds] = useLocalStorage<RecruitingNeed[]>('offensiveNeeds', offensivePositions);
-  const [defensiveNeeds, setDefensiveNeeds] = useLocalStorage<RecruitingNeed[]>('defensiveNeeds', defensivePositions);
+  const [offensiveNeeds, setOffensiveNeeds] = useLocalStorage<RecruitingNeed[]>(
+    currentDynastyId ? `offensiveNeeds_${currentDynastyId}` : 'offensiveNeeds', 
+    offensivePositions
+  );
+  const [defensiveNeeds, setDefensiveNeeds] = useLocalStorage<RecruitingNeed[]>(
+    currentDynastyId ? `defensiveNeeds_${currentDynastyId}` : 'defensiveNeeds', 
+    defensivePositions
+  );
   const [newRecruit, setNewRecruit] = useState<Omit<Recruit, 'id' | 'recruitedYear'>>({
     name: '',
     stars: '',
