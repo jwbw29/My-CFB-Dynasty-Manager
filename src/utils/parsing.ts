@@ -1,5 +1,5 @@
 // src/utils/parsing.ts
-import { Player } from '@/types';  // Add this import
+import { Player } from '@/types/playerTypes';
 
 export function parsePlayerData(text: string): Omit<Player, 'id'>[] {
   const columns = text.split('\n').map(column => column.split('\n'));
@@ -12,7 +12,7 @@ export function parsePlayerData(text: string): Omit<Player, 'id'>[] {
     const rating = correctRating(columns[3][i]);
 
     if (name && position && year && rating) {
-      players.push({ name, position, year, rating });
+      players.push({ name, position, year, rating, jerseyNumber: '', isRedshirted: false });
     }
   }
 

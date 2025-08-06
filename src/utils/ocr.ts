@@ -1,6 +1,6 @@
 // src/utils/enhanced-ocr.ts
 import Tesseract from 'tesseract.js';
-import { Player } from '@/types';
+import { Player } from '@/types/playerTypes';
 
 async function preprocessImage(imageFile: File): Promise<HTMLCanvasElement> {
   return new Promise((resolve, reject) => {
@@ -124,7 +124,8 @@ export function parsePlayerData(text: string): Omit<Player, 'id' | 'devTrait' | 
             name: name.trim(),
             position: '', // We'll expand this later
             year: '',
-            rating: rating
+            rating: rating,
+            isRedshirted: false
           });
           
           console.log('Added player:', name, rating);

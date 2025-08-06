@@ -33,15 +33,15 @@ export interface YearStats {
   playersDrafted: number;
   conferenceStanding: string;
   bowlGame: string;
-  bowlResult: 'Win' | 'Loss' | 'CFP' | 'DNP' | '';
+  bowlResult: "Win" | "Loss" | "CFP" | "DNP" | "";
 }
 
 export interface Game {
   id: number;
   week: number;
-  location: '@' | 'vs' | 'neutral' | ' ';
+  location: "@" | "vs" | "neutral" | " ";
   opponent: string;
-  result: 'Win' | 'Loss' | 'Tie' | 'Bye' | 'N/A';
+  result: "Win" | "Loss" | "Tie" | "Bye" | "N/A";
   score: string;
   isUserControlled?: boolean;
 }

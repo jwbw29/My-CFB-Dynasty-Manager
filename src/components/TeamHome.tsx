@@ -259,7 +259,10 @@ const TeamHome: React.FC = () => {
         (p) => p.name === statLeader.playerName
       );
       if (playerFromRoster) {
-        openPlayerCard({...playerFromRoster, id: playerFromRoster.id.toString()});
+        openPlayerCard({
+          ...playerFromRoster,
+          id: playerFromRoster.id.toString(),
+        });
       } else {
         const basicPlayer = {
           id: Date.now().toString(),

@@ -76,13 +76,19 @@ export interface Player {
 }
 
 export interface Recruit {
-  id: number;
+  id: string;
   recruitedYear: number;
   name: string;
   stars: string;
   position: string;
-  rating: string;
   potential: string;
+  state: string; // This was already correct
+  // CHANGED: Ranks are now numbers or null (if not provided)
+  nationalRank: number | null;
+  stateRank: number | null;
+  // REMOVED: The 'rating' field is no longer needed
+  height?: string;
+  weight?: string;
 }
 
 export interface Transfer {

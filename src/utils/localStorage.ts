@@ -404,10 +404,10 @@ export const clearActiveSessionData = (): void => {
       const key = localStorage.key(i);
       if (
         key &&
-        (key.startsWith("schedule_") || 
-         key.startsWith("yearStats_") ||
-         key.startsWith("offensiveNeeds_") ||
-         key.startsWith("defensiveNeeds_"))
+        (key.startsWith("schedule_") ||
+          key.startsWith("yearStats_") ||
+          key.startsWith("offensiveNeeds_") ||
+          key.startsWith("defensiveNeeds_"))
       ) {
         keysToDelete.push(key);
       }
@@ -460,7 +460,7 @@ export const generateYearRecord = (
 export const getTop25History = (): Top25History => {
   const dynastyData = getCurrentDynastyData();
   // Data is now stored under a 'top25History' key within the dynasty object
-  
+
   // console.log("🚀 ~ getTop25History ~ dynastyData?.top25History:", dynastyData?.top25History)
   return dynastyData?.top25History || {};
 };
@@ -592,7 +592,7 @@ export const progressRosterForNewSeason = (endedYear: number): void => {
           name: recruit.name,
           position: recruit.position,
           year: "FR",
-          rating: recruit.rating,
+          rating: recruit.stars,
           jerseyNumber: "",
           devTrait: recruit.potential as Player["devTrait"],
           notes: `Recruited in the class of ${endedYear}.`,

@@ -326,7 +326,7 @@ const YearRecordModal: React.FC<YearRecordModalProps> = ({ year, onClose }) => {
                         {(record.recruits || []).length > 0 ? (record.recruits || []).sort((a, b) => parseInt(b.stars) - parseInt(a.stars)).map((recruit, index) => (
                           <div key={index} className="flex items-center gap-3 p-2 border rounded-md">
                             <div className="flex flex-col items-center w-12"><div className="flex">{Array.from({ length: 5 }, (_, i) => <Star key={i} className={`h-3 w-3 ${i < parseInt(recruit.stars) ? "text-yellow-400 fill-yellow-400" : "text-gray-300"}`} />)}</div><span className="text-xs">{recruit.stars}⭐</span></div>
-                            <div className="flex-1"><h4 className="font-semibold">{recruit.name}</h4><p className="text-sm text-gray-500">{recruit.position} | Rating: {recruit.rating}</p></div>
+                            <div className="flex-1"><h4 className="font-semibold">{recruit.name}</h4><p className="text-sm text-gray-500">{recruit.position} | Stars: {recruit.stars}</p></div>
                             <DevTraitBadge trait={recruit.potential as any} />
                           </div>
                         )) : <p className="text-sm text-center text-gray-500 py-4">No recruits recorded.</p>}

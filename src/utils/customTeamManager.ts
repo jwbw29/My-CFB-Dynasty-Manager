@@ -96,7 +96,7 @@ export class CustomTeamManager {
     }
 
     // Return original team if no custom replacement
-    return getTeamByName(teamName);
+    return getTeamByName(teamName) || null;
   }
 
   // Get all available teams (originals + customs, with replacements handled)
@@ -170,7 +170,7 @@ export class CustomTeamManager {
 
       // Parse scores
       if (game.score && game.score.includes('-')) {
-        const [score1, score2] = game.score.split('-').map(s => parseInt(s.trim()) || 0);
+        const [score1, score2] = game.score.split('-').map((s: string) => parseInt(s.trim()) || 0);
         
         if (game.location === '@') {
           // Away game: first score is opponent, second is us
