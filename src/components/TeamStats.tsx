@@ -1,0 +1,885 @@
+"use client";
+
+import React, { useState, useMemo, useCallback } from 'react';
+import { Card, CardHeader, CardContent, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import useLocalStorage from '@/hooks/useLocalStorage';
+import { Game } from '@/types/yearRecord';
+import { useDynasty } from '@/contexts/DynastyContext';
+
+interface TeamStatsData {
+  gamesPlayed: number;
+  // Offense
+  totalOffense: number;
+  passYards: number;
+  rushYards: number;
+  points: number;
+  // Defense
+  totalDefense: number;
+  defPassYards: number;
+  defRushYards: number;
+  defPoints: number;
+}
+
+interface TeamLeaderStats {
+  // Passing
+  passingLeaders: PlayerLeaderStat[];
+  // Rushing
+  rushingLeaders: PlayerLeaderStat[];
+  // Receiving
+  receivingLeaders: PlayerLeaderStat[];
+  // Tackles
+  tackleLeaders: PlayerLeaderStat[];
+  // TFLs
+  tflLeaders: PlayerLeaderStat[];
+  // Sacks
+  sackLeaders: PlayerLeaderStat[];
+  // Interceptions
+  intLeaders: PlayerLeaderStat[];
+}
+
+interface PlayerLeaderStat {
+  name: string;
+  // Passing
+  yards?: number;
+  completions?: number;
+  attempts?: number;
+  touchdowns?: number;
+  interceptions?: number;
+  // Rushing
+  carries?: number;
+  // Receiving
+  receptions?: number;
+  // Defense
+  total?: number;
+  perGame?: number;
+}
+
+interface RosterPlayer {
+  id: number;
+  name: string;
+  position: string;
+  jerseyNumber: string;
+  year: string;
+  rating: string;
+  devTrait?: string;
+  notes?: string;
+}
+
+const TeamStats: React.FC = () => {
+  const { currentDynastyId } = useDynasty();
+  const [currentYear] = useLocalStorage<number>('currentYear', new Date().getFullYear());
+  const [schedule] = useLocalStorage<Game[]>(`schedule_${currentYear}`, []);
+  const [rosterPlayers] = useLocalStorage<RosterPlayer[]>('players', []);
+  const [teamStats, setTeamStats] = useLocalStorage<TeamStatsData>(`teamStats_${currentDynastyId}_${currentYear}`, {
+    gamesPlayed: 0,
+    totalOffense: 0,
+    passYards: 0,
+    rushYards: 0,
+    points: 0,
+    totalDefense: 0,
+    defPassYards: 0,
+    defRushYards: 0,
+    defPoints: 0
+  });
+
+  const [teamLeaders, setTeamLeaders] = useLocalStorage<TeamLeaderStats>(`teamLeaders_${currentDynastyId}_${currentYear}`, {
+    passingLeaders: [],
+    rushingLeaders: [],
+    receivingLeaders: [],
+    tackleLeaders: [],
+    tflLeaders: [],
+    sackLeaders: [],
+    intLeaders: []
+  });
+
+  // Calculate games played from schedule (excluding BYE weeks)
+  const calculatedGamesPlayed = useMemo(() => {
+    return schedule.filter(game => 
+      game.result !== 'Bye' && 
+      game.result !== 'N/A' && 
+      game.score !== ''
+    ).length;
+  }, [schedule]);
+
+  // Use calculated games played if user input is 0
+  const effectiveGamesPlayed = teamStats.gamesPlayed || calculatedGamesPlayed;
+
+  // Calculated fields
+  const calculations = useMemo(() => {
+    const gp = effectiveGamesPlayed || 1; // Prevent division by zero
+    
+    return {
+      // Per game stats
+      totalOffensePerGame: teamStats.totalOffense / gp,
+      passYardsPerGame: teamStats.passYards / gp,
+      rushYardsPerGame: teamStats.rushYards / gp,
+      pointsPerGame: teamStats.points / gp,
+      totalDefensePerGame: teamStats.totalDefense / gp,
+      defPassYardsPerGame: teamStats.defPassYards / gp,
+      defRushYardsPerGame: teamStats.defRushYards / gp,
+      defPointsPerGame: teamStats.defPoints / gp,
+      
+      // Percentages
+      avgMarginOfVictory: (teamStats.points - teamStats.defPoints) / gp,
+      rushYardsPercent: teamStats.totalOffense ? (teamStats.rushYards / teamStats.totalOffense) * 100 : 0,
+      passYardsPercent: teamStats.totalOffense ? (teamStats.passYards / teamStats.totalOffense) * 100 : 0,
+      allowedRushYardsPercent: teamStats.totalDefense ? (teamStats.defRushYards / teamStats.totalDefense) * 100 : 0,
+      allowedPassYardsPercent: teamStats.totalDefense ? (teamStats.defPassYards / teamStats.totalDefense) * 100 : 0,
+    };
+  }, [teamStats, effectiveGamesPlayed]);
+
+  const handleStatsChange = useCallback((field: keyof TeamStatsData, value: string) => {
+    const numValue = parseInt(value) || 0;
+    setTeamStats(prev => ({
+      ...prev,
+      [field]: numValue
+    }));
+  }, [setTeamStats]);
+
+  const handleLeaderChange = useCallback((
+    category: keyof TeamLeaderStats, 
+    index: number, 
+    field: keyof PlayerLeaderStat, 
+    value: string
+  ) => {
+    setTeamLeaders(prev => {
+      const leaders = [...(prev[category] || [])];
+      if (!leaders[index]) {
+        leaders[index] = { name: '' };
+      }
+      
+      if (field === 'name') {
+        leaders[index][field] = value;
+      } else {
+        leaders[index][field] = parseFloat(value) || 0;
+      }
+      
+      return {
+        ...prev,
+        [category]: leaders
+      };
+    });
+  }, [setTeamLeaders]);
+
+  const addLeaderRow = useCallback((category: keyof TeamLeaderStats) => {
+    setTeamLeaders(prev => ({
+      ...prev,
+      [category]: [...(prev[category] || []), { name: '' }]
+    }));
+  }, [setTeamLeaders]);
+
+  const formatNumber = (num: number, decimals: number = 1): string => {
+    return num.toFixed(decimals);
+  };
+
+  // Get sorted players for dropdown
+  const getSortedPlayers = () => {
+    return rosterPlayers.sort((a, b) => (parseInt(a.jerseyNumber) || 0) - (parseInt(b.jerseyNumber) || 0));
+  };
+
+  const formatPercentage = (num: number): string => {
+    return `${num.toFixed(1)}%`;
+  };
+
+  return (
+    <div className="space-y-6">
+      <div className="flex justify-center">
+        <h1 className="text-3xl font-bold">{currentYear} Team Stats</h1>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Team Stats Section */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Team Stats</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {/* Games Played */}
+              <div className="grid grid-cols-3 gap-4 items-center">
+                <Label>Games Played</Label>
+                <Input
+                  type="number"
+                  value={teamStats.gamesPlayed}
+                  onChange={(e) => handleStatsChange('gamesPlayed', e.target.value)}
+                  className="w-full"
+                  placeholder={calculatedGamesPlayed.toString()}
+                />
+                <span className="text-sm text-muted-foreground">
+                  Auto: {calculatedGamesPlayed}
+                </span>
+              </div>
+
+              {/* Stats Table */}
+              <div className="overflow-x-auto">
+                <Table >
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead></TableHead>
+                      <TableHead>Total</TableHead>
+                      <TableHead>Per Game</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {/* Offense Section */}
+                    <TableRow className="bg-blue-50 dark:bg-blue-900/20">
+                      <TableCell className="font-semibold" colSpan={3}>Offense</TableCell>
+                    </TableRow>
+
+                    <TableRow >
+                      <TableCell>TOT OFF</TableCell>
+                      <TableCell>
+                        <Input
+                          type="number"
+                          value={teamStats.totalOffense}
+                          onChange={(e) => handleStatsChange('totalOffense', e.target.value)}
+                        />
+                      </TableCell>
+                      <TableCell className="bg-gray-100 dark:bg-gray-800">
+                        {formatNumber(calculations.totalOffensePerGame)}
+                      </TableCell>
+                    </TableRow>
+                    
+                    <TableRow>
+                      <TableCell>Pass YDS</TableCell>
+                      <TableCell>
+                        <Input
+                          type="number"
+                          value={teamStats.passYards}
+                          onChange={(e) => handleStatsChange('passYards', e.target.value)}
+                        />
+                      </TableCell>
+                      <TableCell className="bg-gray-100 dark:bg-gray-800">
+                        {formatNumber(calculations.passYardsPerGame)}
+                      </TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell>Rush YDS</TableCell>
+                      <TableCell>
+                        <Input
+                          type="number"
+                          value={teamStats.rushYards}
+                          onChange={(e) => handleStatsChange('rushYards', e.target.value)}
+                        />
+                      </TableCell>
+                      <TableCell className="bg-gray-100 dark:bg-gray-800">
+                        {formatNumber(calculations.rushYardsPerGame)}
+                      </TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell>PTS</TableCell>
+                      <TableCell>
+                        <Input
+                          type="number"
+                          value={teamStats.points}
+                          onChange={(e) => handleStatsChange('points', e.target.value)}
+                        />
+                      </TableCell>
+                      <TableCell className="bg-gray-100 dark:bg-gray-800">
+                        {formatNumber(calculations.pointsPerGame)}
+                      </TableCell>
+                    </TableRow>
+
+                    {/* Defense Section */}
+                    <TableRow className="bg-red-50 dark:bg-red-900/20">
+                      <TableCell className="font-semibold" colSpan={3}>Defense</TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell>TOT DEF</TableCell>
+                      <TableCell>
+                        <Input
+                          type="number"
+                          value={teamStats.totalDefense}
+                          onChange={(e) => handleStatsChange('totalDefense', e.target.value)}
+                        />
+                      </TableCell>
+                      <TableCell className="bg-gray-100 dark:bg-gray-800">
+                        {formatNumber(calculations.totalDefensePerGame)}
+                      </TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell>Pass YDS</TableCell>
+                      <TableCell>
+                        <Input
+                          type="number"
+                          value={teamStats.defPassYards}
+                          onChange={(e) => handleStatsChange('defPassYards', e.target.value)}
+                        />
+                      </TableCell>
+                      <TableCell className="bg-gray-100 dark:bg-gray-800">
+                        {formatNumber(calculations.defPassYardsPerGame)}
+                      </TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell>Rush YDS</TableCell>
+                      <TableCell>
+                        <Input
+                          type="number"
+                          value={teamStats.defRushYards}
+                          onChange={(e) => handleStatsChange('defRushYards', e.target.value)}
+                        />
+                      </TableCell>
+                      <TableCell className="bg-gray-100 dark:bg-gray-800">
+                        {formatNumber(calculations.defRushYardsPerGame)}
+                      </TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell>PTS</TableCell>
+                      <TableCell>
+                        <Input
+                          type="number"
+                          value={teamStats.defPoints}
+                          onChange={(e) => handleStatsChange('defPoints', e.target.value)}
+                        />
+                      </TableCell>
+                      <TableCell className="bg-gray-100 dark:bg-gray-800">
+                        {formatNumber(calculations.defPointsPerGame)}
+                      </TableCell>
+                    </TableRow>
+                  </TableBody>
+                </Table>
+              </div>
+
+              {/* Calculated Metrics */}
+              <div className="space-y-2">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label className="text-sm">Avg Margin of Victory</Label>
+                    <div className="bg-gray-100 dark:bg-gray-800 p-2 rounded text-center">
+                      {formatNumber(calculations.avgMarginOfVictory)}
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label className="text-sm">Rush Yards as % of Total</Label>
+                    <div className="bg-gray-100 dark:bg-gray-800 p-2 rounded text-center">
+                      {formatPercentage(calculations.rushYardsPercent)}
+                    </div>
+                  </div>
+                  <div>
+                    <Label className="text-sm">Pass Yards as % of Total</Label>
+                    <div className="bg-gray-100 dark:bg-gray-800 p-2 rounded text-center">
+                      {formatPercentage(calculations.passYardsPercent)}
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label className="text-sm">Allowed Rush Yards as % of Total</Label>
+                    <div className="bg-gray-100 dark:bg-gray-800 p-2 rounded text-center">
+                      {formatPercentage(calculations.allowedRushYardsPercent)}
+                    </div>
+                  </div>
+                  <div>
+                    <Label className="text-sm">Allowed Pass Yards as % of Total</Label>
+                    <div className="bg-gray-100 dark:bg-gray-800 p-2 rounded text-center">
+                      {formatPercentage(calculations.allowedPassYardsPercent)}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Team Leaders Section */}
+        <Card className="lg:col-span-2">
+          <CardHeader>
+            <CardTitle>Team Leaders</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-6">
+              {/* Passing Leaders */}
+              <div>
+                <h3 className="font-semibold text-lg bg-blue-100 dark:bg-blue-900 p-2 rounded">Passing</h3>
+                <Table className="table-fixed">
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="w-2/5">Name</TableHead>
+                      <TableHead className="w-1/6">YDS</TableHead>
+                      <TableHead className="w-1/8">COMP%</TableHead>
+                      <TableHead className="w-1/8">TDs</TableHead>
+                      <TableHead className="w-1/8">INTs</TableHead>
+                      <TableHead className="w-1/8 bg-gray-100 dark:bg-gray-800">YPG</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {teamLeaders.passingLeaders?.map((leader, index) => (
+                      <TableRow key={index}>
+                        <TableCell>
+                          <Select
+                            value={leader.name || ''}
+                            onValueChange={(value) => handleLeaderChange('passingLeaders', index, 'name', value)}
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select Player" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {getSortedPlayers().map(player => (
+                                <SelectItem key={player.id} value={player.name}>
+                                  {player.name} - {player.position} #{player.jerseyNumber}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </TableCell>
+                        <TableCell>
+                          <Input
+                            type="number"
+                            value={leader.yards || ''}
+                            onChange={(e) => handleLeaderChange('passingLeaders', index, 'yards', e.target.value)}
+                            className="w-20"
+                          />
+                        </TableCell>
+                        <TableCell>
+                          <Input
+                            type="number"
+                            step="0.1"
+                            value={leader.completions || ''}
+                            onChange={(e) => handleLeaderChange('passingLeaders', index, 'completions', e.target.value)}
+                            className="w-16"
+                          />
+                        </TableCell>
+                        <TableCell>
+                          <Input
+                            type="number"
+                            value={leader.touchdowns || ''}
+                            onChange={(e) => handleLeaderChange('passingLeaders', index, 'touchdowns', e.target.value)}
+                            className="w-14"
+                          />
+                        </TableCell>
+                        <TableCell>
+                          <Input
+                            type="number"
+                            value={leader.interceptions || ''}
+                            onChange={(e) => handleLeaderChange('passingLeaders', index, 'interceptions', e.target.value)}
+                            className="w-14"
+                          />
+                        </TableCell>
+                        <TableCell className="bg-gray-100 dark:bg-gray-800">
+                          {formatNumber((leader.yards || 0) / effectiveGamesPlayed)}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                    <TableRow>
+                      <TableCell colSpan={6}>
+                        <button
+                          onClick={() => addLeaderRow('passingLeaders')}
+                          className="text-blue-600 hover:text-blue-800 text-sm"
+                        >
+                          + Add Player
+                        </button>
+                      </TableCell>
+                    </TableRow>
+                  </TableBody>
+                </Table>
+              </div>
+
+              {/* Rushing Leaders */}
+              <div>
+                <h3 className="font-semibold text-lg bg-green-100 dark:bg-green-900 p-2 rounded">Rushing</h3>
+                <Table className="table-fixed">
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="w-2/5">Name</TableHead>
+                      <TableHead className="w-1/8">CAR</TableHead>
+                      <TableHead className="w-1/6">YDS</TableHead>
+                      <TableHead className="w-1/8">TDs</TableHead>
+                      <TableHead className="w-1/8 bg-gray-100 dark:bg-gray-800">YPC</TableHead>
+                      <TableHead className="w-1/8 bg-gray-100 dark:bg-gray-800">YPG</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {teamLeaders.rushingLeaders?.map((leader, index) => (
+                      <TableRow key={index}>
+                        <TableCell>
+                          <Select
+                            value={leader.name || ''}
+                            onValueChange={(value) => handleLeaderChange('rushingLeaders', index, 'name', value)}
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select Player" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {getSortedPlayers().map(player => (
+                                <SelectItem key={player.id} value={player.name}>
+                                  {player.name} - {player.position} #{player.jerseyNumber}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </TableCell>
+                        <TableCell>
+                          <Input
+                            type="number"
+                            value={leader.carries || ''}
+                            onChange={(e) => handleLeaderChange('rushingLeaders', index, 'carries', e.target.value)}
+                            className="w-16"
+                          />
+                        </TableCell>
+                        <TableCell>
+                          <Input
+                            type="number"
+                            value={leader.yards || ''}
+                            onChange={(e) => handleLeaderChange('rushingLeaders', index, 'yards', e.target.value)}
+                            className="w-20"
+                          />
+                        </TableCell>
+                        <TableCell>
+                          <Input
+                            type="number"
+                            value={leader.touchdowns || ''}
+                            onChange={(e) => handleLeaderChange('rushingLeaders', index, 'touchdowns', e.target.value)}
+                            className="w-14"
+                          />
+                        </TableCell>
+                        <TableCell className="bg-gray-100 dark:bg-gray-800">
+                          {formatNumber((leader.yards || 0) / (leader.carries || 1))}
+                        </TableCell>
+                        <TableCell className="bg-gray-100 dark:bg-gray-800">
+                          {formatNumber((leader.yards || 0) / effectiveGamesPlayed)}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                    <TableRow>
+                      <TableCell colSpan={6}>
+                        <button
+                          onClick={() => addLeaderRow('rushingLeaders')}
+                          className="text-blue-600 hover:text-blue-800 text-sm"
+                        >
+                          + Add Player
+                        </button>
+                      </TableCell>
+                    </TableRow>
+                  </TableBody>
+                </Table>
+              </div>
+
+              {/* Receiving Leaders */}
+              <div>
+                <h3 className="font-semibold text-lg bg-purple-100 dark:bg-purple-900 p-2 rounded">Receiving</h3>
+                <Table className="table-fixed">
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="w-2/5">Name</TableHead>
+                      <TableHead className="w-1/8">REC</TableHead>
+                      <TableHead className="w-1/6">YDS</TableHead>
+                      <TableHead className="w-1/8">TDs</TableHead>
+                      <TableHead className="w-1/8 bg-gray-100 dark:bg-gray-800">YPC</TableHead>
+                      <TableHead className="w-1/8 bg-gray-100 dark:bg-gray-800">YPG</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {teamLeaders.receivingLeaders?.map((leader, index) => (
+                      <TableRow key={index}>
+                        <TableCell>
+                          <Select
+                            value={leader.name || ''}
+                            onValueChange={(value) => handleLeaderChange('receivingLeaders', index, 'name', value)}
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select Player" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {getSortedPlayers().map(player => (
+                                <SelectItem key={player.id} value={player.name}>
+                                  {player.name} - {player.position} #{player.jerseyNumber}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </TableCell>
+                        <TableCell>
+                          <Input
+                            type="number"
+                            value={leader.receptions || ''}
+                            onChange={(e) => handleLeaderChange('receivingLeaders', index, 'receptions', e.target.value)}
+                            className="w-16"
+                          />
+                        </TableCell>
+                        <TableCell>
+                          <Input
+                            type="number"
+                            value={leader.yards || ''}
+                            onChange={(e) => handleLeaderChange('receivingLeaders', index, 'yards', e.target.value)}
+                            className="w-20"
+                          />
+                        </TableCell>
+                        <TableCell>
+                          <Input
+                            type="number"
+                            value={leader.touchdowns || ''}
+                            onChange={(e) => handleLeaderChange('receivingLeaders', index, 'touchdowns', e.target.value)}
+                            className="w-14"
+                          />
+                        </TableCell>
+                        <TableCell className="bg-gray-100 dark:bg-gray-800">
+                          {formatNumber((leader.yards || 0) / (leader.receptions || 1))}
+                        </TableCell>
+                        <TableCell className="bg-gray-100 dark:bg-gray-800">
+                          {formatNumber((leader.yards || 0) / effectiveGamesPlayed)}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                    <TableRow>
+                      <TableCell colSpan={6}>
+                        <button
+                          onClick={() => addLeaderRow('receivingLeaders')}
+                          className="text-blue-600 hover:text-blue-800 text-sm"
+                        >
+                          + Add Player
+                        </button>
+                      </TableCell>
+                    </TableRow>
+                  </TableBody>
+                </Table>
+              </div>
+
+              {/* Defensive Leaders - Tackles */}
+              <div>
+                <h3 className="font-semibold text-lg bg-red-100 dark:bg-red-900 p-2 rounded">TAKs</h3>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Name</TableHead>
+                      <TableHead>TOT</TableHead>
+                      <TableHead className="bg-gray-100 dark:bg-gray-800">Per Game</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {teamLeaders.tackleLeaders?.map((leader, index) => (
+                      <TableRow key={index}>
+                        <TableCell>
+                          <Select
+                            value={leader.name || ''}
+                            onValueChange={(value) => handleLeaderChange('tackleLeaders', index, 'name', value)}
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select Player" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {getSortedPlayers().map(player => (
+                                <SelectItem key={player.id} value={player.name}>
+                                  {player.name} - {player.position} #{player.jerseyNumber}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </TableCell>
+                        <TableCell>
+                          <Input
+                            type="number"
+                            value={leader.total || ''}
+                            onChange={(e) => handleLeaderChange('tackleLeaders', index, 'total', e.target.value)}
+                            className="w-16"
+                          />
+                        </TableCell>
+                        <TableCell className="bg-gray-100 dark:bg-gray-800">
+                          {formatNumber((leader.total || 0) / effectiveGamesPlayed)}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                    <TableRow>
+                      <TableCell colSpan={3}>
+                        <button
+                          onClick={() => addLeaderRow('tackleLeaders')}
+                          className="text-blue-600 hover:text-blue-800 text-sm"
+                        >
+                          + Add Player
+                        </button>
+                      </TableCell>
+                    </TableRow>
+                  </TableBody>
+                </Table>
+              </div>
+
+              {/* TFLs */}
+              <div>
+                <h3 className="font-semibold text-lg bg-orange-100 dark:bg-orange-900 p-2 rounded">TFLs</h3>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Name</TableHead>
+                      <TableHead>TOT</TableHead>
+                      <TableHead className="bg-gray-100 dark:bg-gray-800">Per Game</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {teamLeaders.tflLeaders?.map((leader, index) => (
+                      <TableRow key={index}>
+                        <TableCell>
+                          <Select
+                            value={leader.name || ''}
+                            onValueChange={(value) => handleLeaderChange('tflLeaders', index, 'name', value)}
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select Player" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {getSortedPlayers().map(player => (
+                                <SelectItem key={player.id} value={player.name}>
+                                  {player.name} - {player.position} #{player.jerseyNumber}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </TableCell>
+                        <TableCell>
+                          <Input
+                            type="number"
+                            value={leader.total || ''}
+                            onChange={(e) => handleLeaderChange('tflLeaders', index, 'total', e.target.value)}
+                            className="w-16"
+                          />
+                        </TableCell>
+                        <TableCell className="bg-gray-100 dark:bg-gray-800">
+                          {formatNumber((leader.total || 0) / effectiveGamesPlayed)}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                    <TableRow>
+                      <TableCell colSpan={3}>
+                        <button
+                          onClick={() => addLeaderRow('tflLeaders')}
+                          className="text-blue-600 hover:text-blue-800 text-sm"
+                        >
+                          + Add Player
+                        </button>
+                      </TableCell>
+                    </TableRow>
+                  </TableBody>
+                </Table>
+              </div>
+
+              {/* Sacks */}
+              <div>
+                <h3 className="font-semibold text-lg bg-yellow-100 dark:bg-yellow-900 p-2 rounded">SACKS</h3>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Name</TableHead>
+                      <TableHead>TOT</TableHead>
+                      <TableHead className="bg-gray-100 dark:bg-gray-800">Per Game</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {teamLeaders.sackLeaders?.map((leader, index) => (
+                      <TableRow key={index}>
+                        <TableCell>
+                          <Select
+                            value={leader.name || ''}
+                            onValueChange={(value) => handleLeaderChange('sackLeaders', index, 'name', value)}
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select Player" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {getSortedPlayers().map(player => (
+                                <SelectItem key={player.id} value={player.name}>
+                                  {player.name} - {player.position} #{player.jerseyNumber}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </TableCell>
+                        <TableCell>
+                          <Input
+                            type="number"
+                            step="0.5"
+                            value={leader.total || ''}
+                            onChange={(e) => handleLeaderChange('sackLeaders', index, 'total', e.target.value)}
+                            className="w-16"
+                          />
+                        </TableCell>
+                        <TableCell className="bg-gray-100 dark:bg-gray-800">
+                          {formatNumber((leader.total || 0) / effectiveGamesPlayed)}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                    <TableRow>
+                      <TableCell colSpan={3}>
+                        <button
+                          onClick={() => addLeaderRow('sackLeaders')}
+                          className="text-blue-600 hover:text-blue-800 text-sm"
+                        >
+                          + Add Player
+                        </button>
+                      </TableCell>
+                    </TableRow>
+                  </TableBody>
+                </Table>
+              </div>
+
+              {/* Interceptions */}
+              <div>
+                <h3 className="font-semibold text-lg bg-indigo-100 dark:bg-indigo-900 p-2 rounded">INTs</h3>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Name</TableHead>
+                      <TableHead>TOT</TableHead>
+                      <TableHead className="bg-gray-100 dark:bg-gray-800">Per Game</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {teamLeaders.intLeaders?.map((leader, index) => (
+                      <TableRow key={index}>
+                        <TableCell>
+                          <Select
+                            value={leader.name || ''}
+                            onValueChange={(value) => handleLeaderChange('intLeaders', index, 'name', value)}
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select Player" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {getSortedPlayers().map(player => (
+                                <SelectItem key={player.id} value={player.name}>
+                                  {player.name} - {player.position} #{player.jerseyNumber}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </TableCell>
+                        <TableCell>
+                          <Input
+                            type="number"
+                            value={leader.total || ''}
+                            onChange={(e) => handleLeaderChange('intLeaders', index, 'total', e.target.value)}
+                            className="w-16"
+                          />
+                        </TableCell>
+                        <TableCell className="bg-gray-100 dark:bg-gray-800">
+                          {formatNumber((leader.total || 0) / effectiveGamesPlayed)}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                    <TableRow>
+                      <TableCell colSpan={3}>
+                        <button
+                          onClick={() => addLeaderRow('intLeaders')}
+                          className="text-blue-600 hover:text-blue-800 text-sm"
+                        >
+                          + Add Player
+                        </button>
+                      </TableCell>
+                    </TableRow>
+                  </TableBody>
+                </Table>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  );
+};
+
+export default TeamStats;
