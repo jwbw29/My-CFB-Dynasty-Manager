@@ -37,6 +37,7 @@ import {
   getYearAwards,
   progressRosterForNewSeason,
 } from "@/utils/localStorage";
+import useLocalStorage from "@/hooks/useLocalStorage";
 import { validateYear } from "@/utils/validationUtils";
 import { toast } from "react-hot-toast";
 import { Game, YearRecord } from "@/types/yearRecord";
@@ -55,11 +56,45 @@ interface LocationRecord {
   ties: number;
 }
 
+interface TeamLeaderStats {
+  // Passing
+  passingLeaders: PlayerLeaderStat[];
+  // Rushing
+  rushingLeaders: PlayerLeaderStat[];
+  // Receiving
+  receivingLeaders: PlayerLeaderStat[];
+  // Tackles
+  tackleLeaders: PlayerLeaderStat[];
+  // TFLs
+  tflLeaders: PlayerLeaderStat[];
+  // Sacks
+  sackLeaders: PlayerLeaderStat[];
+  // Interceptions
+  intLeaders: PlayerLeaderStat[];
+}
+
+interface PlayerLeaderStat {
+  name: string;
+  // Passing
+  yards?: number;
+  completions?: number;
+  attempts?: number;
+  touchdowns?: number;
+  interceptions?: number;
+  // Rushing
+  carries?: number;
+  // Receiving
+  receptions?: number;
+  // Defense
+  total?: number;
+  perGame?: number;
+}
+
 interface StatLeaders {
-  passingLeader?: PlayerStat;
-  rushingLeader?: PlayerStat;
-  receivingLeader?: PlayerStat;
-  tacklesLeader?: PlayerStat;
+  passingLeader?: PlayerLeaderStat;
+  rushingLeader?: PlayerLeaderStat;
+  receivingLeader?: PlayerLeaderStat;
+  tacklesLeader?: PlayerLeaderStat;
 }
 
 // --- COMPONENT: GameDisplayRow (Moved outside TeamHome for performance) ---
@@ -214,6 +249,17 @@ const TeamHome: React.FC = () => {
     setNextAdvance,
   } = useDynasty();
 
+  // Load team leaders data from Team Stats
+  const [teamLeaders] = useLocalStorage<TeamLeaderStats>(`teamLeaders_${currentDynastyId}_${currentYear}`, {
+    passingLeaders: [],
+    rushingLeaders: [],
+    receivingLeaders: [],
+    tackleLeaders: [],
+    tflLeaders: [],
+    sackLeaders: [],
+    intLeaders: []
+  });
+
   const teamRank = useMemo(() => {
     if (!teamName || teamName === "Team") return null;
     const rankings = getRankingsForWeek(currentYear, activeWeek);
@@ -252,73 +298,29 @@ const TeamHome: React.FC = () => {
     return () => window.removeEventListener("focus", fetchData);
   }, [dataVersion]);
 
-  const handlePlayerNameClick = useCallback(
-    (statLeader?: PlayerStat) => {
-      if (!statLeader) return;
-      const playerFromRoster = players.find(
-        (p) => p.name === statLeader.playerName
-      );
-      if (playerFromRoster) {
-        openPlayerCard({
-          ...playerFromRoster,
-          id: playerFromRoster.id.toString(),
-        });
-      } else {
-        const basicPlayer = {
-          id: Date.now().toString(),
-          name: statLeader.playerName,
-          position: "Unknown",
-          year: "Graduated",
-          rating: "N/A",
-          jerseyNumber: "N/A",
-          devTrait: "Normal" as const,
-          notes: "Player not on current roster.",
-          isRedshirted: false,
-        };
-        openPlayerCard(basicPlayer);
-      }
-    },
-    [players, openPlayerCard]
-  );
 
   const statLeaders = useMemo<StatLeaders>(() => {
     if (typeof window === "undefined") return {};
     try {
-      const allPlayerStats = getPlayerStats();
-      if (!allPlayerStats || allPlayerStats.length === 0) return {};
-      const currentYearStats = allPlayerStats.filter(
-        (stat) => stat.year === currentYear
-      );
-      const getLeader = (category: string, sortField: keyof PlayerStat) => {
-        return currentYearStats
-          .filter(
-            (stat) => stat.category === category && stat[sortField] != null
-          )
-          .sort(
-            (a, b) => (Number(b[sortField]) || 0) - (Number(a[sortField]) || 0)
-          )[0];
+      // Get the top leader from each category based on Team Stats data
+      const getTopLeader = (leaders: PlayerLeaderStat[], sortField: keyof PlayerLeaderStat) => {
+        if (!leaders || leaders.length === 0) return undefined;
+        return leaders
+          .filter(leader => leader.name && leader[sortField] != null)
+          .sort((a, b) => (Number(b[sortField]) || 0) - (Number(a[sortField]) || 0))[0];
       };
-      const getTacklesLeader = () => {
-        return currentYearStats
-          .filter((stat) => stat.category === "Defense")
-          .sort(
-            (a, b) =>
-              (b.solo || 0) +
-              (b.assists || 0) -
-              ((a.solo || 0) + (a.assists || 0))
-          )[0];
-      };
+
       return {
-        passingLeader: getLeader("Passing", "passyards"),
-        rushingLeader: getLeader("Rushing", "rushyards"),
-        receivingLeader: getLeader("Receiving", "recyards"),
-        tacklesLeader: getTacklesLeader(),
+        passingLeader: getTopLeader(teamLeaders.passingLeaders, 'yards'),
+        rushingLeader: getTopLeader(teamLeaders.rushingLeaders, 'yards'),
+        receivingLeader: getTopLeader(teamLeaders.receivingLeaders, 'yards'),
+        tacklesLeader: getTopLeader(teamLeaders.tackleLeaders, 'total'),
       };
     } catch (error) {
-      console.error("Error parsing playerStats for leaders:", error);
+      console.error("Error parsing teamLeaders for leaders:", error);
       return {};
     }
-  }, [currentYear, players]);
+  }, [teamLeaders]);
 
   const locationRecords = useMemo<{
     home: LocationRecord;
@@ -748,15 +750,12 @@ const TeamHome: React.FC = () => {
                   </div>
                   <div className="font-semibold truncate">
                     {statLeaders.passingLeader ? (
-                      <button
-                        onClick={() =>
-                          handlePlayerNameClick(statLeaders.passingLeader)
-                        }
-                        className="text-left hover:text-blue-600 hover:underline transition-colors cursor-pointer"
-                        title={statLeaders.passingLeader.playerName}
+                      <span
+                        className="text-left"
+                        title={statLeaders.passingLeader.name}
                       >
-                        {statLeaders.passingLeader.playerName}
-                      </button>
+                        {statLeaders.passingLeader.name}
+                      </span>
                     ) : (
                       "N/A"
                     )}
@@ -764,7 +763,7 @@ const TeamHome: React.FC = () => {
                 </div>
                 <div className="text-right">
                   <div className="text-lg sm:text-xl font-bold text-blue-600 dark:text-blue-400">
-                    {statLeaders.passingLeader?.passyards ?? "-"}
+                    {statLeaders.passingLeader?.yards ?? "-"}
                   </div>
                   <div className="text-xs sm:text-sm text-muted-foreground">
                     YDS
@@ -778,15 +777,12 @@ const TeamHome: React.FC = () => {
                   </div>
                   <div className="font-semibold truncate">
                     {statLeaders.rushingLeader ? (
-                      <button
-                        onClick={() =>
-                          handlePlayerNameClick(statLeaders.rushingLeader)
-                        }
-                        className="text-left hover:text-blue-600 hover:underline transition-colors cursor-pointer"
-                        title={statLeaders.rushingLeader.playerName}
+                      <span
+                        className="text-left"
+                        title={statLeaders.rushingLeader.name}
                       >
-                        {statLeaders.rushingLeader.playerName}
-                      </button>
+                        {statLeaders.rushingLeader.name}
+                      </span>
                     ) : (
                       "N/A"
                     )}
@@ -794,7 +790,7 @@ const TeamHome: React.FC = () => {
                 </div>
                 <div className="text-right">
                   <div className="text-lg sm:text-xl font-bold text-green-600 dark:text-green-400">
-                    {statLeaders.rushingLeader?.rushyards ?? "-"}
+                    {statLeaders.rushingLeader?.yards ?? "-"}
                   </div>
                   <div className="text-xs sm:text-sm text-muted-foreground">
                     YDS
@@ -808,15 +804,12 @@ const TeamHome: React.FC = () => {
                   </div>
                   <div className="font-semibold truncate">
                     {statLeaders.receivingLeader ? (
-                      <button
-                        onClick={() =>
-                          handlePlayerNameClick(statLeaders.receivingLeader)
-                        }
-                        className="text-left hover:text-blue-600 hover:underline transition-colors cursor-pointer"
-                        title={statLeaders.receivingLeader.playerName}
+                      <span
+                        className="text-left"
+                        title={statLeaders.receivingLeader.name}
                       >
-                        {statLeaders.receivingLeader.playerName}
-                      </button>
+                        {statLeaders.receivingLeader.name}
+                      </span>
                     ) : (
                       "N/A"
                     )}
@@ -824,7 +817,7 @@ const TeamHome: React.FC = () => {
                 </div>
                 <div className="text-right">
                   <div className="text-lg sm:text-xl font-bold text-yellow-600 dark:text-yellow-400">
-                    {statLeaders.receivingLeader?.recyards ?? "-"}
+                    {statLeaders.receivingLeader?.yards ?? "-"}
                   </div>
                   <div className="text-xs sm:text-sm text-muted-foreground">
                     YDS
@@ -838,15 +831,12 @@ const TeamHome: React.FC = () => {
                   </div>
                   <div className="font-semibold truncate">
                     {statLeaders.tacklesLeader ? (
-                      <button
-                        onClick={() =>
-                          handlePlayerNameClick(statLeaders.tacklesLeader)
-                        }
-                        className="text-left hover:text-blue-600 hover:underline transition-colors cursor-pointer"
-                        title={statLeaders.tacklesLeader.playerName}
+                      <span
+                        className="text-left"
+                        title={statLeaders.tacklesLeader.name}
                       >
-                        {statLeaders.tacklesLeader.playerName}
-                      </button>
+                        {statLeaders.tacklesLeader.name}
+                      </span>
                     ) : (
                       "N/A"
                     )}
@@ -854,8 +844,7 @@ const TeamHome: React.FC = () => {
                 </div>
                 <div className="text-right">
                   <div className="text-lg sm:text-xl font-bold text-red-600 dark:text-red-400">
-                    {(statLeaders.tacklesLeader?.solo ?? 0) +
-                      (statLeaders.tacklesLeader?.assists ?? 0) || "-"}
+                    {statLeaders.tacklesLeader?.total ?? "-"}
                   </div>
                   <div className="text-xs sm:text-sm text-muted-foreground">
                     TKL
