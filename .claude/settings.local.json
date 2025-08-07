@@ -10,7 +10,11 @@
       "Bash(kill:*)",
       "Bash(./RunCFBDM.sh:*)",
       "Bash(timeout 10 npm run dev)",
-      "Bash(chmod:*)"
+      "Bash(chmod:*)",
+      "Bash(./RunCFBDM-dev.sh:*)",
+      "Bash(dos2unix:*)",
+      "Bash(sed:*)",
+      "Bash(timeout:*)"
     ],
     "deny": []
   }
