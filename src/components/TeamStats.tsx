@@ -172,6 +172,17 @@ const TeamStats: React.FC = () => {
     }));
   }, [setTeamLeaders]);
 
+  const removeLeaderRow = useCallback((category: keyof TeamLeaderStats, index: number) => {
+    setTeamLeaders(prev => {
+      const leaders = [...(prev[category] || [])];
+      leaders.splice(index, 1);
+      return {
+        ...prev,
+        [category]: leaders
+      };
+    });
+  }, [setTeamLeaders]);
+
   const formatNumber = (num: number, decimals: number = 1): string => {
     return num.toFixed(decimals);
   };
@@ -408,6 +419,7 @@ const TeamStats: React.FC = () => {
                       <TableHead className="w-1/8">TDs</TableHead>
                       <TableHead className="w-1/8">INTs</TableHead>
                       <TableHead className="w-1/8 bg-gray-100 dark:bg-gray-800">YPG</TableHead>
+                      <TableHead className="w-12"></TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -466,10 +478,19 @@ const TeamStats: React.FC = () => {
                         <TableCell className="bg-gray-100 dark:bg-gray-800">
                           {formatNumber((leader.yards || 0) / effectiveGamesPlayed)}
                         </TableCell>
+                        <TableCell>
+                          <button
+                            onClick={() => removeLeaderRow('passingLeaders', index)}
+                            className="text-red-600 hover:text-red-800 text-sm px-2 py-1 rounded"
+                            title="Remove Player"
+                          >
+                            ✕
+                          </button>
+                        </TableCell>
                       </TableRow>
                     ))}
                     <TableRow>
-                      <TableCell colSpan={6}>
+                      <TableCell colSpan={7}>
                         <button
                           onClick={() => addLeaderRow('passingLeaders')}
                           className="text-blue-600 hover:text-blue-800 text-sm"
@@ -494,6 +515,7 @@ const TeamStats: React.FC = () => {
                       <TableHead className="w-1/8">TDs</TableHead>
                       <TableHead className="w-1/8 bg-gray-100 dark:bg-gray-800">YPC</TableHead>
                       <TableHead className="w-1/8 bg-gray-100 dark:bg-gray-800">YPG</TableHead>
+                      <TableHead className="w-12"></TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -546,10 +568,19 @@ const TeamStats: React.FC = () => {
                         <TableCell className="bg-gray-100 dark:bg-gray-800">
                           {formatNumber((leader.yards || 0) / effectiveGamesPlayed)}
                         </TableCell>
+                        <TableCell>
+                          <button
+                            onClick={() => removeLeaderRow('rushingLeaders', index)}
+                            className="text-red-600 hover:text-red-800 text-sm px-2 py-1 rounded"
+                            title="Remove Player"
+                          >
+                            ✕
+                          </button>
+                        </TableCell>
                       </TableRow>
                     ))}
                     <TableRow>
-                      <TableCell colSpan={6}>
+                      <TableCell colSpan={7}>
                         <button
                           onClick={() => addLeaderRow('rushingLeaders')}
                           className="text-blue-600 hover:text-blue-800 text-sm"
@@ -574,6 +605,7 @@ const TeamStats: React.FC = () => {
                       <TableHead className="w-1/8">TDs</TableHead>
                       <TableHead className="w-1/8 bg-gray-100 dark:bg-gray-800">YPC</TableHead>
                       <TableHead className="w-1/8 bg-gray-100 dark:bg-gray-800">YPG</TableHead>
+                      <TableHead className="w-12"></TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -626,10 +658,19 @@ const TeamStats: React.FC = () => {
                         <TableCell className="bg-gray-100 dark:bg-gray-800">
                           {formatNumber((leader.yards || 0) / effectiveGamesPlayed)}
                         </TableCell>
+                        <TableCell>
+                          <button
+                            onClick={() => removeLeaderRow('receivingLeaders', index)}
+                            className="text-red-600 hover:text-red-800 text-sm px-2 py-1 rounded"
+                            title="Remove Player"
+                          >
+                            ✕
+                          </button>
+                        </TableCell>
                       </TableRow>
                     ))}
                     <TableRow>
-                      <TableCell colSpan={6}>
+                      <TableCell colSpan={7}>
                         <button
                           onClick={() => addLeaderRow('receivingLeaders')}
                           className="text-blue-600 hover:text-blue-800 text-sm"
@@ -651,6 +692,7 @@ const TeamStats: React.FC = () => {
                       <TableHead>Name</TableHead>
                       <TableHead>TOT</TableHead>
                       <TableHead className="bg-gray-100 dark:bg-gray-800">Per Game</TableHead>
+                      <TableHead className="w-12"></TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -684,10 +726,19 @@ const TeamStats: React.FC = () => {
                         <TableCell className="bg-gray-100 dark:bg-gray-800">
                           {formatNumber((leader.total || 0) / effectiveGamesPlayed)}
                         </TableCell>
+                        <TableCell>
+                          <button
+                            onClick={() => removeLeaderRow('tackleLeaders', index)}
+                            className="text-red-600 hover:text-red-800 text-sm px-2 py-1 rounded"
+                            title="Remove Player"
+                          >
+                            ✕
+                          </button>
+                        </TableCell>
                       </TableRow>
                     ))}
                     <TableRow>
-                      <TableCell colSpan={3}>
+                      <TableCell colSpan={4}>
                         <button
                           onClick={() => addLeaderRow('tackleLeaders')}
                           className="text-blue-600 hover:text-blue-800 text-sm"
@@ -709,6 +760,7 @@ const TeamStats: React.FC = () => {
                       <TableHead>Name</TableHead>
                       <TableHead>TOT</TableHead>
                       <TableHead className="bg-gray-100 dark:bg-gray-800">Per Game</TableHead>
+                      <TableHead className="w-12"></TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -742,10 +794,19 @@ const TeamStats: React.FC = () => {
                         <TableCell className="bg-gray-100 dark:bg-gray-800">
                           {formatNumber((leader.total || 0) / effectiveGamesPlayed)}
                         </TableCell>
+                        <TableCell>
+                          <button
+                            onClick={() => removeLeaderRow('tflLeaders', index)}
+                            className="text-red-600 hover:text-red-800 text-sm px-2 py-1 rounded"
+                            title="Remove Player"
+                          >
+                            ✕
+                          </button>
+                        </TableCell>
                       </TableRow>
                     ))}
                     <TableRow>
-                      <TableCell colSpan={3}>
+                      <TableCell colSpan={4}>
                         <button
                           onClick={() => addLeaderRow('tflLeaders')}
                           className="text-blue-600 hover:text-blue-800 text-sm"
@@ -767,6 +828,7 @@ const TeamStats: React.FC = () => {
                       <TableHead>Name</TableHead>
                       <TableHead>TOT</TableHead>
                       <TableHead className="bg-gray-100 dark:bg-gray-800">Per Game</TableHead>
+                      <TableHead className="w-12"></TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -801,10 +863,19 @@ const TeamStats: React.FC = () => {
                         <TableCell className="bg-gray-100 dark:bg-gray-800">
                           {formatNumber((leader.total || 0) / effectiveGamesPlayed)}
                         </TableCell>
+                        <TableCell>
+                          <button
+                            onClick={() => removeLeaderRow('sackLeaders', index)}
+                            className="text-red-600 hover:text-red-800 text-sm px-2 py-1 rounded"
+                            title="Remove Player"
+                          >
+                            ✕
+                          </button>
+                        </TableCell>
                       </TableRow>
                     ))}
                     <TableRow>
-                      <TableCell colSpan={3}>
+                      <TableCell colSpan={4}>
                         <button
                           onClick={() => addLeaderRow('sackLeaders')}
                           className="text-blue-600 hover:text-blue-800 text-sm"
@@ -826,6 +897,7 @@ const TeamStats: React.FC = () => {
                       <TableHead>Name</TableHead>
                       <TableHead>TOT</TableHead>
                       <TableHead className="bg-gray-100 dark:bg-gray-800">Per Game</TableHead>
+                      <TableHead className="w-12"></TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -859,10 +931,19 @@ const TeamStats: React.FC = () => {
                         <TableCell className="bg-gray-100 dark:bg-gray-800">
                           {formatNumber((leader.total || 0) / effectiveGamesPlayed)}
                         </TableCell>
+                        <TableCell>
+                          <button
+                            onClick={() => removeLeaderRow('intLeaders', index)}
+                            className="text-red-600 hover:text-red-800 text-sm px-2 py-1 rounded"
+                            title="Remove Player"
+                          >
+                            ✕
+                          </button>
+                        </TableCell>
                       </TableRow>
                     ))}
                     <TableRow>
-                      <TableCell colSpan={3}>
+                      <TableCell colSpan={4}>
                         <button
                           onClick={() => addLeaderRow('intLeaders')}
                           className="text-blue-600 hover:text-blue-800 text-sm"
