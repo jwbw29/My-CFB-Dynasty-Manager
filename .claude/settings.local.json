@@ -9,7 +9,13 @@
       "Bash(lsof:*)",
       "Bash(kill:*)",
       "Bash(./RunCFBDM.sh:*)",
-      "Bash(timeout 10 npm run dev)"
+      "Bash(timeout 10 npm run dev)",
+      "Bash(git checkout:*)",
+      "Bash(pkill:*)",
+      "Bash(true)",
+      "Bash(git restore:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)"
     ],
     "deny": []
   }
