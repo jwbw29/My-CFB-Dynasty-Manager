@@ -95,8 +95,25 @@ export const DynastyProvider: React.FC<DynastyProviderProps> = ({
         setNextAdvanceState("");
       }
 
-      // We let TeamHome or SchedulePage determine the initial active week
-      // because it's based on game progress.
+      // Calculate the correct active week based on schedule progress
+      const currentYear = parseInt(localStorage.getItem("currentYear") || "2025");
+      const schedule = getSchedule(currentYear);
+      
+      if (schedule && schedule.length > 0) {
+        // Find the last completed game
+        const lastCompletedGame = [...schedule]
+          .reverse()
+          .find((g) => g.result !== "N/A");
+        
+        const calculatedActiveWeek = lastCompletedGame
+          ? Math.min(lastCompletedGame.week + 1, 21)
+          : 0;
+        
+        setActiveWeekState(calculatedActiveWeek);
+        setLatestUnlockedWeek(calculatedActiveWeek);
+      } else {
+        setActiveWeekState(0);
+      }
 
       setIsDynastyLoaded(true);
       refreshData();
