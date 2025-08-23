@@ -60,6 +60,7 @@ import {
 } from "@/utils/localStorage";
 import { DynastySnapshot } from "@/utils/dynasty-export";
 import { RankedTeam } from "@/hooks/useTop25Rankings";
+import { useDynasty } from "@/contexts/DynastyContext";
 
 interface Dynasty {
   id: string;
@@ -91,6 +92,7 @@ interface ImportedData {
 }
 
 const DynastyLaunch: React.FC<DynastyLaunchProps> = ({ onDynastySelected }) => {
+  const { getRankingsForWeek, activeWeek } = useDynasty();
   const [dynasties, setDynasties] = useState<Dynasty[]>([]);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showImportModal, setShowImportModal] = useState(false);
@@ -200,35 +202,11 @@ const DynastyLaunch: React.FC<DynastyLaunchProps> = ({ onDynastySelected }) => {
     return { wins: 0, losses: 0, seasonsPlayed: 0 };
   };
 
-  const getLatestRank = (
-    dynastyId: string,
-    teamName: string
-  ): number | null => {
-    try {
-      const dynastyDataString = localStorage.getItem(`dynasty_${dynastyId}`);
-      if (!dynastyDataString) return null;
-
-      const snapshot = JSON.parse(dynastyDataString);
-      const history = snapshot.top25History || {};
-      if (!history || Object.keys(history).length === 0) return null;
-
-      const latestYear = Math.max(
-        ...Object.keys(history).map(Number).filter(isFinite)
-      );
-      const yearData = history[latestYear];
-      if (!yearData) return null;
-
-      const latestWeek = Math.max(
-        ...Object.keys(yearData).map(Number).filter(isFinite)
-      );
-      const latestPoll = yearData[latestWeek];
-      if (!latestPoll) return null;
-
-      const rankIndex = latestPoll.findIndex((t: any) => t.name === teamName);
-      return rankIndex !== -1 ? rankIndex + 1 : null;
-    } catch {
-      return null;
-    }
+  const getTeamRank = (teamName: string, currentYear: number): number | null => {
+    if (!teamName || teamName === "Team") return null;
+    const rankings = getRankingsForWeek(currentYear, activeWeek);
+    const rankIndex = rankings.findIndex((t) => t.name === teamName);
+    return rankIndex !== -1 ? rankIndex + 1 : null;
   };
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -503,7 +481,9 @@ const DynastyLaunch: React.FC<DynastyLaunchProps> = ({ onDynastySelected }) => {
     };
   };
 
-  const getDynastyAdvanceSchedule = (dynastyId: string): { readyToAdvance: boolean; nextAdvance: string } => {
+  const getDynastyAdvanceSchedule = (
+    dynastyId: string
+  ): { readyToAdvance: boolean; nextAdvance: string } => {
     try {
       const dynastyData = localStorage.getItem(`dynasty_${dynastyId}`);
       if (!dynastyData) return { readyToAdvance: false, nextAdvance: "" };
@@ -514,7 +494,10 @@ const DynastyLaunch: React.FC<DynastyLaunchProps> = ({ onDynastySelected }) => {
         nextAdvance: data.nextAdvance || "",
       };
     } catch (error) {
-      console.error(`Error getting advance schedule for dynasty ${dynastyId}:`, error);
+      console.error(
+        `Error getting advance schedule for dynasty ${dynastyId}:`,
+        error
+      );
       return { readyToAdvance: false, nextAdvance: "" };
     }
   };
@@ -620,11 +603,18 @@ const DynastyLaunch: React.FC<DynastyLaunchProps> = ({ onDynastySelected }) => {
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {dynasties.map((dynasty) => {
+                console.log("🚀 ~ dynasty:", dynasty);
                 // --- THIS IS THE SECTION TO UPDATE ---
                 const schoolInfo = getSchoolInfo(dynasty);
+                console.log("🚀 ~ schoolInfo:", schoolInfo);
                 const actualRecord = calculateDynastyRecord(dynasty.id);
-                const teamRank = getLatestRank(dynasty.id, dynasty.schoolName);
+                console.log("🚀 ~ actualRecord:", actualRecord);
+                const teamRank = getTeamRank(dynasty.schoolName, dynasty.currentYear);
+                console.log("🚀 ~ dynasty.id:", dynasty.id);
+                console.log("🚀 ~ dynasty.schoolName:", dynasty.schoolName);
+                console.log("🚀 ~ teamRank:", teamRank);
                 const advanceSchedule = getDynastyAdvanceSchedule(dynasty.id);
+                console.log("🚀 ~ advanceSchedule:", advanceSchedule);
 
                 return (
                   <Card key={dynasty.id} className="bg-white/10 ...">
@@ -667,14 +657,26 @@ const DynastyLaunch: React.FC<DynastyLaunchProps> = ({ onDynastySelected }) => {
                         </span>
                       </div>
                       <div className="flex items-center gap-2 text-blue-100">
-                        <CheckCircle className={`h-4 w-4 ${advanceSchedule.readyToAdvance ? 'text-green-400' : 'text-gray-400'}`} />
-                        <span>Ready to Advance: {advanceSchedule.readyToAdvance ? 'Yes' : 'No'}</span>
+                        <CheckCircle
+                          className={`h-4 w-4 ${
+                            advanceSchedule.readyToAdvance
+                              ? "text-green-400"
+                              : "text-gray-400"
+                          }`}
+                        />
+                        <span>
+                          Ready to Advance:{" "}
+                          {advanceSchedule.readyToAdvance ? "Yes" : "No"}
+                        </span>
                       </div>
                       {advanceSchedule.nextAdvance && (
                         <div className="flex items-center gap-2 text-blue-100">
                           <Clock className="h-4 w-4" />
                           <span>
-                            Next Advance: {new Date(advanceSchedule.nextAdvance).toLocaleDateString()}
+                            Next Advance:{" "}
+                            {new Date(
+                              advanceSchedule.nextAdvance
+                            ).toLocaleDateString()}
                           </span>
                         </div>
                       )}
