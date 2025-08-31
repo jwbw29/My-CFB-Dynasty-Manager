@@ -674,7 +674,7 @@ const DynastyLaunch: React.FC<DynastyLaunchProps> = ({ onDynastySelected }) => {
                         <div className="flex items-center gap-2 text-blue-100">
                           <Clock className="h-4 w-4" />
                           <span>
-                            Next Advance: {new Date(advanceSchedule.nextAdvance).toLocaleDateString()}
+                            Next Advance: {advanceSchedule.nextAdvance ? new Date(advanceSchedule.nextAdvance + 'T12:00:00').toLocaleDateString() : ''}
                           </span>
                         </div>
                       )}
