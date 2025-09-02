@@ -257,6 +257,22 @@ const Top25Rankings: React.FC = () => {
           </div>
         </CardContent>
       </Card>
+
+      <Card>
+        <CardHeader className="font-bold">Others Receiving Votes:</CardHeader>
+        <CardContent className="flex flex-col gap-2">
+          <p>
+            BYU 102, Auburn 94, Georgia Tech 67, Southern Cal 64, Louisville 59,
+            TCU 49, Missouri 42, South Florida 25, Tulane 18, Nebraska 13,
+            Kansas St. 7, James Madison 4, Liberty 4, UNLV 4, Duke 4, Navy 2,
+            Pittsburgh 2, Baylor 2, Virginia 2, Memphis 2.{" "}
+          </p>
+          <p className="text-sm italic">
+            Point values in parentheses indicate the number of first place
+            votes.
+          </p>
+        </CardContent>
+      </Card>
     </div>
   );
 };
