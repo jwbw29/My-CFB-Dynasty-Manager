@@ -1,14 +1,27 @@
 "use client";
 
-import React, { useState, useMemo, useCallback } from 'react';
-import { Card, CardHeader, CardContent, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import useLocalStorage from '@/hooks/useLocalStorage';
-import { Game } from '@/types/yearRecord';
-import { useDynasty } from '@/contexts/DynastyContext';
+import React, { useState, useMemo, useCallback } from "react";
+import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import useLocalStorage from "@/hooks/useLocalStorage";
+import { Game } from "@/types/yearRecord";
+import { useDynasty } from "@/contexts/DynastyContext";
 
 interface TeamStatsData {
   gamesPlayed: number;
@@ -71,37 +84,45 @@ interface RosterPlayer {
 
 const TeamStats: React.FC = () => {
   const { currentDynastyId } = useDynasty();
-  const [currentYear] = useLocalStorage<number>('currentYear', new Date().getFullYear());
+  const [currentYear] = useLocalStorage<number>(
+    "currentYear",
+    new Date().getFullYear()
+  );
   const [schedule] = useLocalStorage<Game[]>(`schedule_${currentYear}`, []);
-  const [rosterPlayers] = useLocalStorage<RosterPlayer[]>('players', []);
-  const [teamStats, setTeamStats] = useLocalStorage<TeamStatsData>(`teamStats_${currentDynastyId}_${currentYear}`, {
-    gamesPlayed: 0,
-    totalOffense: 0,
-    passYards: 0,
-    rushYards: 0,
-    points: 0,
-    totalDefense: 0,
-    defPassYards: 0,
-    defRushYards: 0,
-    defPoints: 0
-  });
+  const [rosterPlayers] = useLocalStorage<RosterPlayer[]>("players", []);
+  const [teamStats, setTeamStats] = useLocalStorage<TeamStatsData>(
+    `teamStats_${currentDynastyId}_${currentYear}`,
+    {
+      gamesPlayed: 0,
+      totalOffense: 0,
+      passYards: 0,
+      rushYards: 0,
+      points: 0,
+      totalDefense: 0,
+      defPassYards: 0,
+      defRushYards: 0,
+      defPoints: 0,
+    }
+  );
 
-  const [teamLeaders, setTeamLeaders] = useLocalStorage<TeamLeaderStats>(`teamLeaders_${currentDynastyId}_${currentYear}`, {
-    passingLeaders: [],
-    rushingLeaders: [],
-    receivingLeaders: [],
-    tackleLeaders: [],
-    tflLeaders: [],
-    sackLeaders: [],
-    intLeaders: []
-  });
+  const [teamLeaders, setTeamLeaders] = useLocalStorage<TeamLeaderStats>(
+    `teamLeaders_${currentDynastyId}_${currentYear}`,
+    {
+      passingLeaders: [],
+      rushingLeaders: [],
+      receivingLeaders: [],
+      tackleLeaders: [],
+      tflLeaders: [],
+      sackLeaders: [],
+      intLeaders: [],
+    }
+  );
 
   // Calculate games played from schedule (excluding BYE weeks)
   const calculatedGamesPlayed = useMemo(() => {
-    return schedule.filter(game => 
-      game.result !== 'Bye' && 
-      game.result !== 'N/A' && 
-      game.score !== ''
+    return schedule.filter(
+      (game) =>
+        game.result !== "Bye" && game.result !== "N/A" && game.score !== ""
     ).length;
   }, [schedule]);
 
@@ -111,7 +132,7 @@ const TeamStats: React.FC = () => {
   // Calculated fields
   const calculations = useMemo(() => {
     const gp = effectiveGamesPlayed || 1; // Prevent division by zero
-    
+
     return {
       // Per game stats
       totalOffensePerGame: teamStats.totalOffense / gp,
@@ -122,66 +143,86 @@ const TeamStats: React.FC = () => {
       defPassYardsPerGame: teamStats.defPassYards / gp,
       defRushYardsPerGame: teamStats.defRushYards / gp,
       defPointsPerGame: teamStats.defPoints / gp,
-      
+
       // Percentages
       avgMarginOfVictory: (teamStats.points - teamStats.defPoints) / gp,
-      rushYardsPercent: teamStats.totalOffense ? (teamStats.rushYards / teamStats.totalOffense) * 100 : 0,
-      passYardsPercent: teamStats.totalOffense ? (teamStats.passYards / teamStats.totalOffense) * 100 : 0,
-      allowedRushYardsPercent: teamStats.totalDefense ? (teamStats.defRushYards / teamStats.totalDefense) * 100 : 0,
-      allowedPassYardsPercent: teamStats.totalDefense ? (teamStats.defPassYards / teamStats.totalDefense) * 100 : 0,
+      rushYardsPercent: teamStats.totalOffense
+        ? (teamStats.rushYards / teamStats.totalOffense) * 100
+        : 0,
+      passYardsPercent: teamStats.totalOffense
+        ? (teamStats.passYards / teamStats.totalOffense) * 100
+        : 0,
+      allowedRushYardsPercent: teamStats.totalDefense
+        ? (teamStats.defRushYards / teamStats.totalDefense) * 100
+        : 0,
+      allowedPassYardsPercent: teamStats.totalDefense
+        ? (teamStats.defPassYards / teamStats.totalDefense) * 100
+        : 0,
     };
   }, [teamStats, effectiveGamesPlayed]);
 
-  const handleStatsChange = useCallback((field: keyof TeamStatsData, value: string) => {
-    const numValue = parseInt(value) || 0;
-    setTeamStats(prev => ({
-      ...prev,
-      [field]: numValue
-    }));
-  }, [setTeamStats]);
-
-  const handleLeaderChange = useCallback((
-    category: keyof TeamLeaderStats, 
-    index: number, 
-    field: keyof PlayerLeaderStat, 
-    value: string
-  ) => {
-    setTeamLeaders(prev => {
-      const leaders = [...(prev[category] || [])];
-      if (!leaders[index]) {
-        leaders[index] = { name: '' };
-      }
-      
-      if (field === 'name') {
-        leaders[index][field] = value;
-      } else {
-        leaders[index][field] = parseFloat(value) || 0;
-      }
-      
-      return {
+  const handleStatsChange = useCallback(
+    (field: keyof TeamStatsData, value: string) => {
+      const numValue = parseInt(value) || 0;
+      setTeamStats((prev) => ({
         ...prev,
-        [category]: leaders
-      };
-    });
-  }, [setTeamLeaders]);
+        [field]: numValue,
+      }));
+    },
+    [setTeamStats]
+  );
 
-  const addLeaderRow = useCallback((category: keyof TeamLeaderStats) => {
-    setTeamLeaders(prev => ({
-      ...prev,
-      [category]: [...(prev[category] || []), { name: '' }]
-    }));
-  }, [setTeamLeaders]);
+  const handleLeaderChange = useCallback(
+    (
+      category: keyof TeamLeaderStats,
+      index: number,
+      field: keyof PlayerLeaderStat,
+      value: string
+    ) => {
+      setTeamLeaders((prev) => {
+        const leaders = [...(prev[category] || [])];
+        if (!leaders[index]) {
+          leaders[index] = { name: "" };
+        }
 
-  const removeLeaderRow = useCallback((category: keyof TeamLeaderStats, index: number) => {
-    setTeamLeaders(prev => {
-      const leaders = [...(prev[category] || [])];
-      leaders.splice(index, 1);
-      return {
+        if (field === "name") {
+          leaders[index][field] = value;
+        } else {
+          leaders[index][field] = parseFloat(value) || 0;
+        }
+
+        return {
+          ...prev,
+          [category]: leaders,
+        };
+      });
+    },
+    [setTeamLeaders]
+  );
+
+  const addLeaderRow = useCallback(
+    (category: keyof TeamLeaderStats) => {
+      setTeamLeaders((prev) => ({
         ...prev,
-        [category]: leaders
-      };
-    });
-  }, [setTeamLeaders]);
+        [category]: [...(prev[category] || []), { name: "" }],
+      }));
+    },
+    [setTeamLeaders]
+  );
+
+  const removeLeaderRow = useCallback(
+    (category: keyof TeamLeaderStats, index: number) => {
+      setTeamLeaders((prev) => {
+        const leaders = [...(prev[category] || [])];
+        leaders.splice(index, 1);
+        return {
+          ...prev,
+          [category]: leaders,
+        };
+      });
+    },
+    [setTeamLeaders]
+  );
 
   const formatNumber = (num: number, decimals: number = 1): string => {
     return num.toFixed(decimals);
@@ -189,7 +230,10 @@ const TeamStats: React.FC = () => {
 
   // Get sorted players for dropdown
   const getSortedPlayers = () => {
-    return rosterPlayers.sort((a, b) => (parseInt(a.jerseyNumber) || 0) - (parseInt(b.jerseyNumber) || 0));
+    return rosterPlayers.sort(
+      (a, b) =>
+        (parseInt(a.jerseyNumber) || 0) - (parseInt(b.jerseyNumber) || 0)
+    );
   };
 
   const formatPercentage = (num: number): string => {
@@ -216,7 +260,9 @@ const TeamStats: React.FC = () => {
                 <Input
                   type="number"
                   value={teamStats.gamesPlayed}
-                  onChange={(e) => handleStatsChange('gamesPlayed', e.target.value)}
+                  onChange={(e) =>
+                    handleStatsChange("gamesPlayed", e.target.value)
+                  }
                   className="w-full"
                   placeholder={calculatedGamesPlayed.toString()}
                 />
@@ -227,7 +273,7 @@ const TeamStats: React.FC = () => {
 
               {/* Stats Table */}
               <div className="overflow-x-auto">
-                <Table >
+                <Table>
                   <TableHeader>
                     <TableRow>
                       <TableHead></TableHead>
@@ -238,30 +284,36 @@ const TeamStats: React.FC = () => {
                   <TableBody>
                     {/* Offense Section */}
                     <TableRow className="bg-blue-50 dark:bg-blue-900/20">
-                      <TableCell className="font-semibold" colSpan={3}>Offense</TableCell>
+                      <TableCell className="font-semibold" colSpan={3}>
+                        Offense
+                      </TableCell>
                     </TableRow>
 
-                    <TableRow >
+                    <TableRow>
                       <TableCell>TOT OFF</TableCell>
                       <TableCell>
                         <Input
                           type="number"
                           value={teamStats.totalOffense}
-                          onChange={(e) => handleStatsChange('totalOffense', e.target.value)}
+                          onChange={(e) =>
+                            handleStatsChange("totalOffense", e.target.value)
+                          }
                         />
                       </TableCell>
                       <TableCell className="bg-gray-100 dark:bg-gray-800">
                         {formatNumber(calculations.totalOffensePerGame)}
                       </TableCell>
                     </TableRow>
-                    
+
                     <TableRow>
                       <TableCell>Pass YDS</TableCell>
                       <TableCell>
                         <Input
                           type="number"
                           value={teamStats.passYards}
-                          onChange={(e) => handleStatsChange('passYards', e.target.value)}
+                          onChange={(e) =>
+                            handleStatsChange("passYards", e.target.value)
+                          }
                         />
                       </TableCell>
                       <TableCell className="bg-gray-100 dark:bg-gray-800">
@@ -274,7 +326,9 @@ const TeamStats: React.FC = () => {
                         <Input
                           type="number"
                           value={teamStats.rushYards}
-                          onChange={(e) => handleStatsChange('rushYards', e.target.value)}
+                          onChange={(e) =>
+                            handleStatsChange("rushYards", e.target.value)
+                          }
                         />
                       </TableCell>
                       <TableCell className="bg-gray-100 dark:bg-gray-800">
@@ -287,7 +341,9 @@ const TeamStats: React.FC = () => {
                         <Input
                           type="number"
                           value={teamStats.points}
-                          onChange={(e) => handleStatsChange('points', e.target.value)}
+                          onChange={(e) =>
+                            handleStatsChange("points", e.target.value)
+                          }
                         />
                       </TableCell>
                       <TableCell className="bg-gray-100 dark:bg-gray-800">
@@ -297,7 +353,9 @@ const TeamStats: React.FC = () => {
 
                     {/* Defense Section */}
                     <TableRow className="bg-red-50 dark:bg-red-900/20">
-                      <TableCell className="font-semibold" colSpan={3}>Defense</TableCell>
+                      <TableCell className="font-semibold" colSpan={3}>
+                        Defense
+                      </TableCell>
                     </TableRow>
                     <TableRow>
                       <TableCell>TOT DEF</TableCell>
@@ -305,7 +363,9 @@ const TeamStats: React.FC = () => {
                         <Input
                           type="number"
                           value={teamStats.totalDefense}
-                          onChange={(e) => handleStatsChange('totalDefense', e.target.value)}
+                          onChange={(e) =>
+                            handleStatsChange("totalDefense", e.target.value)
+                          }
                         />
                       </TableCell>
                       <TableCell className="bg-gray-100 dark:bg-gray-800">
@@ -318,7 +378,9 @@ const TeamStats: React.FC = () => {
                         <Input
                           type="number"
                           value={teamStats.defPassYards}
-                          onChange={(e) => handleStatsChange('defPassYards', e.target.value)}
+                          onChange={(e) =>
+                            handleStatsChange("defPassYards", e.target.value)
+                          }
                         />
                       </TableCell>
                       <TableCell className="bg-gray-100 dark:bg-gray-800">
@@ -331,7 +393,9 @@ const TeamStats: React.FC = () => {
                         <Input
                           type="number"
                           value={teamStats.defRushYards}
-                          onChange={(e) => handleStatsChange('defRushYards', e.target.value)}
+                          onChange={(e) =>
+                            handleStatsChange("defRushYards", e.target.value)
+                          }
                         />
                       </TableCell>
                       <TableCell className="bg-gray-100 dark:bg-gray-800">
@@ -344,7 +408,9 @@ const TeamStats: React.FC = () => {
                         <Input
                           type="number"
                           value={teamStats.defPoints}
-                          onChange={(e) => handleStatsChange('defPoints', e.target.value)}
+                          onChange={(e) =>
+                            handleStatsChange("defPoints", e.target.value)
+                          }
                         />
                       </TableCell>
                       <TableCell className="bg-gray-100 dark:bg-gray-800">
@@ -365,7 +431,7 @@ const TeamStats: React.FC = () => {
                     </div>
                   </div>
                 </div>
-                
+
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <Label className="text-sm">Rush Yards as % of Total</Label>
@@ -380,16 +446,20 @@ const TeamStats: React.FC = () => {
                     </div>
                   </div>
                 </div>
-                
+
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <Label className="text-sm">Allowed Rush Yards as % of Total</Label>
+                    <Label className="text-sm">
+                      Allowed Rush Yards as % of Total
+                    </Label>
                     <div className="bg-gray-100 dark:bg-gray-800 p-2 rounded text-center">
                       {formatPercentage(calculations.allowedRushYardsPercent)}
                     </div>
                   </div>
                   <div>
-                    <Label className="text-sm">Allowed Pass Yards as % of Total</Label>
+                    <Label className="text-sm">
+                      Allowed Pass Yards as % of Total
+                    </Label>
                     <div className="bg-gray-100 dark:bg-gray-800 p-2 rounded text-center">
                       {formatPercentage(calculations.allowedPassYardsPercent)}
                     </div>
@@ -409,7 +479,9 @@ const TeamStats: React.FC = () => {
             <div className="space-y-6">
               {/* Passing Leaders */}
               <div>
-                <h3 className="font-semibold text-lg bg-blue-100 dark:bg-blue-900 p-2 rounded">Passing</h3>
+                <h3 className="font-semibold text-lg bg-blue-100 dark:bg-blue-900 p-2 rounded">
+                  Passing
+                </h3>
                 <Table className="table-fixed">
                   <TableHeader>
                     <TableRow>
@@ -418,7 +490,9 @@ const TeamStats: React.FC = () => {
                       <TableHead className="w-1/8">COMP%</TableHead>
                       <TableHead className="w-1/8">TDs</TableHead>
                       <TableHead className="w-1/8">INTs</TableHead>
-                      <TableHead className="w-1/8 bg-gray-100 dark:bg-gray-800">YPG</TableHead>
+                      <TableHead className="w-1/8 bg-gray-100 dark:bg-gray-800">
+                        YPG
+                      </TableHead>
                       <TableHead className="w-12"></TableHead>
                     </TableRow>
                   </TableHeader>
@@ -427,16 +501,24 @@ const TeamStats: React.FC = () => {
                       <TableRow key={index}>
                         <TableCell>
                           <Select
-                            value={leader.name || ''}
-                            onValueChange={(value) => handleLeaderChange('passingLeaders', index, 'name', value)}
+                            value={leader.name || ""}
+                            onValueChange={(value) =>
+                              handleLeaderChange(
+                                "passingLeaders",
+                                index,
+                                "name",
+                                value
+                              )
+                            }
                           >
                             <SelectTrigger>
                               <SelectValue placeholder="Select Player" />
                             </SelectTrigger>
                             <SelectContent>
-                              {getSortedPlayers().map(player => (
+                              {getSortedPlayers().map((player) => (
                                 <SelectItem key={player.id} value={player.name}>
-                                  {player.name} - {player.position} #{player.jerseyNumber}
+                                  {player.name} - {player.position} #
+                                  {player.jerseyNumber}
                                 </SelectItem>
                               ))}
                             </SelectContent>
@@ -445,42 +527,74 @@ const TeamStats: React.FC = () => {
                         <TableCell>
                           <Input
                             type="number"
-                            value={leader.yards || ''}
-                            onChange={(e) => handleLeaderChange('passingLeaders', index, 'yards', e.target.value)}
-                            className="w-20"
+                            value={leader.yards || ""}
+                            onChange={(e) =>
+                              handleLeaderChange(
+                                "passingLeaders",
+                                index,
+                                "yards",
+                                e.target.value
+                              )
+                            }
+                            className="text-center mx-auto pr-0"
                           />
                         </TableCell>
                         <TableCell>
                           <Input
                             type="number"
                             step="0.1"
-                            value={leader.completions || ''}
-                            onChange={(e) => handleLeaderChange('passingLeaders', index, 'completions', e.target.value)}
-                            className="w-16"
+                            value={leader.completions || ""}
+                            onChange={(e) =>
+                              handleLeaderChange(
+                                "passingLeaders",
+                                index,
+                                "completions",
+                                e.target.value
+                              )
+                            }
+                            className="text-center mx-auto pr-0"
                           />
                         </TableCell>
                         <TableCell>
                           <Input
                             type="number"
-                            value={leader.touchdowns || ''}
-                            onChange={(e) => handleLeaderChange('passingLeaders', index, 'touchdowns', e.target.value)}
-                            className="w-14"
+                            value={leader.touchdowns || ""}
+                            onChange={(e) =>
+                              handleLeaderChange(
+                                "passingLeaders",
+                                index,
+                                "touchdowns",
+                                e.target.value
+                              )
+                            }
+                            className="text-center mx-auto pr-0"
                           />
                         </TableCell>
                         <TableCell>
                           <Input
                             type="number"
-                            value={leader.interceptions || ''}
-                            onChange={(e) => handleLeaderChange('passingLeaders', index, 'interceptions', e.target.value)}
-                            className="w-14"
+                            value={leader.interceptions || ""}
+                            onChange={(e) =>
+                              handleLeaderChange(
+                                "passingLeaders",
+                                index,
+                                "interceptions",
+                                e.target.value
+                              )
+                            }
+                            className="text-center mx-auto pr-0"
                           />
                         </TableCell>
                         <TableCell className="bg-gray-100 dark:bg-gray-800">
-                          {formatNumber((leader.yards || 0) / effectiveGamesPlayed)}
+                          {formatNumber(
+                            (leader.yards || 0) / effectiveGamesPlayed
+                          )}
                         </TableCell>
                         <TableCell>
                           <button
-                            onClick={() => removeLeaderRow('passingLeaders', index)}
+                            onClick={() =>
+                              removeLeaderRow("passingLeaders", index)
+                            }
                             className="text-red-600 hover:text-red-800 text-sm px-2 py-1 rounded"
                             title="Remove Player"
                           >
@@ -492,7 +606,7 @@ const TeamStats: React.FC = () => {
                     <TableRow>
                       <TableCell colSpan={7}>
                         <button
-                          onClick={() => addLeaderRow('passingLeaders')}
+                          onClick={() => addLeaderRow("passingLeaders")}
                           className="text-blue-600 hover:text-blue-800 text-sm"
                         >
                           + Add Player
@@ -505,7 +619,9 @@ const TeamStats: React.FC = () => {
 
               {/* Rushing Leaders */}
               <div>
-                <h3 className="font-semibold text-lg bg-green-100 dark:bg-green-900 p-2 rounded">Rushing</h3>
+                <h3 className="font-semibold text-lg bg-green-100 dark:bg-green-900 p-2 rounded">
+                  Rushing
+                </h3>
                 <Table className="table-fixed">
                   <TableHeader>
                     <TableRow>
@@ -513,8 +629,12 @@ const TeamStats: React.FC = () => {
                       <TableHead className="w-1/8">CAR</TableHead>
                       <TableHead className="w-1/6">YDS</TableHead>
                       <TableHead className="w-1/8">TDs</TableHead>
-                      <TableHead className="w-1/8 bg-gray-100 dark:bg-gray-800">YPC</TableHead>
-                      <TableHead className="w-1/8 bg-gray-100 dark:bg-gray-800">YPG</TableHead>
+                      <TableHead className="w-1/8 bg-gray-100 dark:bg-gray-800">
+                        YPC
+                      </TableHead>
+                      <TableHead className="w-1/8 bg-gray-100 dark:bg-gray-800">
+                        YPG
+                      </TableHead>
                       <TableHead className="w-12"></TableHead>
                     </TableRow>
                   </TableHeader>
@@ -523,16 +643,24 @@ const TeamStats: React.FC = () => {
                       <TableRow key={index}>
                         <TableCell>
                           <Select
-                            value={leader.name || ''}
-                            onValueChange={(value) => handleLeaderChange('rushingLeaders', index, 'name', value)}
+                            value={leader.name || ""}
+                            onValueChange={(value) =>
+                              handleLeaderChange(
+                                "rushingLeaders",
+                                index,
+                                "name",
+                                value
+                              )
+                            }
                           >
                             <SelectTrigger>
                               <SelectValue placeholder="Select Player" />
                             </SelectTrigger>
                             <SelectContent>
-                              {getSortedPlayers().map(player => (
+                              {getSortedPlayers().map((player) => (
                                 <SelectItem key={player.id} value={player.name}>
-                                  {player.name} - {player.position} #{player.jerseyNumber}
+                                  {player.name} - {player.position} #
+                                  {player.jerseyNumber}
                                 </SelectItem>
                               ))}
                             </SelectContent>
@@ -541,36 +669,63 @@ const TeamStats: React.FC = () => {
                         <TableCell>
                           <Input
                             type="number"
-                            value={leader.carries || ''}
-                            onChange={(e) => handleLeaderChange('rushingLeaders', index, 'carries', e.target.value)}
-                            className="w-16"
+                            value={leader.carries || ""}
+                            onChange={(e) =>
+                              handleLeaderChange(
+                                "rushingLeaders",
+                                index,
+                                "carries",
+                                e.target.value
+                              )
+                            }
+                            className="text-center mx-auto pr-0"
                           />
                         </TableCell>
                         <TableCell>
                           <Input
                             type="number"
-                            value={leader.yards || ''}
-                            onChange={(e) => handleLeaderChange('rushingLeaders', index, 'yards', e.target.value)}
-                            className="w-20"
+                            value={leader.yards || ""}
+                            onChange={(e) =>
+                              handleLeaderChange(
+                                "rushingLeaders",
+                                index,
+                                "yards",
+                                e.target.value
+                              )
+                            }
+                            className="text-center mx-auto pr-0"
                           />
                         </TableCell>
                         <TableCell>
                           <Input
                             type="number"
-                            value={leader.touchdowns || ''}
-                            onChange={(e) => handleLeaderChange('rushingLeaders', index, 'touchdowns', e.target.value)}
-                            className="w-14"
+                            value={leader.touchdowns || ""}
+                            onChange={(e) =>
+                              handleLeaderChange(
+                                "rushingLeaders",
+                                index,
+                                "touchdowns",
+                                e.target.value
+                              )
+                            }
+                            className="text-center mx-auto pr-0"
                           />
                         </TableCell>
                         <TableCell className="bg-gray-100 dark:bg-gray-800">
-                          {formatNumber((leader.yards || 0) / (leader.carries || 1))}
+                          {formatNumber(
+                            (leader.yards || 0) / (leader.carries || 1)
+                          )}
                         </TableCell>
                         <TableCell className="bg-gray-100 dark:bg-gray-800">
-                          {formatNumber((leader.yards || 0) / effectiveGamesPlayed)}
+                          {formatNumber(
+                            (leader.yards || 0) / effectiveGamesPlayed
+                          )}
                         </TableCell>
                         <TableCell>
                           <button
-                            onClick={() => removeLeaderRow('rushingLeaders', index)}
+                            onClick={() =>
+                              removeLeaderRow("rushingLeaders", index)
+                            }
                             className="text-red-600 hover:text-red-800 text-sm px-2 py-1 rounded"
                             title="Remove Player"
                           >
@@ -582,7 +737,7 @@ const TeamStats: React.FC = () => {
                     <TableRow>
                       <TableCell colSpan={7}>
                         <button
-                          onClick={() => addLeaderRow('rushingLeaders')}
+                          onClick={() => addLeaderRow("rushingLeaders")}
                           className="text-blue-600 hover:text-blue-800 text-sm"
                         >
                           + Add Player
@@ -595,7 +750,9 @@ const TeamStats: React.FC = () => {
 
               {/* Receiving Leaders */}
               <div>
-                <h3 className="font-semibold text-lg bg-purple-100 dark:bg-purple-900 p-2 rounded">Receiving</h3>
+                <h3 className="font-semibold text-lg bg-purple-100 dark:bg-purple-900 p-2 rounded">
+                  Receiving
+                </h3>
                 <Table className="table-fixed">
                   <TableHeader>
                     <TableRow>
@@ -603,8 +760,12 @@ const TeamStats: React.FC = () => {
                       <TableHead className="w-1/8">REC</TableHead>
                       <TableHead className="w-1/6">YDS</TableHead>
                       <TableHead className="w-1/8">TDs</TableHead>
-                      <TableHead className="w-1/8 bg-gray-100 dark:bg-gray-800">YPC</TableHead>
-                      <TableHead className="w-1/8 bg-gray-100 dark:bg-gray-800">YPG</TableHead>
+                      <TableHead className="w-1/8 bg-gray-100 dark:bg-gray-800">
+                        YPC
+                      </TableHead>
+                      <TableHead className="w-1/8 bg-gray-100 dark:bg-gray-800">
+                        YPG
+                      </TableHead>
                       <TableHead className="w-12"></TableHead>
                     </TableRow>
                   </TableHeader>
@@ -613,16 +774,24 @@ const TeamStats: React.FC = () => {
                       <TableRow key={index}>
                         <TableCell>
                           <Select
-                            value={leader.name || ''}
-                            onValueChange={(value) => handleLeaderChange('receivingLeaders', index, 'name', value)}
+                            value={leader.name || ""}
+                            onValueChange={(value) =>
+                              handleLeaderChange(
+                                "receivingLeaders",
+                                index,
+                                "name",
+                                value
+                              )
+                            }
                           >
                             <SelectTrigger>
                               <SelectValue placeholder="Select Player" />
                             </SelectTrigger>
                             <SelectContent>
-                              {getSortedPlayers().map(player => (
+                              {getSortedPlayers().map((player) => (
                                 <SelectItem key={player.id} value={player.name}>
-                                  {player.name} - {player.position} #{player.jerseyNumber}
+                                  {player.name} - {player.position} #
+                                  {player.jerseyNumber}
                                 </SelectItem>
                               ))}
                             </SelectContent>
@@ -631,36 +800,63 @@ const TeamStats: React.FC = () => {
                         <TableCell>
                           <Input
                             type="number"
-                            value={leader.receptions || ''}
-                            onChange={(e) => handleLeaderChange('receivingLeaders', index, 'receptions', e.target.value)}
-                            className="w-16"
+                            value={leader.receptions || ""}
+                            onChange={(e) =>
+                              handleLeaderChange(
+                                "receivingLeaders",
+                                index,
+                                "receptions",
+                                e.target.value
+                              )
+                            }
+                            className="text-center mx-auto pr-0"
                           />
                         </TableCell>
                         <TableCell>
                           <Input
                             type="number"
-                            value={leader.yards || ''}
-                            onChange={(e) => handleLeaderChange('receivingLeaders', index, 'yards', e.target.value)}
-                            className="w-20"
+                            value={leader.yards || ""}
+                            onChange={(e) =>
+                              handleLeaderChange(
+                                "receivingLeaders",
+                                index,
+                                "yards",
+                                e.target.value
+                              )
+                            }
+                            className="text-center mx-auto pr-0"
                           />
                         </TableCell>
                         <TableCell>
                           <Input
                             type="number"
-                            value={leader.touchdowns || ''}
-                            onChange={(e) => handleLeaderChange('receivingLeaders', index, 'touchdowns', e.target.value)}
-                            className="w-14"
+                            value={leader.touchdowns || ""}
+                            onChange={(e) =>
+                              handleLeaderChange(
+                                "receivingLeaders",
+                                index,
+                                "touchdowns",
+                                e.target.value
+                              )
+                            }
+                            className="text-center mx-auto pr-0"
                           />
                         </TableCell>
                         <TableCell className="bg-gray-100 dark:bg-gray-800">
-                          {formatNumber((leader.yards || 0) / (leader.receptions || 1))}
+                          {formatNumber(
+                            (leader.yards || 0) / (leader.receptions || 1)
+                          )}
                         </TableCell>
                         <TableCell className="bg-gray-100 dark:bg-gray-800">
-                          {formatNumber((leader.yards || 0) / effectiveGamesPlayed)}
+                          {formatNumber(
+                            (leader.yards || 0) / effectiveGamesPlayed
+                          )}
                         </TableCell>
                         <TableCell>
                           <button
-                            onClick={() => removeLeaderRow('receivingLeaders', index)}
+                            onClick={() =>
+                              removeLeaderRow("receivingLeaders", index)
+                            }
                             className="text-red-600 hover:text-red-800 text-sm px-2 py-1 rounded"
                             title="Remove Player"
                           >
@@ -672,7 +868,7 @@ const TeamStats: React.FC = () => {
                     <TableRow>
                       <TableCell colSpan={7}>
                         <button
-                          onClick={() => addLeaderRow('receivingLeaders')}
+                          onClick={() => addLeaderRow("receivingLeaders")}
                           className="text-blue-600 hover:text-blue-800 text-sm"
                         >
                           + Add Player
@@ -683,15 +879,20 @@ const TeamStats: React.FC = () => {
                 </Table>
               </div>
 
-              {/* Defensive Leaders - Tackles */}
+              {/* DEFENSIVE LEADERS */}
+              {/* Tackles */}
               <div>
-                <h3 className="font-semibold text-lg bg-red-100 dark:bg-red-900 p-2 rounded">TAKs</h3>
+                <h3 className="font-semibold text-lg bg-red-100 dark:bg-red-900 p-2 rounded">
+                  TAKs
+                </h3>
                 <Table>
                   <TableHeader>
                     <TableRow>
                       <TableHead>Name</TableHead>
                       <TableHead>TOT</TableHead>
-                      <TableHead className="bg-gray-100 dark:bg-gray-800">Per Game</TableHead>
+                      <TableHead className="bg-gray-100 dark:bg-gray-800">
+                        Per Game
+                      </TableHead>
                       <TableHead className="w-12"></TableHead>
                     </TableRow>
                   </TableHeader>
@@ -700,16 +901,24 @@ const TeamStats: React.FC = () => {
                       <TableRow key={index}>
                         <TableCell>
                           <Select
-                            value={leader.name || ''}
-                            onValueChange={(value) => handleLeaderChange('tackleLeaders', index, 'name', value)}
+                            value={leader.name || ""}
+                            onValueChange={(value) =>
+                              handleLeaderChange(
+                                "tackleLeaders",
+                                index,
+                                "name",
+                                value
+                              )
+                            }
                           >
                             <SelectTrigger>
                               <SelectValue placeholder="Select Player" />
                             </SelectTrigger>
                             <SelectContent>
-                              {getSortedPlayers().map(player => (
+                              {getSortedPlayers().map((player) => (
                                 <SelectItem key={player.id} value={player.name}>
-                                  {player.name} - {player.position} #{player.jerseyNumber}
+                                  {player.name} - {player.position} #
+                                  {player.jerseyNumber}
                                 </SelectItem>
                               ))}
                             </SelectContent>
@@ -718,17 +927,28 @@ const TeamStats: React.FC = () => {
                         <TableCell>
                           <Input
                             type="number"
-                            value={leader.total || ''}
-                            onChange={(e) => handleLeaderChange('tackleLeaders', index, 'total', e.target.value)}
-                            className="w-16"
+                            value={leader.total || ""}
+                            onChange={(e) =>
+                              handleLeaderChange(
+                                "tackleLeaders",
+                                index,
+                                "total",
+                                e.target.value
+                              )
+                            }
+                            className="w-16 text-center mx-auto pr-0"
                           />
                         </TableCell>
                         <TableCell className="bg-gray-100 dark:bg-gray-800">
-                          {formatNumber((leader.total || 0) / effectiveGamesPlayed)}
+                          {formatNumber(
+                            (leader.total || 0) / effectiveGamesPlayed
+                          )}
                         </TableCell>
                         <TableCell>
                           <button
-                            onClick={() => removeLeaderRow('tackleLeaders', index)}
+                            onClick={() =>
+                              removeLeaderRow("tackleLeaders", index)
+                            }
                             className="text-red-600 hover:text-red-800 text-sm px-2 py-1 rounded"
                             title="Remove Player"
                           >
@@ -740,7 +960,7 @@ const TeamStats: React.FC = () => {
                     <TableRow>
                       <TableCell colSpan={4}>
                         <button
-                          onClick={() => addLeaderRow('tackleLeaders')}
+                          onClick={() => addLeaderRow("tackleLeaders")}
                           className="text-blue-600 hover:text-blue-800 text-sm"
                         >
                           + Add Player
@@ -753,13 +973,17 @@ const TeamStats: React.FC = () => {
 
               {/* TFLs */}
               <div>
-                <h3 className="font-semibold text-lg bg-orange-100 dark:bg-orange-900 p-2 rounded">TFLs</h3>
+                <h3 className="font-semibold text-lg bg-orange-100 dark:bg-orange-900 p-2 rounded">
+                  TFLs
+                </h3>
                 <Table>
                   <TableHeader>
                     <TableRow>
                       <TableHead>Name</TableHead>
                       <TableHead>TOT</TableHead>
-                      <TableHead className="bg-gray-100 dark:bg-gray-800">Per Game</TableHead>
+                      <TableHead className="bg-gray-100 dark:bg-gray-800">
+                        Per Game
+                      </TableHead>
                       <TableHead className="w-12"></TableHead>
                     </TableRow>
                   </TableHeader>
@@ -768,16 +992,24 @@ const TeamStats: React.FC = () => {
                       <TableRow key={index}>
                         <TableCell>
                           <Select
-                            value={leader.name || ''}
-                            onValueChange={(value) => handleLeaderChange('tflLeaders', index, 'name', value)}
+                            value={leader.name || ""}
+                            onValueChange={(value) =>
+                              handleLeaderChange(
+                                "tflLeaders",
+                                index,
+                                "name",
+                                value
+                              )
+                            }
                           >
                             <SelectTrigger>
                               <SelectValue placeholder="Select Player" />
                             </SelectTrigger>
                             <SelectContent>
-                              {getSortedPlayers().map(player => (
+                              {getSortedPlayers().map((player) => (
                                 <SelectItem key={player.id} value={player.name}>
-                                  {player.name} - {player.position} #{player.jerseyNumber}
+                                  {player.name} - {player.position} #
+                                  {player.jerseyNumber}
                                 </SelectItem>
                               ))}
                             </SelectContent>
@@ -786,17 +1018,26 @@ const TeamStats: React.FC = () => {
                         <TableCell>
                           <Input
                             type="number"
-                            value={leader.total || ''}
-                            onChange={(e) => handleLeaderChange('tflLeaders', index, 'total', e.target.value)}
-                            className="w-16"
+                            value={leader.total || ""}
+                            onChange={(e) =>
+                              handleLeaderChange(
+                                "tflLeaders",
+                                index,
+                                "total",
+                                e.target.value
+                              )
+                            }
+                            className="w-16 text-center mx-auto pr-0"
                           />
                         </TableCell>
                         <TableCell className="bg-gray-100 dark:bg-gray-800">
-                          {formatNumber((leader.total || 0) / effectiveGamesPlayed)}
+                          {formatNumber(
+                            (leader.total || 0) / effectiveGamesPlayed
+                          )}
                         </TableCell>
                         <TableCell>
                           <button
-                            onClick={() => removeLeaderRow('tflLeaders', index)}
+                            onClick={() => removeLeaderRow("tflLeaders", index)}
                             className="text-red-600 hover:text-red-800 text-sm px-2 py-1 rounded"
                             title="Remove Player"
                           >
@@ -808,7 +1049,7 @@ const TeamStats: React.FC = () => {
                     <TableRow>
                       <TableCell colSpan={4}>
                         <button
-                          onClick={() => addLeaderRow('tflLeaders')}
+                          onClick={() => addLeaderRow("tflLeaders")}
                           className="text-blue-600 hover:text-blue-800 text-sm"
                         >
                           + Add Player
@@ -821,13 +1062,17 @@ const TeamStats: React.FC = () => {
 
               {/* Sacks */}
               <div>
-                <h3 className="font-semibold text-lg bg-yellow-100 dark:bg-yellow-900 p-2 rounded">SACKS</h3>
+                <h3 className="font-semibold text-lg bg-yellow-100 dark:bg-yellow-900 p-2 rounded">
+                  SACKS
+                </h3>
                 <Table>
                   <TableHeader>
                     <TableRow>
                       <TableHead>Name</TableHead>
                       <TableHead>TOT</TableHead>
-                      <TableHead className="bg-gray-100 dark:bg-gray-800">Per Game</TableHead>
+                      <TableHead className="bg-gray-100 dark:bg-gray-800">
+                        Per Game
+                      </TableHead>
                       <TableHead className="w-12"></TableHead>
                     </TableRow>
                   </TableHeader>
@@ -836,16 +1081,24 @@ const TeamStats: React.FC = () => {
                       <TableRow key={index}>
                         <TableCell>
                           <Select
-                            value={leader.name || ''}
-                            onValueChange={(value) => handleLeaderChange('sackLeaders', index, 'name', value)}
+                            value={leader.name || ""}
+                            onValueChange={(value) =>
+                              handleLeaderChange(
+                                "sackLeaders",
+                                index,
+                                "name",
+                                value
+                              )
+                            }
                           >
                             <SelectTrigger>
                               <SelectValue placeholder="Select Player" />
                             </SelectTrigger>
                             <SelectContent>
-                              {getSortedPlayers().map(player => (
+                              {getSortedPlayers().map((player) => (
                                 <SelectItem key={player.id} value={player.name}>
-                                  {player.name} - {player.position} #{player.jerseyNumber}
+                                  {player.name} - {player.position} #
+                                  {player.jerseyNumber}
                                 </SelectItem>
                               ))}
                             </SelectContent>
@@ -855,17 +1108,28 @@ const TeamStats: React.FC = () => {
                           <Input
                             type="number"
                             step="0.5"
-                            value={leader.total || ''}
-                            onChange={(e) => handleLeaderChange('sackLeaders', index, 'total', e.target.value)}
-                            className="w-16"
+                            value={leader.total || ""}
+                            onChange={(e) =>
+                              handleLeaderChange(
+                                "sackLeaders",
+                                index,
+                                "total",
+                                e.target.value
+                              )
+                            }
+                            className="w-16 text-center mx-auto pr-0"
                           />
                         </TableCell>
                         <TableCell className="bg-gray-100 dark:bg-gray-800">
-                          {formatNumber((leader.total || 0) / effectiveGamesPlayed)}
+                          {formatNumber(
+                            (leader.total || 0) / effectiveGamesPlayed
+                          )}
                         </TableCell>
                         <TableCell>
                           <button
-                            onClick={() => removeLeaderRow('sackLeaders', index)}
+                            onClick={() =>
+                              removeLeaderRow("sackLeaders", index)
+                            }
                             className="text-red-600 hover:text-red-800 text-sm px-2 py-1 rounded"
                             title="Remove Player"
                           >
@@ -877,7 +1141,7 @@ const TeamStats: React.FC = () => {
                     <TableRow>
                       <TableCell colSpan={4}>
                         <button
-                          onClick={() => addLeaderRow('sackLeaders')}
+                          onClick={() => addLeaderRow("sackLeaders")}
                           className="text-blue-600 hover:text-blue-800 text-sm"
                         >
                           + Add Player
@@ -890,13 +1154,17 @@ const TeamStats: React.FC = () => {
 
               {/* Interceptions */}
               <div>
-                <h3 className="font-semibold text-lg bg-indigo-100 dark:bg-indigo-900 p-2 rounded">INTs</h3>
+                <h3 className="font-semibold text-lg bg-indigo-100 dark:bg-indigo-900 p-2 rounded">
+                  INTs
+                </h3>
                 <Table>
                   <TableHeader>
                     <TableRow>
                       <TableHead>Name</TableHead>
                       <TableHead>TOT</TableHead>
-                      <TableHead className="bg-gray-100 dark:bg-gray-800">Per Game</TableHead>
+                      <TableHead className="bg-gray-100 dark:bg-gray-800">
+                        Per Game
+                      </TableHead>
                       <TableHead className="w-12"></TableHead>
                     </TableRow>
                   </TableHeader>
@@ -905,16 +1173,24 @@ const TeamStats: React.FC = () => {
                       <TableRow key={index}>
                         <TableCell>
                           <Select
-                            value={leader.name || ''}
-                            onValueChange={(value) => handleLeaderChange('intLeaders', index, 'name', value)}
+                            value={leader.name || ""}
+                            onValueChange={(value) =>
+                              handleLeaderChange(
+                                "intLeaders",
+                                index,
+                                "name",
+                                value
+                              )
+                            }
                           >
                             <SelectTrigger>
                               <SelectValue placeholder="Select Player" />
                             </SelectTrigger>
                             <SelectContent>
-                              {getSortedPlayers().map(player => (
+                              {getSortedPlayers().map((player) => (
                                 <SelectItem key={player.id} value={player.name}>
-                                  {player.name} - {player.position} #{player.jerseyNumber}
+                                  {player.name} - {player.position} #
+                                  {player.jerseyNumber}
                                 </SelectItem>
                               ))}
                             </SelectContent>
@@ -923,17 +1199,26 @@ const TeamStats: React.FC = () => {
                         <TableCell>
                           <Input
                             type="number"
-                            value={leader.total || ''}
-                            onChange={(e) => handleLeaderChange('intLeaders', index, 'total', e.target.value)}
-                            className="w-16"
+                            value={leader.total || ""}
+                            onChange={(e) =>
+                              handleLeaderChange(
+                                "intLeaders",
+                                index,
+                                "total",
+                                e.target.value
+                              )
+                            }
+                            className="w-16 text-center mx-auto pr-0"
                           />
                         </TableCell>
                         <TableCell className="bg-gray-100 dark:bg-gray-800">
-                          {formatNumber((leader.total || 0) / effectiveGamesPlayed)}
+                          {formatNumber(
+                            (leader.total || 0) / effectiveGamesPlayed
+                          )}
                         </TableCell>
                         <TableCell>
                           <button
-                            onClick={() => removeLeaderRow('intLeaders', index)}
+                            onClick={() => removeLeaderRow("intLeaders", index)}
                             className="text-red-600 hover:text-red-800 text-sm px-2 py-1 rounded"
                             title="Remove Player"
                           >
@@ -945,7 +1230,7 @@ const TeamStats: React.FC = () => {
                     <TableRow>
                       <TableCell colSpan={4}>
                         <button
-                          onClick={() => addLeaderRow('intLeaders')}
+                          onClick={() => addLeaderRow("intLeaders")}
                           className="text-blue-600 hover:text-blue-800 text-sm"
                         >
                           + Add Player
