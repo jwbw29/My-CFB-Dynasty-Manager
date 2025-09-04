@@ -33,6 +33,10 @@ interface DynastyContextType {
   ) => void;
   getRankingsForWeek: (year: number, week: number) => RankedTeam[];
 
+  // --- OTHERS RECEIVING VOTES ---
+  updateOthersReceivingVotes: (year: number, week: number, text: string) => void;
+  getOthersReceivingVotes: (year: number, week: number) => string;
+
   // --- ADVANCE SCHEDULE FIELDS ---
   readyToAdvance: boolean;
   nextAdvance: string;
@@ -65,6 +69,9 @@ export const DynastyProvider: React.FC<DynastyProviderProps> = ({
   // --- NEW CENTRALIZED STATE ---
   const [activeWeek, setActiveWeekState] = useState(0);
   const [top25History, setTop25HistoryState] = useState<Top25History>({});
+  const [othersReceivingVotes, setOthersReceivingVotes] = useState<{
+    [year: number]: { [week: number]: string };
+  }>({});
 
   // --- ADVANCE SCHEDULE STATE ---
   const [readyToAdvance, setReadyToAdvanceState] = useState(false);
@@ -78,21 +85,24 @@ export const DynastyProvider: React.FC<DynastyProviderProps> = ({
       const history = getTop25History();
       setTop25HistoryState(history);
 
-      // Load advance schedule fields
+      // Load advance schedule fields and others receiving votes
       const dynastyData = localStorage.getItem(`dynasty_${currentDynastyId}`);
       if (dynastyData) {
         try {
           const data = JSON.parse(dynastyData);
           setReadyToAdvanceState(data.readyToAdvance || false);
           setNextAdvanceState(data.nextAdvance || "");
+          setOthersReceivingVotes(data.othersReceivingVotes || {});
         } catch (e) {
-          console.error("Error loading dynasty advance schedule data:", e);
+          console.error("Error loading dynasty data:", e);
           setReadyToAdvanceState(false);
           setNextAdvanceState("");
+          setOthersReceivingVotes({});
         }
       } else {
         setReadyToAdvanceState(false);
         setNextAdvanceState("");
+        setOthersReceivingVotes({});
       }
 
       // Calculate the correct active week based on schedule progress
@@ -183,6 +193,28 @@ export const DynastyProvider: React.FC<DynastyProviderProps> = ({
     [top25History]
   );
 
+  const updateOthersReceivingVotes = useCallback(
+    (year: number, week: number, text: string) => {
+      setOthersReceivingVotes((prev) => ({
+        ...prev,
+        [year]: {
+          ...(prev[year] || {}),
+          [week]: text,
+        },
+      }));
+      refreshData();
+    },
+    []
+  );
+
+  const getOthersReceivingVotes = useCallback(
+    (year: number, week: number): string => {
+      const yearData = othersReceivingVotes[year] || {};
+      return yearData[week] || "";
+    },
+    [othersReceivingVotes]
+  );
+
   const saveDynastyData = useCallback(() => {
     if (!currentDynastyId) return;
 
@@ -220,9 +252,10 @@ export const DynastyProvider: React.FC<DynastyProviderProps> = ({
       // This ensures the most up-to-date version is saved, preventing data loss.
       dynastyData.top25History = top25History;
 
-      // 3.1. Add advance schedule fields
+      // 3.1. Add advance schedule fields and others receiving votes
       dynastyData.readyToAdvance = readyToAdvance;
       dynastyData.nextAdvance = nextAdvance;
+      dynastyData.othersReceivingVotes = othersReceivingVotes;
 
       // 4. Gather dynamic, year-specific and dynasty-specific keys from localStorage.
       Object.keys(localStorage).forEach((key) => {
@@ -276,7 +309,7 @@ export const DynastyProvider: React.FC<DynastyProviderProps> = ({
     } catch (error) {
       console.error("Error saving dynasty data:", error);
     }
-  }, [currentDynastyId, top25History, readyToAdvance, nextAdvance]);
+  }, [currentDynastyId, top25History, readyToAdvance, nextAdvance, othersReceivingVotes]);
 
   const value: DynastyContextType = {
     currentDynastyId,
@@ -293,6 +326,9 @@ export const DynastyProvider: React.FC<DynastyProviderProps> = ({
     advanceWeek,
     updateRankingsForWeek,
     getRankingsForWeek,
+    // --- OTHERS RECEIVING VOTES VALUES ---
+    updateOthersReceivingVotes,
+    getOthersReceivingVotes,
     // --- ADVANCE SCHEDULE VALUES ---
     readyToAdvance,
     nextAdvance,

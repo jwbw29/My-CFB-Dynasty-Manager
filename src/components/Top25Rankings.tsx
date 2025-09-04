@@ -2,7 +2,7 @@
 
 "use client";
 
-import React, { useMemo, useCallback } from "react";
+import React, { useMemo, useCallback, useState, useEffect } from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
@@ -19,6 +19,7 @@ import { useTop25Rankings, RankedTeam } from "@/hooks/useTop25Rankings";
 import { TeamLogo } from "./ui/TeamLogo";
 import { getWeekDisplayName } from "@/utils/weekUtils";
 import { getCurrentYear } from "@/utils/localStorage";
+import { useDynasty } from "@/contexts/DynastyContext";
 
 // --- WEEKS array for the dropdown selector ---
 const WEEKS = Array.from({ length: 22 }, (_, i) => i); // Weeks 0-21
@@ -90,6 +91,81 @@ const TeamRankingRow: React.FC<TeamRankingRowProps> = ({
       </div>
       <div className="text-center w-16 flex justify-center">
         {renderRankingChange(team.name, index)}
+      </div>
+    </div>
+  );
+};
+
+// --- OthersReceivingVotes Editor Component ---
+interface OthersReceivingVotesProps {
+  currentYear: number;
+  activeWeek: number;
+}
+
+const OthersReceivingVotes: React.FC<OthersReceivingVotesProps> = ({
+  currentYear,
+  activeWeek,
+}) => {
+  const {
+    getOthersReceivingVotes,
+    updateOthersReceivingVotes,
+    saveDynastyData,
+  } = useDynasty();
+
+  const [text, setText] = useState<string>("");
+  const [isEditing, setIsEditing] = useState(false);
+  const [draft, setDraft] = useState(text);
+
+  // Load the saved text when component mounts or week/year changes
+  useEffect(() => {
+    const savedText = getOthersReceivingVotes(currentYear, activeWeek);
+    setText(savedText);
+    setDraft(savedText);
+  }, [currentYear, activeWeek, getOthersReceivingVotes]);
+
+  const handleEdit = () => {
+    setDraft(text);
+    setIsEditing(true);
+  };
+
+  const handleCancel = () => {
+    setIsEditing(false);
+    setDraft(text);
+  };
+
+  const handleSave = () => {
+    setText(draft);
+    setIsEditing(false);
+    // Save to dynasty context/localStorage
+    updateOthersReceivingVotes(currentYear, activeWeek, draft);
+    saveDynastyData();
+  };
+
+  if (!isEditing) {
+    return (
+      <div className="flex items-start justify-between gap-2">
+        <p className="flex-1 whitespace-pre-wrap">{text}</p>
+        <Button variant="outline" size="sm" onClick={handleEdit}>
+          Edit
+        </Button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex flex-col gap-2">
+      <textarea
+        className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+        rows={5}
+        value={draft}
+        onChange={(e) => setDraft(e.target.value)}
+        placeholder="Others receiving votes (e.g., Team A 45, Team B 23)"
+      />
+      <div className="flex gap-2">
+        <Button onClick={handleSave}>Save</Button>
+        <Button variant="outline" onClick={handleCancel}>
+          Cancel
+        </Button>
       </div>
     </div>
   );
@@ -260,13 +336,11 @@ const Top25Rankings: React.FC = () => {
 
       <Card>
         <CardHeader className="font-bold">Others Receiving Votes:</CardHeader>
-        <CardContent className="flex flex-col gap-2">
-          <p>
-            BYU 102, Auburn 94, Georgia Tech 67, Southern Cal 64, Louisville 59,
-            TCU 49, Missouri 42, South Florida 25, Tulane 18, Nebraska 13,
-            Kansas St. 7, James Madison 4, Liberty 4, UNLV 4, Duke 4, Navy 2,
-            Pittsburgh 2, Baylor 2, Virginia 2, Memphis 2.{" "}
-          </p>
+        <CardContent className="flex flex-col gap-6">
+          <OthersReceivingVotes
+            currentYear={currentYear}
+            activeWeek={activeWeek}
+          />
           <p className="text-sm italic">
             Point values in parentheses indicate the number of first place
             votes.
