@@ -705,3 +705,55 @@ export const restoreDynastyFromSnapshot = (data: Record<string, any>): void => {
     }
   });
 };
+
+// --- USER CONTROLLED TEAMS MANAGEMENT ---
+
+const USER_CONTROLLED_TEAMS_KEY = "userControlledTeams";
+
+/**
+ * Get the list of user-controlled teams for the current dynasty
+ */
+export const getUserControlledTeams = (): string[] => {
+  const dynastyData = getCurrentDynastyData();
+  return dynastyData?.[USER_CONTROLLED_TEAMS_KEY] || [];
+};
+
+/**
+ * Set the list of user-controlled teams for the current dynasty
+ */
+export const setUserControlledTeams = (teams: string[]): void => {
+  const dynastyId = safeLocalStorage.getItem("currentDynastyId");
+  if (!dynastyId) return;
+
+  const dynastyData = getCurrentDynastyData() || {};
+  dynastyData[USER_CONTROLLED_TEAMS_KEY] = teams;
+  
+  safeLocalStorage.setItem(`dynasty_${dynastyId}`, JSON.stringify(dynastyData));
+};
+
+/**
+ * Add a team to the user-controlled teams list
+ */
+export const addUserControlledTeam = (teamName: string): void => {
+  const currentTeams = getUserControlledTeams();
+  if (!currentTeams.includes(teamName)) {
+    setUserControlledTeams([...currentTeams, teamName]);
+  }
+};
+
+/**
+ * Remove a team from the user-controlled teams list
+ */
+export const removeUserControlledTeam = (teamName: string): void => {
+  const currentTeams = getUserControlledTeams();
+  setUserControlledTeams(currentTeams.filter(team => team !== teamName));
+};
+
+/**
+ * Check if a team is user-controlled
+ */
+export const isTeamUserControlled = (teamName: string): boolean => {
+  if (!teamName) return false;
+  const userControlledTeams = getUserControlledTeams();
+  return userControlledTeams.includes(teamName);
+};

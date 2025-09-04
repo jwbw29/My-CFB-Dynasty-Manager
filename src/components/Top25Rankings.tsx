@@ -20,9 +20,16 @@ import { TeamLogo } from "./ui/TeamLogo";
 import { getWeekDisplayName } from "@/utils/weekUtils";
 import { getCurrentYear } from "@/utils/localStorage";
 import { useDynasty } from "@/contexts/DynastyContext";
+import { isTeamUserControlled as isUserControlled } from "@/utils/localStorage";
 
 // --- WEEKS array for the dropdown selector ---
 const WEEKS = Array.from({ length: 22 }, (_, i) => i); // Weeks 0-21
+
+// --- HELPER: Check if a team is user-controlled ---
+// Now using the new centralized user teams data source
+const isTeamUserControlled = (teamName: string): boolean => {
+  return isUserControlled(teamName);
+};
 
 // --- Updated TeamRankingRow Component ---
 interface TeamRankingRowProps {
@@ -67,7 +74,12 @@ const TeamRankingRow: React.FC<TeamRankingRowProps> = ({
               {team.name ? (
                 <div className="flex items-center gap-2">
                   <TeamLogo teamName={team.name} size="sm" />
-                  <span className="font-semibold text-sm">{team.name}</span>
+                  <span className="font-semibold text-sm">
+                    {team.name}
+                    {isTeamUserControlled(team.name) && (
+                      <span className="text-xs text-blue-600 font-medium"> (User)</span>
+                    )}
+                  </span>
                   {team.record && team.record.trim() && (
                     <span className="text-muted-foreground text-xs">
                       ({team.record})

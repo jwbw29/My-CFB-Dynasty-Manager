@@ -2,6 +2,7 @@
 // Component to display team info with custom team support
 import React from 'react';
 import { CustomTeamManager } from '@/utils/customTeamManager';
+import { isTeamUserControlled } from '@/utils/localStorage';
 
 interface TeamInfoDisplayProps {
   teamName: string;
@@ -20,13 +21,25 @@ export const TeamInfoDisplay: React.FC<TeamInfoDisplayProps> = ({
   const isCustom = CustomTeamManager.isCustomTeam(teamName);
 
   if (!teamInfo) {
-    return <span className={className}>{teamName}</span>;
+    return (
+      <span className={className}>
+        {teamName}
+        {isTeamUserControlled(teamName) && (
+          <span className="text-xs text-blue-600 font-medium"> (User)</span>
+        )}
+      </span>
+    );
   }
 
   return (
     <div className={className}>
       <div className="flex items-center gap-2">
-        <span className="font-semibold">{teamInfo.name}</span>
+        <span className="font-semibold">
+          {teamInfo.name}
+          {isTeamUserControlled(teamInfo.name) && (
+            <span className="text-xs text-blue-600 font-medium"> (User)</span>
+          )}
+        </span>
         {isCustom && <span className="text-xs bg-blue-100 text-blue-800 px-1 rounded">Custom</span>}
       </div>
       {teamInfo.nickName && (

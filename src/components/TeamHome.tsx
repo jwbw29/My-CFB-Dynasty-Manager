@@ -36,6 +36,7 @@ import {
   getTransfers,
   getYearAwards,
   progressRosterForNewSeason,
+  isTeamUserControlled,
 } from "@/utils/localStorage";
 import useLocalStorage from "@/hooks/useLocalStorage";
 import { validateYear } from "@/utils/validationUtils";
@@ -174,9 +175,7 @@ const GameDisplayRow: React.FC<GameDisplayRowProps> = ({
         <TeamDisplay
           name={firstTeam.name}
           rank={firstTeam.rank}
-          isUserControlled={
-            firstTeam.name === game.opponent ? game.isUserControlled : false
-          }
+          isUserControlled={isTeamUserControlled(firstTeam.name)}
         />
       </div>
 
@@ -195,9 +194,7 @@ const GameDisplayRow: React.FC<GameDisplayRowProps> = ({
         <TeamDisplay
           name={secondTeam.name}
           rank={secondTeam.rank}
-          isUserControlled={
-            secondTeam.name === game.opponent ? game.isUserControlled : false
-          }
+          isUserControlled={isTeamUserControlled(secondTeam.name)}
         />
       </div>
 

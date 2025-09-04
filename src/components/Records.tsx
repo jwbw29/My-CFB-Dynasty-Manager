@@ -24,6 +24,7 @@ import {
   getTransfers,
   calculateStats,
   getYearAwards,
+  isTeamUserControlled,
 } from "@/utils/localStorage";
 import { YearRecord, Game } from "@/types/yearRecord";
 import { DraftedPlayer } from "@/types/playerTypes";
@@ -932,7 +933,12 @@ const Records: React.FC = () => {
                             <SelectItem key={t.name} value={t.name}>
                               <div className="flex items-center gap-2">
                                 <TeamLogo teamName={t.name} size="sm" />
-                                {t.name}
+                                <span>
+                                  {t.name}
+                                  {isTeamUserControlled(t.name) && (
+                                    <span className="text-xs text-blue-600 font-medium"> (User)</span>
+                                  )}
+                                </span>
                               </div>
                             </SelectItem>
                           ))}
@@ -1013,7 +1019,12 @@ const Records: React.FC = () => {
                               <SelectItem key={t.name} value={t.name}>
                                 <div className="flex items-center gap-2">
                                   <TeamLogo teamName={t.name} size="sm" />
-                                  {t.name}
+                                  <span>
+                                    {t.name}
+                                    {isTeamUserControlled(t.name) && (
+                                      <span className="text-xs text-blue-600 font-medium"> (User)</span>
+                                    )}
+                                  </span>
                                 </div>
                               </SelectItem>
                             ))}

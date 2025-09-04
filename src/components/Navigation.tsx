@@ -45,6 +45,7 @@ const Navigation: React.FC<NavigationProps> = memo(
       { name: "Team Home", path: "/" },
       { name: "Schedule", path: "/schedule" },
       { name: "Top 25", path: "/top25" },
+      { name: "User Teams", path: "/user-teams" },
       { name: "Roster", path: "/roster" },
       { name: "Recruiting", path: "/recruiting" },
       { name: "Transfers", path: "/transfers" },

@@ -9,7 +9,7 @@ import React, {
   ReactNode,
   useCallback,
 } from "react";
-import { getTop25History, getSchedule } from "@/utils/localStorage"; // <-- Import getSchedule
+import { getTop25History, getSchedule, getUserControlledTeams } from "@/utils/localStorage"; // <-- Import getSchedule and getUserControlledTeams
 import { RankedTeam, Top25History } from "@/hooks/useTop25Rankings";
 
 interface DynastyContextType {
@@ -252,10 +252,11 @@ export const DynastyProvider: React.FC<DynastyProviderProps> = ({
       // This ensures the most up-to-date version is saved, preventing data loss.
       dynastyData.top25History = top25History;
 
-      // 3.1. Add advance schedule fields and others receiving votes
+      // 3.1. Add advance schedule fields, others receiving votes, and user controlled teams
       dynastyData.readyToAdvance = readyToAdvance;
       dynastyData.nextAdvance = nextAdvance;
       dynastyData.othersReceivingVotes = othersReceivingVotes;
+      dynastyData.userControlledTeams = getUserControlledTeams();
 
       // 4. Gather dynamic, year-specific and dynasty-specific keys from localStorage.
       Object.keys(localStorage).forEach((key) => {

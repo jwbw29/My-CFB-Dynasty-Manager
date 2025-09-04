@@ -27,6 +27,7 @@ import {
   calculateStats,
   getYearStats,
   getCoachProfile,
+  isTeamUserControlled,
 } from "@/utils/localStorage";
 import { getTeamData } from "@/utils/fbsTeams";
 import { fcsTeams } from "@/utils/fcsTeams";
@@ -46,8 +47,7 @@ type UpdateableField =
   | "location"
   | "opponent"
   | "result"
-  | "score"
-  | "isUserControlled";
+  | "score";
 
 const getWeekDisplayName = (weekNumber: number): string => {
   switch (weekNumber) {
@@ -181,7 +181,12 @@ const GameRow = React.memo(
                 {game.opponent && game.opponent !== "BYE" && (
                   <div className="flex items-center gap-2">
                     <TeamLogo teamName={game.opponent} size="xs" />
-                    <span>{opponentDisplayName}</span>
+                    <span>
+                      {opponentDisplayName}
+                      {isTeamUserControlled(game.opponent) && (
+                        <span className="text-xs text-blue-600 font-medium"> (User)</span>
+                      )}
+                    </span>
                   </div>
                 )}
                 {game.opponent === "BYE" && <span>BYE</span>}
@@ -199,7 +204,12 @@ const GameRow = React.memo(
                     <div className="flex items-center justify-between w-full">
                       <div className="flex items-center gap-2">
                         <TeamLogo teamName={team.name} size="xs" />
-                        <span>{team.name}</span>
+                        <span>
+                          {team.name}
+                          {isTeamUserControlled(team.name) && (
+                            <span className="text-xs text-blue-600 font-medium"> (User)</span>
+                          )}
+                        </span>
                       </div>
                       <div className="flex items-center gap-1 ml-2">
                         <ConferenceLogo
@@ -217,20 +227,6 @@ const GameRow = React.memo(
               })}
             </SelectContent>
           </Select>
-        </div>
-        <div className="flex justify-center">
-          <div className="flex flex-col items-center gap-1">
-            <input
-              type="checkbox"
-              checked={game.isUserControlled || false}
-              onChange={(e) =>
-                onUpdateGame(game.week, "isUserControlled", e.target.checked)
-              }
-              className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-              disabled={!game.opponent || game.opponent === "BYE"}
-            />
-            <span className="text-xs text-gray-500">User</span>
-          </div>
         </div>
         <div>
           <Select
@@ -473,8 +469,6 @@ const SchedulePage = () => {
                 ? "Loss"
                 : "Tie";
           }
-        } else if (field === "isUserControlled") {
-          gameToUpdate.isUserControlled = value;
         } else {
           gameToUpdate[field as "location"] = value;
         }

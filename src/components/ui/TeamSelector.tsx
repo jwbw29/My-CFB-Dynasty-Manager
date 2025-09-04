@@ -5,6 +5,7 @@ import { TeamLogo, ConferenceLogo } from './TeamLogo';
 import { getTeamWithLogo } from '@/utils/logoUtils';
 import { fbsTeams } from '@/utils/fbsTeams';
 import { CustomTeamManager } from '@/utils/customTeamManager';
+import { isTeamUserControlled } from '@/utils/localStorage';
 
 interface TeamSelectorProps {
   value: string;
@@ -32,7 +33,12 @@ export const TeamSelector: React.FC<TeamSelectorProps> = ({
           {value && (
             <div className="flex items-center gap-2">
               <TeamLogo teamName={value} size="sm" />
-              <span>{value}</span>
+              <span>
+                {value}
+                {isTeamUserControlled(value) && (
+                  <span className="text-xs text-blue-600 font-medium"> (User)</span>
+                )}
+              </span>
             </div>
           )}
         </SelectValue>
@@ -45,7 +51,12 @@ export const TeamSelector: React.FC<TeamSelectorProps> = ({
               <div className="flex items-center justify-between w-full">
                 <div className="flex items-center gap-2">
                   <TeamLogo teamName={team.name} size="sm" />
-                  <span>{team.name}</span>
+                  <span>
+                    {team.name}
+                    {isTeamUserControlled(team.name) && (
+                      <span className="text-xs text-blue-600 font-medium"> (User)</span>
+                    )}
+                  </span>
                 </div>
                 <div className="flex items-center gap-2 ml-4">
                   <ConferenceLogo conference={team.conference} size="xs" />
