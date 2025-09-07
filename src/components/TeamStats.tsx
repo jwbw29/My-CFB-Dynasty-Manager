@@ -22,6 +22,7 @@ import {
 import useLocalStorage from "@/hooks/useLocalStorage";
 import { Game } from "@/types/yearRecord";
 import { useDynasty } from "@/contexts/DynastyContext";
+import { ChevronUp, ChevronDown } from "lucide-react";
 
 interface TeamStatsData {
   gamesPlayed: number;
@@ -117,6 +118,17 @@ const TeamStats: React.FC = () => {
       intLeaders: [],
     }
   );
+
+  // Sorting state
+  const [sortConfig, setSortConfig] = useState<{
+    category: keyof TeamLeaderStats | null;
+    field: string | null;
+    direction: 'asc' | 'desc';
+  }>({
+    category: null,
+    field: null,
+    direction: 'desc'
+  });
 
   // Calculate games played from schedule (excluding BYE weeks)
   const calculatedGamesPlayed = useMemo(() => {
@@ -234,6 +246,69 @@ const TeamStats: React.FC = () => {
       (a, b) =>
         (parseInt(a.jerseyNumber) || 0) - (parseInt(b.jerseyNumber) || 0)
     );
+  };
+
+  // Sorting functionality
+  const handleSort = (category: keyof TeamLeaderStats, field: string) => {
+    let direction: 'asc' | 'desc' = 'desc';
+    
+    if (sortConfig.category === category && sortConfig.field === field && sortConfig.direction === 'desc') {
+      direction = 'asc';
+    }
+    
+    setSortConfig({ category, field, direction });
+  };
+
+  const getSortedLeaders = (category: keyof TeamLeaderStats) => {
+    const leaders = teamLeaders[category] || [];
+    
+    if (sortConfig.category !== category || !sortConfig.field) {
+      return leaders;
+    }
+
+    return [...leaders].sort((a, b) => {
+      let aVal, bVal;
+      
+      // Handle calculated fields
+      if (sortConfig.field === 'ypg') {
+        aVal = (a.yards || 0) / effectiveGamesPlayed;
+        bVal = (b.yards || 0) / effectiveGamesPlayed;
+      } else if (sortConfig.field === 'ypc_rushing') {
+        aVal = (a.yards || 0) / (a.carries || 1);
+        bVal = (b.yards || 0) / (b.carries || 1);
+      } else if (sortConfig.field === 'ypc_receiving') {
+        aVal = (a.yards || 0) / (a.receptions || 1);
+        bVal = (b.yards || 0) / (b.receptions || 1);
+      } else if (sortConfig.field === 'per_game') {
+        aVal = (a.total || 0) / effectiveGamesPlayed;
+        bVal = (b.total || 0) / effectiveGamesPlayed;
+      } else {
+        // Handle regular fields
+        aVal = a[sortConfig.field as keyof PlayerLeaderStat];
+        bVal = b[sortConfig.field as keyof PlayerLeaderStat];
+      }
+      
+      if (sortConfig.field === 'name') {
+        const aStr = (aVal as string) || '';
+        const bStr = (bVal as string) || '';
+        return sortConfig.direction === 'asc' ? aStr.localeCompare(bStr) : bStr.localeCompare(aStr);
+      }
+      
+      const aNum = Number(aVal) || 0;
+      const bNum = Number(bVal) || 0;
+      
+      return sortConfig.direction === 'asc' ? aNum - bNum : bNum - aNum;
+    });
+  };
+
+  const renderSortIcon = (category: keyof TeamLeaderStats, field: string) => {
+    if (sortConfig.category !== category || sortConfig.field !== field) {
+      return null;
+    }
+    
+    return sortConfig.direction === 'asc' ? 
+      <ChevronUp className="w-4 h-4 inline ml-1" /> : 
+      <ChevronDown className="w-4 h-4 inline ml-1" />;
   };
 
   const formatPercentage = (num: number): string => {
@@ -485,19 +560,47 @@ const TeamStats: React.FC = () => {
                 <Table className="table-fixed">
                   <TableHeader>
                     <TableRow>
-                      <TableHead className="w-2/5">Name</TableHead>
-                      <TableHead className="w-1/6">YDS</TableHead>
-                      <TableHead className="w-1/8">COMP%</TableHead>
-                      <TableHead className="w-1/8">TDs</TableHead>
-                      <TableHead className="w-1/8">INTs</TableHead>
-                      <TableHead className="w-1/8 bg-gray-100 dark:bg-gray-800">
-                        YPG
+                      <TableHead 
+                        className="w-2/5 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800"
+                        onClick={() => handleSort('passingLeaders', 'name')}
+                      >
+                        Name {renderSortIcon('passingLeaders', 'name')}
+                      </TableHead>
+                      <TableHead 
+                        className="w-1/6 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800"
+                        onClick={() => handleSort('passingLeaders', 'yards')}
+                      >
+                        YDS {renderSortIcon('passingLeaders', 'yards')}
+                      </TableHead>
+                      <TableHead 
+                        className="w-1/8 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800"
+                        onClick={() => handleSort('passingLeaders', 'completions')}
+                      >
+                        COMP% {renderSortIcon('passingLeaders', 'completions')}
+                      </TableHead>
+                      <TableHead 
+                        className="w-1/8 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800"
+                        onClick={() => handleSort('passingLeaders', 'touchdowns')}
+                      >
+                        TDs {renderSortIcon('passingLeaders', 'touchdowns')}
+                      </TableHead>
+                      <TableHead 
+                        className="w-1/8 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800"
+                        onClick={() => handleSort('passingLeaders', 'interceptions')}
+                      >
+                        INTs {renderSortIcon('passingLeaders', 'interceptions')}
+                      </TableHead>
+                      <TableHead 
+                        className="w-1/8 bg-gray-100 dark:bg-gray-800 cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-700"
+                        onClick={() => handleSort('passingLeaders', 'ypg')}
+                      >
+                        YPG {renderSortIcon('passingLeaders', 'ypg')}
                       </TableHead>
                       <TableHead className="w-12"></TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {teamLeaders.passingLeaders?.map((leader, index) => (
+                    {getSortedLeaders('passingLeaders')?.map((leader, index) => (
                       <TableRow key={index}>
                         <TableCell>
                           <Select
@@ -625,21 +728,47 @@ const TeamStats: React.FC = () => {
                 <Table className="table-fixed">
                   <TableHeader>
                     <TableRow>
-                      <TableHead className="w-2/5">Name</TableHead>
-                      <TableHead className="w-1/8">CAR</TableHead>
-                      <TableHead className="w-1/6">YDS</TableHead>
-                      <TableHead className="w-1/8">TDs</TableHead>
-                      <TableHead className="w-1/8 bg-gray-100 dark:bg-gray-800">
-                        YPC
+                      <TableHead 
+                        className="w-2/5 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800"
+                        onClick={() => handleSort('rushingLeaders', 'name')}
+                      >
+                        Name {renderSortIcon('rushingLeaders', 'name')}
                       </TableHead>
-                      <TableHead className="w-1/8 bg-gray-100 dark:bg-gray-800">
-                        YPG
+                      <TableHead 
+                        className="w-1/8 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800"
+                        onClick={() => handleSort('rushingLeaders', 'carries')}
+                      >
+                        CAR {renderSortIcon('rushingLeaders', 'carries')}
+                      </TableHead>
+                      <TableHead 
+                        className="w-1/6 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800"
+                        onClick={() => handleSort('rushingLeaders', 'yards')}
+                      >
+                        YDS {renderSortIcon('rushingLeaders', 'yards')}
+                      </TableHead>
+                      <TableHead 
+                        className="w-1/8 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800"
+                        onClick={() => handleSort('rushingLeaders', 'touchdowns')}
+                      >
+                        TDs {renderSortIcon('rushingLeaders', 'touchdowns')}
+                      </TableHead>
+                      <TableHead 
+                        className="w-1/8 bg-gray-100 dark:bg-gray-800 cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-700"
+                        onClick={() => handleSort('rushingLeaders', 'ypc_rushing')}
+                      >
+                        YPC {renderSortIcon('rushingLeaders', 'ypc_rushing')}
+                      </TableHead>
+                      <TableHead 
+                        className="w-1/8 bg-gray-100 dark:bg-gray-800 cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-700"
+                        onClick={() => handleSort('rushingLeaders', 'ypg')}
+                      >
+                        YPG {renderSortIcon('rushingLeaders', 'ypg')}
                       </TableHead>
                       <TableHead className="w-12"></TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {teamLeaders.rushingLeaders?.map((leader, index) => (
+                    {getSortedLeaders('rushingLeaders')?.map((leader, index) => (
                       <TableRow key={index}>
                         <TableCell>
                           <Select
@@ -756,21 +885,47 @@ const TeamStats: React.FC = () => {
                 <Table className="table-fixed">
                   <TableHeader>
                     <TableRow>
-                      <TableHead className="w-2/5">Name</TableHead>
-                      <TableHead className="w-1/8">REC</TableHead>
-                      <TableHead className="w-1/6">YDS</TableHead>
-                      <TableHead className="w-1/8">TDs</TableHead>
-                      <TableHead className="w-1/8 bg-gray-100 dark:bg-gray-800">
-                        YPC
+                      <TableHead 
+                        className="w-2/5 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800"
+                        onClick={() => handleSort('receivingLeaders', 'name')}
+                      >
+                        Name {renderSortIcon('receivingLeaders', 'name')}
                       </TableHead>
-                      <TableHead className="w-1/8 bg-gray-100 dark:bg-gray-800">
-                        YPG
+                      <TableHead 
+                        className="w-1/8 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800"
+                        onClick={() => handleSort('receivingLeaders', 'receptions')}
+                      >
+                        REC {renderSortIcon('receivingLeaders', 'receptions')}
+                      </TableHead>
+                      <TableHead 
+                        className="w-1/6 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800"
+                        onClick={() => handleSort('receivingLeaders', 'yards')}
+                      >
+                        YDS {renderSortIcon('receivingLeaders', 'yards')}
+                      </TableHead>
+                      <TableHead 
+                        className="w-1/8 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800"
+                        onClick={() => handleSort('receivingLeaders', 'touchdowns')}
+                      >
+                        TDs {renderSortIcon('receivingLeaders', 'touchdowns')}
+                      </TableHead>
+                      <TableHead 
+                        className="w-1/8 bg-gray-100 dark:bg-gray-800 cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-700"
+                        onClick={() => handleSort('receivingLeaders', 'ypc_receiving')}
+                      >
+                        YPC {renderSortIcon('receivingLeaders', 'ypc_receiving')}
+                      </TableHead>
+                      <TableHead 
+                        className="w-1/8 bg-gray-100 dark:bg-gray-800 cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-700"
+                        onClick={() => handleSort('receivingLeaders', 'ypg')}
+                      >
+                        YPG {renderSortIcon('receivingLeaders', 'ypg')}
                       </TableHead>
                       <TableHead className="w-12"></TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {teamLeaders.receivingLeaders?.map((leader, index) => (
+                    {getSortedLeaders('receivingLeaders')?.map((leader, index) => (
                       <TableRow key={index}>
                         <TableCell>
                           <Select
@@ -888,16 +1043,29 @@ const TeamStats: React.FC = () => {
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Name</TableHead>
-                      <TableHead>TOT</TableHead>
-                      <TableHead className="bg-gray-100 dark:bg-gray-800">
-                        Per Game
+                      <TableHead 
+                        className="cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800"
+                        onClick={() => handleSort('tackleLeaders', 'name')}
+                      >
+                        Name {renderSortIcon('tackleLeaders', 'name')}
+                      </TableHead>
+                      <TableHead 
+                        className="cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800"
+                        onClick={() => handleSort('tackleLeaders', 'total')}
+                      >
+                        TOT {renderSortIcon('tackleLeaders', 'total')}
+                      </TableHead>
+                      <TableHead 
+                        className="bg-gray-100 dark:bg-gray-800 cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-700"
+                        onClick={() => handleSort('tackleLeaders', 'per_game')}
+                      >
+                        Per Game {renderSortIcon('tackleLeaders', 'per_game')}
                       </TableHead>
                       <TableHead className="w-12"></TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {teamLeaders.tackleLeaders?.map((leader, index) => (
+                    {getSortedLeaders('tackleLeaders')?.map((leader, index) => (
                       <TableRow key={index}>
                         <TableCell>
                           <Select
@@ -979,16 +1147,29 @@ const TeamStats: React.FC = () => {
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Name</TableHead>
-                      <TableHead>TOT</TableHead>
-                      <TableHead className="bg-gray-100 dark:bg-gray-800">
-                        Per Game
+                      <TableHead 
+                        className="cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800"
+                        onClick={() => handleSort('tflLeaders', 'name')}
+                      >
+                        Name {renderSortIcon('tflLeaders', 'name')}
+                      </TableHead>
+                      <TableHead 
+                        className="cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800"
+                        onClick={() => handleSort('tflLeaders', 'total')}
+                      >
+                        TOT {renderSortIcon('tflLeaders', 'total')}
+                      </TableHead>
+                      <TableHead 
+                        className="bg-gray-100 dark:bg-gray-800 cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-700"
+                        onClick={() => handleSort('tflLeaders', 'per_game')}
+                      >
+                        Per Game {renderSortIcon('tflLeaders', 'per_game')}
                       </TableHead>
                       <TableHead className="w-12"></TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {teamLeaders.tflLeaders?.map((leader, index) => (
+                    {getSortedLeaders('tflLeaders')?.map((leader, index) => (
                       <TableRow key={index}>
                         <TableCell>
                           <Select
@@ -1068,16 +1249,29 @@ const TeamStats: React.FC = () => {
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Name</TableHead>
-                      <TableHead>TOT</TableHead>
-                      <TableHead className="bg-gray-100 dark:bg-gray-800">
-                        Per Game
+                      <TableHead 
+                        className="cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800"
+                        onClick={() => handleSort('sackLeaders', 'name')}
+                      >
+                        Name {renderSortIcon('sackLeaders', 'name')}
+                      </TableHead>
+                      <TableHead 
+                        className="cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800"
+                        onClick={() => handleSort('sackLeaders', 'total')}
+                      >
+                        TOT {renderSortIcon('sackLeaders', 'total')}
+                      </TableHead>
+                      <TableHead 
+                        className="bg-gray-100 dark:bg-gray-800 cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-700"
+                        onClick={() => handleSort('sackLeaders', 'per_game')}
+                      >
+                        Per Game {renderSortIcon('sackLeaders', 'per_game')}
                       </TableHead>
                       <TableHead className="w-12"></TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {teamLeaders.sackLeaders?.map((leader, index) => (
+                    {getSortedLeaders('sackLeaders')?.map((leader, index) => (
                       <TableRow key={index}>
                         <TableCell>
                           <Select
@@ -1160,16 +1354,29 @@ const TeamStats: React.FC = () => {
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Name</TableHead>
-                      <TableHead>TOT</TableHead>
-                      <TableHead className="bg-gray-100 dark:bg-gray-800">
-                        Per Game
+                      <TableHead 
+                        className="cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800"
+                        onClick={() => handleSort('intLeaders', 'name')}
+                      >
+                        Name {renderSortIcon('intLeaders', 'name')}
+                      </TableHead>
+                      <TableHead 
+                        className="cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800"
+                        onClick={() => handleSort('intLeaders', 'total')}
+                      >
+                        TOT {renderSortIcon('intLeaders', 'total')}
+                      </TableHead>
+                      <TableHead 
+                        className="bg-gray-100 dark:bg-gray-800 cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-700"
+                        onClick={() => handleSort('intLeaders', 'per_game')}
+                      >
+                        Per Game {renderSortIcon('intLeaders', 'per_game')}
                       </TableHead>
                       <TableHead className="w-12"></TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {teamLeaders.intLeaders?.map((leader, index) => (
+                    {getSortedLeaders('intLeaders')?.map((leader, index) => (
                       <TableRow key={index}>
                         <TableCell>
                           <Select
