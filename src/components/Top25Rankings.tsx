@@ -77,7 +77,9 @@ const TeamRankingRow: React.FC<TeamRankingRowProps> = ({
                   <span className="font-semibold text-sm">
                     {team.name}
                     {isTeamUserControlled(team.name) && (
-                      <span className="text-xs text-blue-600 font-medium"> (User)</span>
+                      <span className="text-xs text-blue-600 font-medium">
+                        (User)
+                      </span>
                     )}
                   </span>
                   {team.record && team.record.trim() && (
