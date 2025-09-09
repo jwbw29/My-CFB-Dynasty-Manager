@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo, useCallback } from "react";
+import React, { useMemo, useCallback } from "react";
 import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -119,16 +119,19 @@ const TeamStats: React.FC = () => {
     }
   );
 
-  // Sorting state
-  const [sortConfig, setSortConfig] = useState<{
-    category: keyof TeamLeaderStats | null;
-    field: string | null;
-    direction: 'asc' | 'desc';
-  }>({
-    category: null,
-    field: null,
-    direction: 'desc'
-  });
+  // Persistent sorting state per category
+  const [sortConfigs, setSortConfigs] = useLocalStorage<Record<keyof TeamLeaderStats, { field: string | null; direction: 'asc' | 'desc' }>>(
+    `teamLeaderSorts_${currentDynastyId}_${currentYear}`,
+    {
+      passingLeaders: { field: null, direction: 'desc' },
+      rushingLeaders: { field: null, direction: 'desc' },
+      receivingLeaders: { field: null, direction: 'desc' },
+      tackleLeaders: { field: null, direction: 'desc' },
+      tflLeaders: { field: null, direction: 'desc' },
+      sackLeaders: { field: null, direction: 'desc' },
+      intLeaders: { field: null, direction: 'desc' }
+    }
+  );
 
   // Calculate games played from schedule (excluding BYE weeks)
   const calculatedGamesPlayed = useMemo(() => {
@@ -250,19 +253,24 @@ const TeamStats: React.FC = () => {
 
   // Sorting functionality
   const handleSort = (category: keyof TeamLeaderStats, field: string) => {
+    const currentSort = sortConfigs[category];
     let direction: 'asc' | 'desc' = 'desc';
     
-    if (sortConfig.category === category && sortConfig.field === field && sortConfig.direction === 'desc') {
+    if (currentSort.field === field && currentSort.direction === 'desc') {
       direction = 'asc';
     }
     
-    setSortConfig({ category, field, direction });
+    setSortConfigs(prev => ({
+      ...prev,
+      [category]: { field, direction }
+    }));
   };
 
   const getSortedLeaders = (category: keyof TeamLeaderStats) => {
     const leaders = teamLeaders[category] || [];
+    const sortConfig = sortConfigs[category];
     
-    if (sortConfig.category !== category || !sortConfig.field) {
+    if (!sortConfig.field) {
       return leaders;
     }
 
@@ -302,7 +310,8 @@ const TeamStats: React.FC = () => {
   };
 
   const renderSortIcon = (category: keyof TeamLeaderStats, field: string) => {
-    if (sortConfig.category !== category || sortConfig.field !== field) {
+    const sortConfig = sortConfigs[category];
+    if (sortConfig.field !== field) {
       return null;
     }
     
