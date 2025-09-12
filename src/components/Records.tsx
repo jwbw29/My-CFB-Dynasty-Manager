@@ -473,7 +473,10 @@ const Records: React.FC = () => {
                   </div>
                 </div>
               </div>
+
+              {/* Top Row */}
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+                {/* Overall Record */}
                 <Card>
                   <CardContent className="pt-4 text-center">
                     <p className="text-xs font-medium text-gray-500">Overall</p>
@@ -482,6 +485,8 @@ const Records: React.FC = () => {
                     </p>
                   </CardContent>
                 </Card>
+
+                {/* Conference Record */}
                 <Card>
                   <CardContent className="pt-4 text-center">
                     <p className="text-xs font-medium text-gray-500">
@@ -492,6 +497,8 @@ const Records: React.FC = () => {
                     </p>
                   </CardContent>
                 </Card>
+
+                {/* Points For */}
                 <Card>
                   <CardContent className="pt-4 text-center">
                     <p className="text-xs font-medium text-gray-500">
@@ -502,6 +509,8 @@ const Records: React.FC = () => {
                     </p>
                   </CardContent>
                 </Card>
+
+                {/* Points Against */}
                 <Card>
                   <CardContent className="pt-4 text-center">
                     <p className="text-xs font-medium text-gray-500">
@@ -512,6 +521,8 @@ const Records: React.FC = () => {
                     </p>
                   </CardContent>
                 </Card>
+
+                {/* Conference Finish */}
                 <Card>
                   <CardContent className="pt-4 text-center">
                     <p className="text-xs font-medium text-gray-500">
@@ -522,6 +533,8 @@ const Records: React.FC = () => {
                     </p>
                   </CardContent>
                 </Card>
+
+                {/* Final Rank */}
                 <Card>
                   <CardContent className="pt-4 text-center">
                     <p className="text-xs font-medium text-gray-500">
@@ -533,7 +546,10 @@ const Records: React.FC = () => {
                   </CardContent>
                 </Card>
               </div>
+
+              {/* Second Row */}
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {/* Season Achievements */}
                 <Card>
                   <CardHeader className="p-4">
                     <CardTitle className="text-lg flex items-center gap-2">
@@ -594,6 +610,8 @@ const Records: React.FC = () => {
                     )}
                   </CardContent>
                 </Card>
+
+                {/* Schedule Highlights */}
                 <Card>
                   <CardHeader className="p-4">
                     <CardTitle className="text-lg flex items-center gap-2">
@@ -645,6 +663,12 @@ const Records: React.FC = () => {
                   </CardContent>
                 </Card>
               </div>
+              <Card>
+                <CardHeader>
+                  <CardTitle>{activeRecord.year} Season Stats</CardTitle>
+                  <CardContent>CardContent</CardContent>
+                </CardHeader>
+              </Card>
             </div>
           </TabsContent>
 
@@ -936,7 +960,10 @@ const Records: React.FC = () => {
                                 <span>
                                   {t.name}
                                   {isTeamUserControlled(t.name) && (
-                                    <span className="text-xs text-blue-600 font-medium"> (User)</span>
+                                    <span className="text-xs text-blue-600 font-medium">
+                                      {" "}
+                                      (User)
+                                    </span>
                                   )}
                                 </span>
                               </div>
@@ -1022,7 +1049,10 @@ const Records: React.FC = () => {
                                   <span>
                                     {t.name}
                                     {isTeamUserControlled(t.name) && (
-                                      <span className="text-xs text-blue-600 font-medium"> (User)</span>
+                                      <span className="text-xs text-blue-600 font-medium">
+                                        {" "}
+                                        (User)
+                                      </span>
                                     )}
                                   </span>
                                 </div>

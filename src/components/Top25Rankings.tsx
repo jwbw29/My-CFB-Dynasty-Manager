@@ -21,6 +21,7 @@ import { getWeekDisplayName } from "@/utils/weekUtils";
 import { getCurrentYear } from "@/utils/localStorage";
 import { useDynasty } from "@/contexts/DynastyContext";
 import { isTeamUserControlled as isUserControlled } from "@/utils/localStorage";
+import { TeamDisplay } from "./TeamHome";
 
 // --- WEEKS array for the dropdown selector ---
 const WEEKS = Array.from({ length: 22 }, (_, i) => i); // Weeks 0-21
@@ -74,14 +75,11 @@ const TeamRankingRow: React.FC<TeamRankingRowProps> = ({
               {team.name ? (
                 <div className="flex items-center gap-2">
                   <TeamLogo teamName={team.name} size="sm" />
-                  <span className="font-semibold text-sm">
-                    {team.name}
-                    {isTeamUserControlled(team.name) && (
-                      <span className="text-xs text-blue-600 font-medium">
-                        (User)
-                      </span>
-                    )}
-                  </span>
+                  <TeamDisplay
+                    name={team.name}
+                    isUserControlled={isTeamUserControlled(team.name)}
+                    custom_classes="font-semibold"
+                  />
                   {team.record && team.record.trim() && (
                     <span className="text-muted-foreground text-xs">
                       ({team.record})
@@ -96,8 +94,15 @@ const TeamRankingRow: React.FC<TeamRankingRowProps> = ({
           <SelectContent className="max-h-72">
             <SelectItem value="unranked">-- Unranked --</SelectItem>
             {dropdownOptions.map((optionTeam) => (
-              <SelectItem key={optionTeam.name} value={optionTeam.name}>
-                {optionTeam.name}
+              <SelectItem
+                key={optionTeam.name}
+                value={optionTeam.name}
+                className="flex flex-row"
+              >
+                <TeamDisplay
+                  name={optionTeam.name}
+                  isUserControlled={isTeamUserControlled(optionTeam.name)}
+                />
               </SelectItem>
             ))}
           </SelectContent>

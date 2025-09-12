@@ -106,13 +106,14 @@ interface GameDisplayRowProps {
   getRankForTeam: (teamNameToRank: string, week: number) => number | null;
 }
 
-const TeamDisplay: React.FC<{
+export const TeamDisplay: React.FC<{
   name: string;
-  rank: number | null;
+  rank?: number | null;
   isUserControlled?: boolean;
-}> = ({ name, rank, isUserControlled }) => (
+  custom_classes?: string;
+}> = ({ name, rank, isUserControlled, custom_classes }) => (
   <div className="flex items-center gap-2 min-w-0">
-    <span className="text-sm min-w-0">
+    <span className={`text-sm min-w-0 ${custom_classes}`}>
       {rank && (
         <span className="font-bold text-muted-foreground">#{rank} </span>
       )}
@@ -247,15 +248,18 @@ const TeamHome: React.FC = () => {
   } = useDynasty();
 
   // Load team leaders data from Team Stats
-  const [teamLeaders] = useLocalStorage<TeamLeaderStats>(`teamLeaders_${currentDynastyId}_${currentYear}`, {
-    passingLeaders: [],
-    rushingLeaders: [],
-    receivingLeaders: [],
-    tackleLeaders: [],
-    tflLeaders: [],
-    sackLeaders: [],
-    intLeaders: []
-  });
+  const [teamLeaders] = useLocalStorage<TeamLeaderStats>(
+    `teamLeaders_${currentDynastyId}_${currentYear}`,
+    {
+      passingLeaders: [],
+      rushingLeaders: [],
+      receivingLeaders: [],
+      tackleLeaders: [],
+      tflLeaders: [],
+      sackLeaders: [],
+      intLeaders: [],
+    }
+  );
 
   const teamRank = useMemo(() => {
     if (!teamName || teamName === "Team") return null;
@@ -295,23 +299,27 @@ const TeamHome: React.FC = () => {
     return () => window.removeEventListener("focus", fetchData);
   }, [dataVersion]);
 
-
   const statLeaders = useMemo<StatLeaders>(() => {
     if (typeof window === "undefined") return {};
     try {
       // Get the top leader from each category based on Team Stats data
-      const getTopLeader = (leaders: PlayerLeaderStat[], sortField: keyof PlayerLeaderStat) => {
+      const getTopLeader = (
+        leaders: PlayerLeaderStat[],
+        sortField: keyof PlayerLeaderStat
+      ) => {
         if (!leaders || leaders.length === 0) return undefined;
         return leaders
-          .filter(leader => leader.name && leader[sortField] != null)
-          .sort((a, b) => (Number(b[sortField]) || 0) - (Number(a[sortField]) || 0))[0];
+          .filter((leader) => leader.name && leader[sortField] != null)
+          .sort(
+            (a, b) => (Number(b[sortField]) || 0) - (Number(a[sortField]) || 0)
+          )[0];
       };
 
       return {
-        passingLeader: getTopLeader(teamLeaders.passingLeaders, 'yards'),
-        rushingLeader: getTopLeader(teamLeaders.rushingLeaders, 'yards'),
-        receivingLeader: getTopLeader(teamLeaders.receivingLeaders, 'yards'),
-        tacklesLeader: getTopLeader(teamLeaders.tackleLeaders, 'total'),
+        passingLeader: getTopLeader(teamLeaders.passingLeaders, "yards"),
+        rushingLeader: getTopLeader(teamLeaders.rushingLeaders, "yards"),
+        receivingLeader: getTopLeader(teamLeaders.receivingLeaders, "yards"),
+        tacklesLeader: getTopLeader(teamLeaders.tackleLeaders, "total"),
       };
     } catch (error) {
       console.error("Error parsing teamLeaders for leaders:", error);
