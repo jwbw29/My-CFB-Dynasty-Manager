@@ -25,8 +25,15 @@ import {
   calculateStats,
   getYearAwards,
   isTeamUserControlled,
+  getTeamStats,
+  getTeamLeaders,
 } from "@/utils/localStorage";
-import { YearRecord, Game } from "@/types/yearRecord";
+import {
+  YearRecord,
+  Game,
+  TeamStatsData,
+  TeamLeaderStats,
+} from "@/types/yearRecord";
 import { DraftedPlayer } from "@/types/playerTypes";
 import {
   Trophy,
@@ -104,9 +111,19 @@ const Records: React.FC = () => {
   const [activeRecord, setActiveRecord] = useState<YearRecord | null>(null);
   const [hasChanges, setHasChanges] = useState(false);
 
-  // --- MODIFICATION: Get current year ---
-  const { dataVersion } = useDynasty();
+  // --- MODIFICATION: Get current year and dynasty ID ---
+  const { dataVersion, currentDynastyId } = useDynasty();
   const currentYear = useMemo(() => getCurrentYear(), []);
+
+  // Helper function to calculate effective games played
+  const getEffectiveGamesPlayed = useCallback((record: YearRecord | null) => {
+    if (!record) return 1;
+    const calculatedGamesPlayed = record.schedule.filter(
+      (game) =>
+        game.result !== "Bye" && game.result !== "N/A" && game.score !== ""
+    ).length;
+    return record.teamStats?.gamesPlayed || calculatedGamesPlayed || 1;
+  }, []);
 
   useEffect(() => {
     const loadRecords = () => {
@@ -205,11 +222,27 @@ const Records: React.FC = () => {
         playersDrafted: storedEditableData.playersDrafted,
         finalRanking: storedEditableData.finalRanking,
         conferenceFinish: storedEditableData.conferenceFinish,
+        // Team Stats (load from localStorage)
+        teamStats: currentDynastyId
+          ? getTeamStats(currentDynastyId, currentYear)
+          : undefined,
+        teamLeaders: currentDynastyId
+          ? getTeamLeaders(currentDynastyId, currentYear)
+          : undefined,
       };
     } else {
       // HISTORICAL MODE: Just load the saved record
       recordForDisplay =
         allStoredRecords.find((r) => r.year === selectedYear) || null;
+
+      // Load team stats for historical records if dynasty ID is available
+      if (recordForDisplay && currentDynastyId) {
+        recordForDisplay = {
+          ...recordForDisplay,
+          teamStats: getTeamStats(currentDynastyId, selectedYear),
+          teamLeaders: getTeamLeaders(currentDynastyId, selectedYear),
+        };
+      }
     }
 
     // Ensure schedule array is always the correct size for the UI
@@ -444,7 +477,9 @@ const Records: React.FC = () => {
 
           {/* Overview */}
           <TabsContent value="overview" className="mt-6">
+            {/* All Content Below the tabs */}
             <div className="space-y-6 max-w-7xl mx-auto">
+              {/* Team logo and Year Season Summary */}
               <div className="text-center space-y-2">
                 <div className="flex items-center justify-center gap-4">
                   {(() => {
@@ -665,11 +700,284 @@ const Records: React.FC = () => {
                   </CardContent>
                 </Card>
               </div>
+
+              {/* Third Row - Season Stats */}
               <Card>
                 <CardHeader>
-                  <CardTitle>{activeRecord.year} Season Stats</CardTitle>
-                  <CardContent>CardContent</CardContent>
+                  <CardTitle className="flex items-center gap-2">
+                    <BarChart2 className="h-5 w-5" />
+                    {activeRecord.year} Season Stats
+                  </CardTitle>
                 </CardHeader>
+                <CardContent>
+                  {activeRecord.teamStats ? (
+                    <div className="space-y-6">
+                      {/* Team Stats Overview */}
+                      <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
+                        <div className="text-center p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
+                          <p className="text-sm font-medium text-green-600 dark:text-green-400">
+                            Total Offense
+                          </p>
+                          <p className="text-2xl font-bold text-green-800 dark:text-green-200">
+                            {activeRecord.teamStats.totalOffense.toLocaleString()}
+                          </p>
+                        </div>
+                        <div className="text-center p-3 bg-red-50 dark:bg-red-900/20 rounded-lg">
+                          <p className="text-sm font-medium text-red-600 dark:text-red-400">
+                            Total Defense
+                          </p>
+                          <p className="text-2xl font-bold text-red-800 dark:text-red-200">
+                            {activeRecord.teamStats.totalDefense.toLocaleString()}
+                          </p>
+                        </div>
+                        <div className="text-center p-3 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
+                          <p className="text-sm font-medium text-purple-600 dark:text-purple-400">
+                            Avg Margin
+                          </p>
+                          <p className="text-2xl font-bold text-purple-800 dark:text-purple-200">
+                            {(
+                              (activeRecord.teamStats.points -
+                                activeRecord.teamStats.defPoints) /
+                              getEffectiveGamesPlayed(activeRecord)
+                            ).toFixed(1)}
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Offense vs Defense Breakdown */}
+                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        {/* Offense */}
+                        <div className="space-y-4">
+                          <h4 className="text-lg font-semibold text-blue-800 dark:text-blue-200 flex items-center gap-2">
+                            <TrendingUp className="h-5 w-5" />
+                            Offense
+                          </h4>
+                          <div className="grid grid-cols-2 gap-3">
+                            <div className="bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg">
+                              <p className="text-xs text-blue-600 dark:text-blue-400 uppercase tracking-wide">
+                                Pass Yards
+                              </p>
+                              <p className="text-lg font-bold text-blue-800 dark:text-blue-200">
+                                {activeRecord.teamStats.passYards.toLocaleString()}
+                              </p>
+                              <p className="text-xs text-blue-600 dark:text-blue-400">
+                                (
+                                {(
+                                  activeRecord.teamStats.passYards /
+                                  getEffectiveGamesPlayed(activeRecord)
+                                ).toFixed(1)}{" "}
+                                per game)
+                              </p>
+                            </div>
+                            <div className="bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg">
+                              <p className="text-xs text-blue-600 dark:text-blue-400 uppercase tracking-wide">
+                                Rush Yards
+                              </p>
+                              <p className="text-lg font-bold text-blue-800 dark:text-blue-200">
+                                {activeRecord.teamStats.rushYards.toLocaleString()}
+                              </p>
+                              <p className="text-xs text-blue-600 dark:text-blue-400">
+                                (
+                                {(
+                                  activeRecord.teamStats.rushYards /
+                                  getEffectiveGamesPlayed(activeRecord)
+                                ).toFixed(1)}{" "}
+                                per game)
+                              </p>
+                            </div>
+                            <div className="bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg col-span-2">
+                              <p className="text-xs text-blue-600 dark:text-blue-400 uppercase tracking-wide">
+                                Points Scored
+                              </p>
+                              <p className="text-lg font-bold text-blue-800 dark:text-blue-200">
+                                {activeRecord.teamStats.points.toLocaleString()}
+                              </p>
+                              <p className="text-xs text-blue-600 dark:text-blue-400">
+                                (
+                                {(
+                                  activeRecord.teamStats.points /
+                                  getEffectiveGamesPlayed(activeRecord)
+                                ).toFixed(1)}{" "}
+                                per game)
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Defense */}
+                        <div className="space-y-4">
+                          <h4 className="text-lg font-semibold text-red-800 dark:text-red-200 flex items-center gap-2">
+                            <ShieldCheck className="h-5 w-5" />
+                            Defense
+                          </h4>
+                          <div className="grid grid-cols-2 gap-3">
+                            <div className="bg-red-50 dark:bg-red-900/20 p-3 rounded-lg">
+                              <p className="text-xs text-red-600 dark:text-red-400 uppercase tracking-wide">
+                                Pass Yards Allowed
+                              </p>
+                              <p className="text-lg font-bold text-red-800 dark:text-red-200">
+                                {activeRecord.teamStats.defPassYards.toLocaleString()}
+                              </p>
+                              <p className="text-xs text-red-600 dark:text-red-400">
+                                (
+                                {(
+                                  activeRecord.teamStats.defPassYards /
+                                  getEffectiveGamesPlayed(activeRecord)
+                                ).toFixed(1)}{" "}
+                                per game)
+                              </p>
+                            </div>
+                            <div className="bg-red-50 dark:bg-red-900/20 p-3 rounded-lg">
+                              <p className="text-xs text-red-600 dark:text-red-400 uppercase tracking-wide">
+                                Rush Yards Allowed
+                              </p>
+                              <p className="text-lg font-bold text-red-800 dark:text-red-200">
+                                {activeRecord.teamStats.defRushYards.toLocaleString()}
+                              </p>
+                              <p className="text-xs text-red-600 dark:text-red-400">
+                                (
+                                {(
+                                  activeRecord.teamStats.defRushYards /
+                                  getEffectiveGamesPlayed(activeRecord)
+                                ).toFixed(1)}{" "}
+                                per game)
+                              </p>
+                            </div>
+                            <div className="bg-red-50 dark:bg-red-900/20 p-3 rounded-lg col-span-2">
+                              <p className="text-xs text-red-600 dark:text-red-400 uppercase tracking-wide">
+                                Points Allowed
+                              </p>
+                              <p className="text-lg font-bold text-red-800 dark:text-red-200">
+                                {activeRecord.teamStats.defPoints.toLocaleString()}
+                              </p>
+                              <p className="text-xs text-red-600 dark:text-red-400">
+                                (
+                                {(
+                                  activeRecord.teamStats.defPoints /
+                                  getEffectiveGamesPlayed(activeRecord)
+                                ).toFixed(1)}{" "}
+                                per game)
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Team Leaders - Show only top performers */}
+                      {activeRecord.teamLeaders && (
+                        <div className="space-y-4">
+                          <h4 className="text-lg font-semibold flex items-center gap-2">
+                            <Star className="h-5 w-5 text-yellow-500" />
+                            Season Leaders
+                          </h4>
+                          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                            {/* Top Passer */}
+                            {activeRecord.teamLeaders.passingLeaders.length >
+                              0 && (
+                              <div className="bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg">
+                                <p className="text-xs text-blue-600 dark:text-blue-400 uppercase tracking-wide font-medium">
+                                  Passing Leader
+                                </p>
+                                <p className="font-bold text-blue-800 dark:text-blue-200 truncate">
+                                  {
+                                    activeRecord.teamLeaders.passingLeaders[0]
+                                      .name
+                                  }
+                                </p>
+                                <p className="text-sm text-blue-600 dark:text-blue-400">
+                                  {activeRecord.teamLeaders.passingLeaders[0].yards?.toLocaleString() ||
+                                    0}{" "}
+                                  yds,{" "}
+                                  {activeRecord.teamLeaders.passingLeaders[0]
+                                    .touchdowns || 0}{" "}
+                                  TDs
+                                </p>
+                              </div>
+                            )}
+
+                            {/* Top Rusher */}
+                            {activeRecord.teamLeaders.rushingLeaders.length >
+                              0 && (
+                              <div className="bg-green-50 dark:bg-green-900/20 p-3 rounded-lg">
+                                <p className="text-xs text-green-600 dark:text-green-400 uppercase tracking-wide font-medium">
+                                  Rushing Leader
+                                </p>
+                                <p className="font-bold text-green-800 dark:text-green-200 truncate">
+                                  {
+                                    activeRecord.teamLeaders.rushingLeaders[0]
+                                      .name
+                                  }
+                                </p>
+                                <p className="text-sm text-green-600 dark:text-green-400">
+                                  {activeRecord.teamLeaders.rushingLeaders[0].yards?.toLocaleString() ||
+                                    0}{" "}
+                                  yds,{" "}
+                                  {activeRecord.teamLeaders.rushingLeaders[0]
+                                    .touchdowns || 0}{" "}
+                                  TDs
+                                </p>
+                              </div>
+                            )}
+
+                            {/* Top Receiver */}
+                            {activeRecord.teamLeaders.receivingLeaders.length >
+                              0 && (
+                              <div className="bg-purple-50 dark:bg-purple-900/20 p-3 rounded-lg">
+                                <p className="text-xs text-purple-600 dark:text-purple-400 uppercase tracking-wide font-medium">
+                                  Receiving Leader
+                                </p>
+                                <p className="font-bold text-purple-800 dark:text-purple-200 truncate">
+                                  {
+                                    activeRecord.teamLeaders.receivingLeaders[0]
+                                      .name
+                                  }
+                                </p>
+                                <p className="text-sm text-purple-600 dark:text-purple-400">
+                                  {activeRecord.teamLeaders.receivingLeaders[0]
+                                    .receptions || 0}{" "}
+                                  rec,{" "}
+                                  {activeRecord.teamLeaders.receivingLeaders[0].yards?.toLocaleString() ||
+                                    0}{" "}
+                                  yds
+                                </p>
+                              </div>
+                            )}
+
+                            {/* Top Tackler */}
+                            {activeRecord.teamLeaders.tackleLeaders.length >
+                              0 && (
+                              <div className="bg-red-50 dark:bg-red-900/20 p-3 rounded-lg">
+                                <p className="text-xs text-red-600 dark:text-red-400 uppercase tracking-wide font-medium">
+                                  Tackle Leader
+                                </p>
+                                <p className="font-bold text-red-800 dark:text-red-200 truncate">
+                                  {
+                                    activeRecord.teamLeaders.tackleLeaders[0]
+                                      .name
+                                  }
+                                </p>
+                                <p className="text-sm text-red-600 dark:text-red-400">
+                                  {activeRecord.teamLeaders.tackleLeaders[0]
+                                    .total || 0}{" "}
+                                  tackles
+                                </p>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+                      <BarChart2 className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                      <p>No team stats available for this season.</p>
+                      <p className="text-sm mt-2">
+                        Stats will appear here when they are entered in the Team
+                        Stats page.
+                      </p>
+                    </div>
+                  )}
+                </CardContent>
               </Card>
             </div>
           </TabsContent>

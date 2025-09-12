@@ -757,3 +757,57 @@ export const isTeamUserControlled = (teamName: string): boolean => {
   const userControlledTeams = getUserControlledTeams();
   return userControlledTeams.includes(teamName);
 };
+
+// --- TEAM STATS MANAGEMENT ---
+
+/**
+ * Get team stats for a specific dynasty and year
+ */
+export const getTeamStats = (dynastyId: string, year: number): import("@/types/yearRecord").TeamStatsData => {
+  const key = `teamStats_${dynastyId}_${year}`;
+  const stored = safeLocalStorage.getItem(key);
+  
+  const defaultStats = {
+    gamesPlayed: 0,
+    totalOffense: 0,
+    passYards: 0,
+    rushYards: 0,
+    points: 0,
+    totalDefense: 0,
+    defPassYards: 0,
+    defRushYards: 0,
+    defPoints: 0,
+  };
+
+  try {
+    return stored ? JSON.parse(stored) : defaultStats;
+  } catch (error) {
+    console.error(`Error parsing team stats for ${dynastyId}_${year}:`, error);
+    return defaultStats;
+  }
+};
+
+/**
+ * Get team leaders for a specific dynasty and year
+ */
+export const getTeamLeaders = (dynastyId: string, year: number): import("@/types/yearRecord").TeamLeaderStats => {
+  const key = `teamLeaders_${dynastyId}_${year}`;
+  const stored = safeLocalStorage.getItem(key);
+  
+  const defaultLeaders = {
+    passingLeaders: [],
+    rushingLeaders: [],
+    receivingLeaders: [],
+    tackleLeaders: [],
+    tflLeaders: [],
+    sackLeaders: [],
+    intLeaders: [],
+  };
+
+  try {
+    return stored ? JSON.parse(stored) : defaultLeaders;
+  } catch (error) {
+    console.error(`Error parsing team leaders for ${dynastyId}_${year}:`, error);
+    return defaultLeaders;
+  }
+};
