@@ -434,6 +434,7 @@ const Records: React.FC = () => {
 
       {activeRecord ? (
         <Tabs defaultValue="overview" className="w-full">
+          {/* Tabs List */}
           <TabsList className="grid w-full grid-cols-2 md:grid-cols-4">
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="schedule">Schedule</TabsTrigger>
@@ -441,6 +442,7 @@ const Records: React.FC = () => {
             <TabsTrigger value="awards">Awards & Draft</TabsTrigger>
           </TabsList>
 
+          {/* Overview */}
           <TabsContent value="overview" className="mt-6">
             <div className="space-y-6 max-w-7xl mx-auto">
               <div className="text-center space-y-2">
@@ -672,6 +674,7 @@ const Records: React.FC = () => {
             </div>
           </TabsContent>
 
+          {/* Schedule */}
           <TabsContent value="schedule" className="mt-6">
             <Card>
               <CardHeader>
@@ -728,6 +731,7 @@ const Records: React.FC = () => {
             </Card>
           </TabsContent>
 
+          {/* Recruits & Transfers */}
           <TabsContent value="recruits" className="mt-6">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <Card className="flex flex-col">
@@ -845,6 +849,7 @@ const Records: React.FC = () => {
             </div>
           </TabsContent>
 
+          {/* Awards & Draft */}
           <TabsContent value="awards" className="mt-6">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
               <div className="flex flex-col gap-6">
