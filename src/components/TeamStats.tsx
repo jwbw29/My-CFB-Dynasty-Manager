@@ -255,58 +255,70 @@ const TeamStats: React.FC = () => {
   const handleSort = (category: keyof TeamLeaderStats, field: string) => {
     const currentSort = sortConfigs[category];
     let direction: 'asc' | 'desc' = 'desc';
+    let sortField = field;
     
     if (currentSort.field === field && currentSort.direction === 'desc') {
       direction = 'asc';
+    } else if (currentSort.field === field && currentSort.direction === 'asc') {
+      // Clear sorting if clicking the same ascending field
+      sortField = '';
     }
+    
+    // Apply sorting immediately to the team leaders data
+    const leaders = teamLeaders[category] || [];
+    let sortedLeaders = [...leaders];
+    
+    if (sortField) {
+      sortedLeaders = sortedLeaders.sort((a, b) => {
+        let aVal, bVal;
+        
+        // Handle calculated fields
+        if (sortField === 'ypg') {
+          aVal = (a.yards || 0) / effectiveGamesPlayed;
+          bVal = (b.yards || 0) / effectiveGamesPlayed;
+        } else if (sortField === 'ypc_rushing') {
+          aVal = (a.yards || 0) / (a.carries || 1);
+          bVal = (b.yards || 0) / (b.carries || 1);
+        } else if (sortField === 'ypc_receiving') {
+          aVal = (a.yards || 0) / (a.receptions || 1);
+          bVal = (b.yards || 0) / (b.receptions || 1);
+        } else if (sortField === 'per_game') {
+          aVal = (a.total || 0) / effectiveGamesPlayed;
+          bVal = (b.total || 0) / effectiveGamesPlayed;
+        } else {
+          // Handle regular fields
+          aVal = a[sortField as keyof PlayerLeaderStat];
+          bVal = b[sortField as keyof PlayerLeaderStat];
+        }
+        
+        if (sortField === 'name') {
+          const aStr = (aVal as string) || '';
+          const bStr = (bVal as string) || '';
+          return direction === 'asc' ? aStr.localeCompare(bStr) : bStr.localeCompare(aStr);
+        }
+        
+        const aNum = Number(aVal) || 0;
+        const bNum = Number(bVal) || 0;
+        
+        return direction === 'asc' ? aNum - bNum : bNum - aNum;
+      });
+    }
+    
+    // Update both the sorted data and the sort configuration
+    setTeamLeaders(prev => ({
+      ...prev,
+      [category]: sortedLeaders
+    }));
     
     setSortConfigs(prev => ({
       ...prev,
-      [category]: { field, direction }
+      [category]: { field: sortField, direction }
     }));
   };
 
   const getSortedLeaders = (category: keyof TeamLeaderStats) => {
-    const leaders = teamLeaders[category] || [];
-    const sortConfig = sortConfigs[category];
-    
-    if (!sortConfig.field) {
-      return leaders;
-    }
-
-    return [...leaders].sort((a, b) => {
-      let aVal, bVal;
-      
-      // Handle calculated fields
-      if (sortConfig.field === 'ypg') {
-        aVal = (a.yards || 0) / effectiveGamesPlayed;
-        bVal = (b.yards || 0) / effectiveGamesPlayed;
-      } else if (sortConfig.field === 'ypc_rushing') {
-        aVal = (a.yards || 0) / (a.carries || 1);
-        bVal = (b.yards || 0) / (b.carries || 1);
-      } else if (sortConfig.field === 'ypc_receiving') {
-        aVal = (a.yards || 0) / (a.receptions || 1);
-        bVal = (b.yards || 0) / (b.receptions || 1);
-      } else if (sortConfig.field === 'per_game') {
-        aVal = (a.total || 0) / effectiveGamesPlayed;
-        bVal = (b.total || 0) / effectiveGamesPlayed;
-      } else {
-        // Handle regular fields
-        aVal = a[sortConfig.field as keyof PlayerLeaderStat];
-        bVal = b[sortConfig.field as keyof PlayerLeaderStat];
-      }
-      
-      if (sortConfig.field === 'name') {
-        const aStr = (aVal as string) || '';
-        const bStr = (bVal as string) || '';
-        return sortConfig.direction === 'asc' ? aStr.localeCompare(bStr) : bStr.localeCompare(aStr);
-      }
-      
-      const aNum = Number(aVal) || 0;
-      const bNum = Number(bVal) || 0;
-      
-      return sortConfig.direction === 'asc' ? aNum - bNum : bNum - aNum;
-    });
+    // Simply return the leaders as they are - sorting is handled by handleSort
+    return teamLeaders[category] || [];
   };
 
   const renderSortIcon = (category: keyof TeamLeaderStats, field: string) => {
