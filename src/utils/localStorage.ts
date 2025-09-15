@@ -322,6 +322,22 @@ export const removeAllYearRecords = (): void => {
   safeLocalStorage.removeItem(YEAR_RECORDS_KEY);
 };
 
+// --- Trophies ---
+export const getRivalTrophiesForYear = (year: number): string[] => {
+  try {
+    const storedTrophies = safeLocalStorage.getItem('allTrophies');
+    if (!storedTrophies) return [];
+
+    const allTrophies = JSON.parse(storedTrophies);
+    return allTrophies
+      .filter((trophy: any) => trophy.year === year && trophy.category === 'rivalry')
+      .map((trophy: any) => trophy.name || trophy.type);
+  } catch (error) {
+    console.error(`Error getting rival trophies for year ${year}:`, error);
+    return [];
+  }
+};
+
 // --- Recruits ---
 export const getAllRecruits = (): Recruit[] => {
   const storedRecruits = safeLocalStorage.getItem(ALL_RECRUITS_KEY);

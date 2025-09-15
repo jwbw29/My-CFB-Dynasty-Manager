@@ -63,6 +63,7 @@ export interface YearRecord {
   playersDrafted: DraftedPlayer[];
   finalRanking?: string;
   conferenceFinish?: string;
+  rivalTrophies?: string[];
   // Team Stats
   teamStats?: TeamStatsData;
   teamLeaders?: TeamLeaderStats;

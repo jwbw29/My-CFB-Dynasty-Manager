@@ -27,6 +27,7 @@ import {
   isTeamUserControlled,
   getTeamStats,
   getTeamLeaders,
+  getRivalTrophiesForYear,
 } from "@/utils/localStorage";
 import {
   YearRecord,
@@ -157,6 +158,7 @@ const Records: React.FC = () => {
           playersDrafted: [],
           finalRanking: "",
           conferenceFinish: "",
+          rivalTrophies: getRivalTrophiesForYear(currentYear),
         };
         records.push(newCurrentRecord);
       }
@@ -222,6 +224,7 @@ const Records: React.FC = () => {
         playersDrafted: storedEditableData.playersDrafted,
         finalRanking: storedEditableData.finalRanking,
         conferenceFinish: storedEditableData.conferenceFinish,
+        rivalTrophies: getRivalTrophiesForYear(currentYear),
         // Team Stats (load from localStorage)
         teamStats: currentDynastyId
           ? getTeamStats(currentDynastyId, currentYear)
@@ -235,12 +238,19 @@ const Records: React.FC = () => {
       recordForDisplay =
         allStoredRecords.find((r) => r.year === selectedYear) || null;
 
-      // Load team stats for historical records if dynasty ID is available
+      // Load team stats and rival trophies for historical records if dynasty ID is available
       if (recordForDisplay && currentDynastyId) {
         recordForDisplay = {
           ...recordForDisplay,
           teamStats: getTeamStats(currentDynastyId, selectedYear),
           teamLeaders: getTeamLeaders(currentDynastyId, selectedYear),
+          rivalTrophies: recordForDisplay.rivalTrophies || getRivalTrophiesForYear(selectedYear),
+        };
+      } else if (recordForDisplay) {
+        // Ensure rival trophies are loaded even without dynasty ID
+        recordForDisplay = {
+          ...recordForDisplay,
+          rivalTrophies: recordForDisplay.rivalTrophies || getRivalTrophiesForYear(selectedYear),
         };
       }
     }
@@ -643,6 +653,23 @@ const Records: React.FC = () => {
                             {activeRecord.heisman}
                           </p>
                         </div>
+                      </div>
+                    )}
+                    {activeRecord.rivalTrophies && activeRecord.rivalTrophies.length > 0 && (
+                      <div className="space-y-2">
+                        {activeRecord.rivalTrophies.map((trophy, index) => (
+                          <div key={index} className="flex items-center gap-3 p-3 bg-orange-50 dark:bg-orange-900/20 rounded-lg">
+                            <Trophy className="h-5 w-5 text-orange-600" />
+                            <div>
+                              <p className="font-semibold text-orange-800 dark:text-orange-200">
+                                Rival Trophy
+                              </p>
+                              <p className="text-sm text-orange-600 dark:text-orange-400">
+                                {trophy}
+                              </p>
+                            </div>
+                          </div>
+                        ))}
                       </div>
                     )}
                   </CardContent>
