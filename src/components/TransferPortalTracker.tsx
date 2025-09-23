@@ -16,8 +16,8 @@ import {
 import useLocalStorage from "@/hooks/useLocalStorage";
 import { capitalizeName } from "@/utils";
 import { fbsTeams } from "@/utils/fbsTeams";
-import { Transfer } from "@/types/playerTypes";
-import { getTransfers } from "@/utils/localStorage";
+import { Transfer, Player } from "@/types/playerTypes";
+import { getTransfers, getPlayers, setPlayers } from "@/utils/localStorage";
 import { generalPositions } from "@/types/playerTypes";
 import {
   notifySuccess,
@@ -73,13 +73,20 @@ const TransferPortalTracker: React.FC = () => {
     "allTransfers",
     []
   );
-  const [newTransfer, setNewTransfer] = useState<
-    Omit<Transfer, "id" | "transferYear">
+  const [players, setPlayersState] = useLocalStorage<Player[]>("players", []);
+  const [newIncomingTransfer, setNewIncomingTransfer] = useState<
+    Omit<Transfer, "id" | "transferYear" | "transferDirection">
   >({
     playerName: "",
     position: "",
     stars: "",
-    transferDirection: "From",
+    school: "",
+  });
+  const [newOutgoingTransfer, setNewOutgoingTransfer] = useState<{
+    playerId: string;
+    school: string;
+  }>({
+    playerId: "",
     school: "",
   });
   const [editingId, setEditingId] = useState<number | null>(null);
@@ -90,19 +97,49 @@ const TransferPortalTracker: React.FC = () => {
     getTransfers(selectedYear)
   );
 
-  const addTransfer = () => {
+  const addIncomingTransfer = () => {
     const transferToAdd = {
-      ...newTransfer,
+      ...newIncomingTransfer,
       id: Date.now(),
       transferYear: selectedYear,
-      playerName: capitalizeName(newTransfer.playerName),
+      transferDirection: "From" as const,
+      playerName: capitalizeName(newIncomingTransfer.playerName),
     };
     setAllTransfers([...allTransfers, transferToAdd]);
-    setNewTransfer({
+    setNewIncomingTransfer({
       playerName: "",
       position: "",
       stars: "",
-      transferDirection: "From",
+      school: "",
+    });
+    notifySuccess(MESSAGES.SAVE_SUCCESS);
+  };
+
+  const addOutgoingTransfer = () => {
+    const selectedPlayer = players.find(p => p.id.toString() === newOutgoingTransfer.playerId);
+    if (!selectedPlayer) {
+      notifyError("Please select a player");
+      return;
+    }
+
+    const transferToAdd: Transfer = {
+      id: Date.now(),
+      transferYear: selectedYear,
+      transferDirection: "To",
+      playerName: selectedPlayer.name,
+      position: selectedPlayer.position,
+      stars: selectedPlayer.rating,
+      school: newOutgoingTransfer.school,
+    };
+
+    // Add to transfers and remove from roster
+    setAllTransfers([...allTransfers, transferToAdd]);
+    const updatedPlayers = players.filter(p => p.id.toString() !== newOutgoingTransfer.playerId);
+    setPlayersState(updatedPlayers);
+    setPlayers(updatedPlayers);
+
+    setNewOutgoingTransfer({
+      playerId: "",
       school: "",
     });
     notifySuccess(MESSAGES.SAVE_SUCCESS);
@@ -110,7 +147,14 @@ const TransferPortalTracker: React.FC = () => {
 
   const startEditing = (transfer: Transfer) => {
     setEditingId(transfer.id);
-    setNewTransfer(transfer);
+    if (transfer.transferDirection === "From") {
+      setNewIncomingTransfer({
+        playerName: transfer.playerName,
+        position: transfer.position,
+        stars: transfer.stars,
+        school: transfer.school,
+      });
+    }
   };
 
   const saveEdit = () => {
@@ -118,20 +162,20 @@ const TransferPortalTracker: React.FC = () => {
       allTransfers.map((transfer) =>
         transfer.id === editingId
           ? {
-              ...newTransfer,
-              id: transfer.id,
-              transferYear: selectedYear,
-              playerName: capitalizeName(newTransfer.playerName),
+              ...transfer,
+              playerName: capitalizeName(newIncomingTransfer.playerName),
+              position: newIncomingTransfer.position,
+              stars: newIncomingTransfer.stars,
+              school: newIncomingTransfer.school,
             }
           : transfer
       )
     );
     setEditingId(null);
-    setNewTransfer({
+    setNewIncomingTransfer({
       playerName: "",
       position: "",
       stars: "",
-      transferDirection: "From",
       school: "",
     });
     notifySuccess(MESSAGES.SAVE_SUCCESS);
@@ -139,16 +183,36 @@ const TransferPortalTracker: React.FC = () => {
 
   const cancelEdit = () => {
     setEditingId(null);
-    setNewTransfer({
+    setNewIncomingTransfer({
       playerName: "",
       position: "",
       stars: "",
-      transferDirection: "From",
       school: "",
     });
   };
 
   const removeTransfer = (id: number) => {
+    const transferToRemove = allTransfers.find(t => t.id === id);
+
+    // If removing an outgoing transfer, restore player to roster
+    if (transferToRemove && transferToRemove.transferDirection === "To") {
+      const restoredPlayer: Player = {
+        id: Date.now(), // New ID since the original was removed
+        name: transferToRemove.playerName,
+        position: transferToRemove.position,
+        year: "TR", // Mark as transfer
+        rating: transferToRemove.stars,
+        jerseyNumber: "",
+        devTrait: "Normal" as const,
+        notes: `Restored from transfer portal (${transferToRemove.school})`,
+        isRedshirted: false,
+      };
+
+      const updatedPlayers = [...players, restoredPlayer];
+      setPlayersState(updatedPlayers);
+      setPlayers(updatedPlayers);
+    }
+
     setAllTransfers(allTransfers.filter((transfer) => transfer.id !== id));
     notifySuccess(MESSAGES.SAVE_SUCCESS);
   };
@@ -159,25 +223,26 @@ const TransferPortalTracker: React.FC = () => {
         Transfer Portal Tracker
       </h1>
 
+      {/* Incoming Transfers Form */}
       <Card>
         <CardHeader className="text-xl font-semibold">
           <div className="flex justify-between items-center">
-            <span>Add New Transfer for Year: {selectedYear}</span>
+            <span>Add Incoming Transfer for Year: {selectedYear}</span>
           </div>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-6 gap-4 mb-4">
             <Input
-              value={newTransfer.playerName}
+              value={newIncomingTransfer.playerName}
               onChange={(e) =>
-                setNewTransfer({ ...newTransfer, playerName: e.target.value })
+                setNewIncomingTransfer({ ...newIncomingTransfer, playerName: e.target.value })
               }
               placeholder="Player Name"
             />
             <Select
-              value={newTransfer.position}
+              value={newIncomingTransfer.position}
               onValueChange={(value) =>
-                setNewTransfer({ ...newTransfer, position: value })
+                setNewIncomingTransfer({ ...newIncomingTransfer, position: value })
               }
             >
               <SelectTrigger>
@@ -192,9 +257,9 @@ const TransferPortalTracker: React.FC = () => {
               </SelectContent>
             </Select>
             <Select
-              value={newTransfer.stars}
+              value={newIncomingTransfer.stars}
               onValueChange={(value) =>
-                setNewTransfer({ ...newTransfer, stars: value })
+                setNewIncomingTransfer({ ...newIncomingTransfer, stars: value })
               }
             >
               <SelectTrigger>
@@ -208,24 +273,13 @@ const TransferPortalTracker: React.FC = () => {
                 ))}
               </SelectContent>
             </Select>
+            <div className="flex items-center justify-center bg-green-50 dark:bg-green-900/20 rounded border px-3">
+              <span className="text-green-600 dark:text-green-400 font-medium">From</span>
+            </div>
             <Select
-              value={newTransfer.transferDirection}
-              onValueChange={(value: "From" | "To") =>
-                setNewTransfer({ ...newTransfer, transferDirection: value })
-              }
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Direction" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="To">To</SelectItem>
-                <SelectItem value="From">From</SelectItem>
-              </SelectContent>
-            </Select>
-            <Select
-              value={newTransfer.school}
+              value={newIncomingTransfer.school}
               onValueChange={(value) =>
-                setNewTransfer({ ...newTransfer, school: value })
+                setNewIncomingTransfer({ ...newIncomingTransfer, school: value })
               }
             >
               <SelectTrigger>
@@ -249,8 +303,59 @@ const TransferPortalTracker: React.FC = () => {
                 </Button>
               </div>
             ) : (
-              <Button onClick={addTransfer}>Add Transfer</Button>
+              <Button onClick={addIncomingTransfer}>Add Transfer</Button>
             )}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Outgoing Transfers Form */}
+      <Card>
+        <CardHeader className="text-xl font-semibold">
+          <div className="flex justify-between items-center">
+            <span>Add Outgoing Transfer for Year: {selectedYear}</span>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+            <Select
+              value={newOutgoingTransfer.playerId}
+              onValueChange={(value) =>
+                setNewOutgoingTransfer({ ...newOutgoingTransfer, playerId: value })
+              }
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select Player" />
+              </SelectTrigger>
+              <SelectContent>
+                {players.map((player) => (
+                  <SelectItem key={player.id} value={player.id.toString()}>
+                    {player.name} - {player.position} ({player.rating}⭐)
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <div className="flex items-center justify-center bg-red-50 dark:bg-red-900/20 rounded border px-3">
+              <span className="text-red-600 dark:text-red-400 font-medium">To</span>
+            </div>
+            <Select
+              value={newOutgoingTransfer.school}
+              onValueChange={(value) =>
+                setNewOutgoingTransfer({ ...newOutgoingTransfer, school: value })
+              }
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="School" />
+              </SelectTrigger>
+              <SelectContent>
+                {fbsTeams.map((team) => (
+                  <SelectItem key={team.name} value={team.name}>
+                    {team.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Button onClick={addOutgoingTransfer}>Add Transfer</Button>
           </div>
         </CardContent>
       </Card>
@@ -303,15 +408,17 @@ const TransferPortalTracker: React.FC = () => {
                   {/* --- MODIFICATION END --- */}
                   <td className="text-center">
                     <div className="flex items-center gap-1 justify-center">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => startEditing(transfer)}
-                        title="Edit"
-                      >
-                        {" "}
-                        <Pencil className="h-4 w-4" />
-                      </Button>
+                      {/* Only allow editing incoming transfers */}
+                      {transfer.transferDirection === "From" && (
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => startEditing(transfer)}
+                          title="Edit"
+                        >
+                          <Pencil className="h-4 w-4" />
+                        </Button>
+                      )}
                       <AlertDialog>
                         <AlertDialogTrigger asChild>
                           <Button
@@ -328,6 +435,8 @@ const TransferPortalTracker: React.FC = () => {
                             <AlertDialogDescription>
                               Are you sure you want to remove{" "}
                               {transfer.playerName}?
+                              {transfer.transferDirection === "To" &&
+                                " This will restore them to your roster."}
                             </AlertDialogDescription>
                           </AlertDialogHeader>
                           <AlertDialogFooter>
