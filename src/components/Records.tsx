@@ -595,7 +595,7 @@ const Records: React.FC = () => {
               </div>
 
               {/* Second Row */}
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {/* Season Achievements */}
                 <Card>
                   <CardHeader className="p-4">
@@ -722,6 +722,62 @@ const Records: React.FC = () => {
                             {scheduleHighlights.longestStreak} Games
                           </p>
                         </div>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+
+                {/* NFL Draft Class Preview */}
+                <Card>
+                  <CardHeader className="p-4">
+                    <CardTitle className="text-lg flex items-center gap-2">
+                      <ShieldCheck className="text-blue-600" /> NFL Draft Class
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="p-4">
+                    {(activeRecord.playersDrafted || []).length > 0 ? (
+                      <div className="space-y-3">
+                        <div className="text-center p-2 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                          <p className="text-2xl font-bold text-blue-800 dark:text-blue-200">
+                            {(activeRecord.playersDrafted || []).length}
+                          </p>
+                          <p className="text-sm text-blue-600 dark:text-blue-400">
+                            Players Drafted
+                          </p>
+                        </div>
+                        <div className="space-y-2">
+                          {(activeRecord.playersDrafted || [])
+                            .filter(p => p.playerName.trim())
+                            .sort((a, b) => a.round - b.round || a.pick - b.pick)
+                            .slice(0, 3)
+                            .map((player) => (
+                              <div
+                                key={player.id}
+                                className="flex items-center gap-3 p-2 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800"
+                              >
+                                <div className="w-6 h-6 bg-blue-600 text-white rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0">
+                                  R{player.round}
+                                </div>
+                                <div className="min-w-0 flex-1">
+                                  <p className="font-medium text-blue-800 dark:text-blue-200 truncate text-sm">
+                                    {player.playerName}
+                                  </p>
+                                </div>
+                              </div>
+                            ))}
+                          {(activeRecord.playersDrafted || []).filter(p => p.playerName.trim()).length > 3 && (
+                            <p className="text-xs text-center text-blue-600 dark:text-blue-400 mt-2">
+                              +{(activeRecord.playersDrafted || []).filter(p => p.playerName.trim()).length - 3} more
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="text-center py-4">
+                        <ShieldCheck className="h-8 w-8 mx-auto mb-2 text-gray-400" />
+                        <p className="text-sm text-gray-500 dark:text-gray-400">
+                          No players drafted
+                        </p>
                       </div>
                     )}
                   </CardContent>
@@ -1443,7 +1499,7 @@ const Records: React.FC = () => {
                   <CardHeader className="flex flex-row items-center justify-between">
                     <CardTitle className="flex items-center gap-2">
                       <ShieldCheck className="text-blue-600" />
-                      NFL Draft Class
+                      NFL Draft Class ({(activeRecord.playersDrafted || []).length})
                     </CardTitle>
                     <Button
                       onClick={addDraftedPlayer}
@@ -1458,48 +1514,94 @@ const Records: React.FC = () => {
                       <div className="space-y-2">
                         {(activeRecord.playersDrafted || [])
                           .sort((a, b) => a.round - b.round || a.pick - b.pick)
-                          .map((player, index) => (
-                            <div
-                              key={player.id}
-                              className="grid grid-cols-[1fr,auto,auto] gap-2 items-center"
-                            >
-                              <Input
-                                value={player.playerName}
-                                onChange={(e) =>
-                                  updateDraftedPlayer(
-                                    index,
-                                    "playerName",
-                                    e.target.value
-                                  )
-                                }
-                                placeholder="Player Name"
-                                className="h-8"
-                              />
-                              <div className="flex items-center gap-1">
-                                <span className="text-xs">R</span>
-                                <Input
-                                  type="number"
-                                  value={player.round}
-                                  onChange={(e) =>
-                                    updateDraftedPlayer(
-                                      index,
-                                      "round",
-                                      e.target.value
-                                    )
-                                  }
-                                  className="h-8 w-14 text-center"
-                                />
-                              </div>
-                              <Button
-                                onClick={() => removeDraftedPlayer(player.id)}
-                                variant="ghost"
-                                size="icon"
-                                className="h-8 w-8"
+                          .map((player, index) => {
+                            // If player has no name, show input mode for editing
+                            if (!player.playerName.trim()) {
+                              return (
+                                <div
+                                  key={player.id}
+                                  className="grid grid-cols-[1fr,auto,auto] gap-2 items-center p-2 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-800/50"
+                                >
+                                  <Input
+                                    value={player.playerName}
+                                    onChange={(e) =>
+                                      updateDraftedPlayer(
+                                        index,
+                                        "playerName",
+                                        e.target.value
+                                      )
+                                    }
+                                    placeholder="Player Name"
+                                    className="h-8"
+                                    autoFocus
+                                  />
+                                  <div className="flex items-center gap-1">
+                                    <span className="text-xs">R</span>
+                                    <Input
+                                      type="number"
+                                      value={player.round}
+                                      onChange={(e) =>
+                                        updateDraftedPlayer(
+                                          index,
+                                          "round",
+                                          parseInt(e.target.value) || 1
+                                        )
+                                      }
+                                      className="h-8 w-14 text-center"
+                                      min="1"
+                                      max="7"
+                                    />
+                                  </div>
+                                  <Button
+                                    onClick={() => removeDraftedPlayer(player.id)}
+                                    variant="ghost"
+                                    size="icon"
+                                    className="h-8 w-8"
+                                  >
+                                    <X className="h-4 w-4 text-destructive" />
+                                  </Button>
+                                </div>
+                              );
+                            }
+
+                            // Show solid display mode for players with names
+                            return (
+                              <div
+                                key={player.id}
+                                className="flex items-center justify-between p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800"
                               >
-                                <X className="h-4 w-4 text-destructive" />
-                              </Button>
-                            </div>
-                          ))}
+                                <div className="flex items-center gap-3">
+                                  <div className="flex-shrink-0">
+                                    <div className="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-bold">
+                                      R{player.round}
+                                    </div>
+                                  </div>
+                                  <div className="min-w-0">
+                                    <p className="font-semibold text-blue-800 dark:text-blue-200 truncate">
+                                      {player.playerName}
+                                    </p>
+                                    <p className="text-xs text-blue-600 dark:text-blue-400">
+                                      Round {player.round}
+                                      {player.pick > 0 && `, Pick ${player.pick}`}
+                                    </p>
+                                  </div>
+                                </div>
+                                <Button
+                                  onClick={() => removeDraftedPlayer(player.id)}
+                                  variant="ghost"
+                                  size="icon"
+                                  className="h-8 w-8 opacity-70 hover:opacity-100 text-blue-600 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20"
+                                >
+                                  <X className="h-4 w-4" />
+                                </Button>
+                              </div>
+                            );
+                          })}
+                        {(activeRecord.playersDrafted || []).length === 0 && (
+                          <p className="text-center text-muted-foreground py-4">
+                            No players drafted yet.
+                          </p>
+                        )}
                       </div>
                     </ScrollArea>
                   </CardContent>
