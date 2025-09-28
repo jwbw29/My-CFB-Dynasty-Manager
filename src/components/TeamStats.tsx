@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo, useCallback, useState } from "react";
+import React, { useMemo, useCallback } from "react";
 import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -22,7 +22,7 @@ import {
 import useLocalStorage from "@/hooks/useLocalStorage";
 import { Game } from "@/types/yearRecord";
 import { useDynasty } from "@/contexts/DynastyContext";
-import { ChevronUp, ChevronDown, Plus } from "lucide-react";
+import { ChevronUp, ChevronDown } from "lucide-react";
 
 interface TeamStatsData {
   gamesPlayed: number;
@@ -135,45 +135,7 @@ const TeamStats: React.FC = () => {
     intLeaders: { field: null, direction: "desc" },
   });
 
-  // Add mode state for team stats inputs
-  const [addModeStates, setAddModeStates] = React.useState<
-    Record<keyof TeamStatsData, boolean>
-  >({
-    gamesPlayed: false,
-    totalOffense: false,
-    passYards: false,
-    rushYards: false,
-    points: false,
-    totalDefense: false,
-    defPassYards: false,
-    defRushYards: false,
-    defPoints: false,
-  });
 
-  // Temporary add values state
-  const [addValues, setAddValues] = React.useState<
-    Record<keyof TeamStatsData, string>
-  >({
-    gamesPlayed: "",
-    totalOffense: "",
-    passYards: "",
-    rushYards: "",
-    points: "",
-    totalDefense: "",
-    defPassYards: "",
-    defRushYards: "",
-    defPoints: "",
-  });
-
-  // Add mode state for team leaders inputs
-  const [leaderAddModeStates, setLeaderAddModeStates] = React.useState<
-    Record<string, boolean>
-  >({});
-
-  // Temporary add values state for team leaders
-  const [leaderAddValues, setLeaderAddValues] = React.useState<
-    Record<string, string>
-  >({});
 
   // Calculate games played from schedule (excluding BYE weeks)
   const calculatedGamesPlayed = useMemo(() => {
@@ -229,163 +191,7 @@ const TeamStats: React.FC = () => {
     [setTeamStats]
   );
 
-  // Handle entering add mode
-  const handleAddModeToggle = useCallback(
-    (field: keyof TeamStatsData) => {
-      setAddModeStates((prev) => ({
-        ...prev,
-        [field]: !prev[field],
-      }));
-      // Clear the add value when toggling off
-      if (addModeStates[field]) {
-        setAddValues((prev) => ({
-          ...prev,
-          [field]: "",
-        }));
-      }
-    },
-    [addModeStates]
-  );
 
-  // Handle add value change
-  const handleAddValueChange = useCallback(
-    (field: keyof TeamStatsData, value: string) => {
-      setAddValues((prev) => ({
-        ...prev,
-        [field]: value,
-      }));
-    },
-    []
-  );
-
-  // Handle adding value to existing stat
-  const handleAddToStat = useCallback(
-    (field: keyof TeamStatsData) => {
-      const addValue = parseInt(addValues[field]) || 0;
-      if (addValue !== 0) {
-        setTeamStats((prev) => ({
-          ...prev,
-          [field]: prev[field] + addValue,
-        }));
-      }
-      // Reset add mode and clear value
-      setAddModeStates((prev) => ({
-        ...prev,
-        [field]: false,
-      }));
-      setAddValues((prev) => ({
-        ...prev,
-        [field]: "",
-      }));
-    },
-    [addValues, setTeamStats]
-  );
-
-  // Handle canceling add mode
-  const handleCancelAdd = useCallback((field: keyof TeamStatsData) => {
-    setAddModeStates((prev) => ({
-      ...prev,
-      [field]: false,
-    }));
-    setAddValues((prev) => ({
-      ...prev,
-      [field]: "",
-    }));
-  }, []);
-
-  // Team Leaders add functionality
-  const getLeaderKey = (
-    category: keyof TeamLeaderStats,
-    index: number,
-    field: string
-  ) => {
-    return `${category}_${index}_${field}`;
-  };
-
-  const handleLeaderAddModeToggle = useCallback(
-    (category: keyof TeamLeaderStats, index: number, field: string) => {
-      const key = getLeaderKey(category, index, field);
-      setLeaderAddModeStates((prev) => ({
-        ...prev,
-        [key]: !prev[key],
-      }));
-      // Clear the add value when toggling off
-      if (leaderAddModeStates[key]) {
-        setLeaderAddValues((prev) => ({
-          ...prev,
-          [key]: "",
-        }));
-      }
-    },
-    [leaderAddModeStates]
-  );
-
-  const handleLeaderAddValueChange = useCallback(
-    (
-      category: keyof TeamLeaderStats,
-      index: number,
-      field: string,
-      value: string
-    ) => {
-      const key = getLeaderKey(category, index, field);
-      setLeaderAddValues((prev) => ({
-        ...prev,
-        [key]: value,
-      }));
-    },
-    []
-  );
-
-  const handleLeaderAddToStat = useCallback(
-    (category: keyof TeamLeaderStats, index: number, field: string) => {
-      const key = getLeaderKey(category, index, field);
-      const addValue = parseFloat(leaderAddValues[key]) || 0;
-
-      if (addValue !== 0) {
-        setTeamLeaders((prev) => {
-          const leaders = [...(prev[category] || [])];
-          if (!leaders[index]) {
-            leaders[index] = { name: "" };
-          }
-
-          const currentValue =
-            (leaders[index][field as keyof PlayerLeaderStat] as number) || 0;
-          (leaders[index] as any)[field] = currentValue + addValue;
-
-          return {
-            ...prev,
-            [category]: leaders,
-          };
-        });
-      }
-
-      // Reset add mode and clear value
-      setLeaderAddModeStates((prev) => ({
-        ...prev,
-        [key]: false,
-      }));
-      setLeaderAddValues((prev) => ({
-        ...prev,
-        [key]: "",
-      }));
-    },
-    [leaderAddValues, setTeamLeaders]
-  );
-
-  const handleLeaderCancelAdd = useCallback(
-    (category: keyof TeamLeaderStats, index: number, field: string) => {
-      const key = getLeaderKey(category, index, field);
-      setLeaderAddModeStates((prev) => ({
-        ...prev,
-        [key]: false,
-      }));
-      setLeaderAddValues((prev) => ({
-        ...prev,
-        [key]: "",
-      }));
-    },
-    []
-  );
 
   const handleLeaderChange = useCallback(
     (
@@ -540,220 +346,7 @@ const TeamStats: React.FC = () => {
     return `${num.toFixed(1)}%`;
   };
 
-  // Custom input component with add functionality
-  const StatsInputWithAdd: React.FC<{
-    field: keyof TeamStatsData;
-    value: number;
-    placeholder?: string;
-  }> = ({ field, value, placeholder }) => {
-    const [localValue, setLocalValue] = React.useState<string>("");
-    const isAddMode = addModeStates[field];
-    const addValue = addValues[field];
 
-    // Sync local value with prop value when it changes externally
-    React.useEffect(() => {
-      setLocalValue(
-        value !== undefined && value !== null ? value.toString() : ""
-      );
-    }, [value]);
-
-    const handleInputChange = (newValue: string) => {
-      setLocalValue(newValue);
-    };
-
-    const handleInputBlur = () => {
-      handleStatsChange(field, localValue);
-    };
-
-    const handleKeyDown = (e: React.KeyboardEvent) => {
-      if (e.key === "Enter") {
-        handleStatsChange(field, localValue);
-        (e.target as HTMLInputElement).blur();
-      }
-    };
-
-    if (isAddMode) {
-      return (
-        <div className="relative">
-          <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-sm text-gray-600 dark:text-gray-400 pointer-events-none">
-            {value} +
-          </div>
-          <Input
-            type="number"
-            value={
-              addValue !== undefined && addValue !== null
-                ? addValue.toString()
-                : ""
-            }
-            onChange={(e) => handleAddValueChange(field, e.target.value)}
-            placeholder="0"
-            className="pl-16 pr-16"
-            autoFocus
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                handleAddToStat(field);
-              } else if (e.key === "Escape") {
-                handleCancelAdd(field);
-              }
-            }}
-          />
-          <div className="absolute right-1 top-1/2 transform -translate-y-1/2 flex gap-1">
-            <button
-              onClick={() => handleAddToStat(field)}
-              className="w-6 h-6 bg-green-600 text-white text-xs rounded hover:bg-green-700 flex items-center justify-center"
-              title="Add to current value (Enter)"
-            >
-              ✓
-            </button>
-            <button
-              onClick={() => handleCancelAdd(field)}
-              className="w-6 h-6 bg-gray-500 text-white text-xs rounded hover:bg-gray-600 flex items-center justify-center"
-              title="Cancel (Escape)"
-            >
-              ✕
-            </button>
-          </div>
-        </div>
-      );
-    }
-
-    return (
-      <div className="relative">
-        <Input
-          type="number"
-          value={localValue}
-          onChange={(e) => handleInputChange(e.target.value)}
-          onBlur={handleInputBlur}
-          onKeyDown={handleKeyDown}
-          placeholder={placeholder}
-          className="pr-8"
-        />
-        <button
-          onClick={() => handleAddModeToggle(field)}
-          className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
-          title="Add to current value"
-        >
-          <Plus className="h-4 w-4" />
-        </button>
-      </div>
-    );
-  };
-
-  // Custom input component for team leaders with add functionality
-  const LeaderInputWithAdd: React.FC<{
-    category: keyof TeamLeaderStats;
-    index: number;
-    field: string;
-    value: number | undefined;
-    step?: string;
-    className?: string;
-  }> = ({ category, index, field, value, step, className }) => {
-    const [localValue, setLocalValue] = React.useState<string>("");
-    const key = getLeaderKey(category, index, field);
-    const isAddMode = leaderAddModeStates[key];
-    const addValue = leaderAddValues[key];
-
-    // Sync local value with prop value when it changes externally
-    React.useEffect(() => {
-      setLocalValue(
-        value !== undefined && value !== null ? value.toString() : ""
-      );
-    }, [value]);
-
-    const handleInputChange = (newValue: string) => {
-      setLocalValue(newValue);
-    };
-
-    const handleInputBlur = () => {
-      handleLeaderChange(
-        category,
-        index,
-        field as keyof PlayerLeaderStat,
-        localValue
-      );
-    };
-
-    const handleKeyDown = (e: React.KeyboardEvent) => {
-      if (e.key === "Enter") {
-        handleLeaderChange(
-          category,
-          index,
-          field as keyof PlayerLeaderStat,
-          localValue
-        );
-        (e.target as HTMLInputElement).blur();
-      }
-    };
-
-    if (isAddMode) {
-      return (
-        <div className="relative">
-          <div className="absolute left-2 top-1/2 transform -translate-y-1/2 text-xs text-gray-600 dark:text-gray-400 pointer-events-none">
-            {value || 0} +
-          </div>
-          <Input
-            type="number"
-            step={step}
-            value={
-              addValue !== undefined && addValue !== null
-                ? addValue.toString()
-                : ""
-            }
-            onChange={(e) =>
-              handleLeaderAddValueChange(category, index, field, e.target.value)
-            }
-            placeholder="0"
-            className={`pl-12 pr-12 ${className}`}
-            autoFocus
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                handleLeaderAddToStat(category, index, field);
-              } else if (e.key === "Escape") {
-                handleLeaderCancelAdd(category, index, field);
-              }
-            }}
-          />
-          <div className="absolute right-0.5 top-1/2 transform -translate-y-1/2 flex gap-0.5">
-            <button
-              onClick={() => handleLeaderAddToStat(category, index, field)}
-              className="w-5 h-5 bg-green-600 text-white text-xs rounded hover:bg-green-700 flex items-center justify-center"
-              title="Add to current value (Enter)"
-            >
-              ✓
-            </button>
-            <button
-              onClick={() => handleLeaderCancelAdd(category, index, field)}
-              className="w-5 h-5 bg-gray-500 text-white text-xs rounded hover:bg-gray-600 flex items-center justify-center"
-              title="Cancel (Escape)"
-            >
-              ✕
-            </button>
-          </div>
-        </div>
-      );
-    }
-
-    return (
-      <div className="relative">
-        <Input
-          type="number"
-          step={step}
-          value={localValue}
-          onChange={(e) => handleInputChange(e.target.value)}
-          onBlur={handleInputBlur}
-          onKeyDown={handleKeyDown}
-          className={`${className} pr-8`}
-        />
-        <button
-          onClick={() => handleLeaderAddModeToggle(category, index, field)}
-          className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
-          title="Add to current value"
-        >
-          <Plus className="h-4 w-4" />
-        </button>
-      </div>
-    );
-  };
 
   return (
     <div
@@ -812,9 +405,10 @@ const TeamStats: React.FC = () => {
                   <TableRow>
                     <TableCell>TOT OFF</TableCell>
                     <TableCell>
-                      <StatsInputWithAdd
-                        field="totalOffense"
-                        value={teamStats.totalOffense}
+                      <Input
+                        type="number"
+                        value={teamStats.totalOffense || ""}
+                        onChange={(e) => handleStatsChange("totalOffense", e.target.value)}
                       />
                     </TableCell>
                     <TableCell className="bg-gray-100 dark:bg-gray-800">
@@ -825,9 +419,10 @@ const TeamStats: React.FC = () => {
                   <TableRow>
                     <TableCell>Pass YDS</TableCell>
                     <TableCell>
-                      <StatsInputWithAdd
-                        field="passYards"
-                        value={teamStats.passYards}
+                      <Input
+                        type="number"
+                        value={teamStats.passYards || ""}
+                        onChange={(e) => handleStatsChange("passYards", e.target.value)}
                       />
                     </TableCell>
                     <TableCell className="bg-gray-100 dark:bg-gray-800">
@@ -837,9 +432,10 @@ const TeamStats: React.FC = () => {
                   <TableRow>
                     <TableCell>Rush YDS</TableCell>
                     <TableCell>
-                      <StatsInputWithAdd
-                        field="rushYards"
-                        value={teamStats.rushYards}
+                      <Input
+                        type="number"
+                        value={teamStats.rushYards || ""}
+                        onChange={(e) => handleStatsChange("rushYards", e.target.value)}
                       />
                     </TableCell>
                     <TableCell className="bg-gray-100 dark:bg-gray-800">
@@ -849,9 +445,10 @@ const TeamStats: React.FC = () => {
                   <TableRow>
                     <TableCell>PTS</TableCell>
                     <TableCell>
-                      <StatsInputWithAdd
-                        field="points"
-                        value={teamStats.points}
+                      <Input
+                        type="number"
+                        value={teamStats.points || ""}
+                        onChange={(e) => handleStatsChange("points", e.target.value)}
                       />
                     </TableCell>
                     <TableCell className="bg-gray-100 dark:bg-gray-800">
@@ -868,9 +465,10 @@ const TeamStats: React.FC = () => {
                   <TableRow>
                     <TableCell>TOT DEF</TableCell>
                     <TableCell>
-                      <StatsInputWithAdd
-                        field="totalDefense"
-                        value={teamStats.totalDefense}
+                      <Input
+                        type="number"
+                        value={teamStats.totalDefense || ""}
+                        onChange={(e) => handleStatsChange("totalDefense", e.target.value)}
                       />
                     </TableCell>
                     <TableCell className="bg-gray-100 dark:bg-gray-800">
@@ -880,9 +478,10 @@ const TeamStats: React.FC = () => {
                   <TableRow>
                     <TableCell>Pass YDS</TableCell>
                     <TableCell>
-                      <StatsInputWithAdd
-                        field="defPassYards"
-                        value={teamStats.defPassYards}
+                      <Input
+                        type="number"
+                        value={teamStats.defPassYards || ""}
+                        onChange={(e) => handleStatsChange("defPassYards", e.target.value)}
                       />
                     </TableCell>
                     <TableCell className="bg-gray-100 dark:bg-gray-800">
@@ -892,9 +491,10 @@ const TeamStats: React.FC = () => {
                   <TableRow>
                     <TableCell>Rush YDS</TableCell>
                     <TableCell>
-                      <StatsInputWithAdd
-                        field="defRushYards"
-                        value={teamStats.defRushYards}
+                      <Input
+                        type="number"
+                        value={teamStats.defRushYards || ""}
+                        onChange={(e) => handleStatsChange("defRushYards", e.target.value)}
                       />
                     </TableCell>
                     <TableCell className="bg-gray-100 dark:bg-gray-800">
@@ -904,9 +504,10 @@ const TeamStats: React.FC = () => {
                   <TableRow>
                     <TableCell>PTS</TableCell>
                     <TableCell>
-                      <StatsInputWithAdd
-                        field="defPoints"
-                        value={teamStats.defPoints}
+                      <Input
+                        type="number"
+                        value={teamStats.defPoints || ""}
+                        onChange={(e) => handleStatsChange("defPoints", e.target.value)}
                       />
                     </TableCell>
                     <TableCell className="bg-gray-100 dark:bg-gray-800">
@@ -1056,40 +657,36 @@ const TeamStats: React.FC = () => {
                         </Select>
                       </TableCell>
                       <TableCell>
-                        <LeaderInputWithAdd
-                          category="passingLeaders"
-                          index={index}
-                          field="yards"
-                          value={leader.yards}
-                          className="text-center mx-auto pr-0"
+                        <Input
+                          type="number"
+                          value={leader.yards || ""}
+                          onChange={(e) => handleLeaderChange("passingLeaders", index, "yards", e.target.value)}
+                          className="text-center mx-auto"
                         />
                       </TableCell>
                       <TableCell>
-                        <LeaderInputWithAdd
-                          category="passingLeaders"
-                          index={index}
-                          field="completions"
-                          value={leader.completions}
+                        <Input
+                          type="number"
                           step="0.1"
-                          className="text-center mx-auto pr-0"
+                          value={leader.completions || ""}
+                          onChange={(e) => handleLeaderChange("passingLeaders", index, "completions", e.target.value)}
+                          className="text-center mx-auto"
                         />
                       </TableCell>
                       <TableCell>
-                        <LeaderInputWithAdd
-                          category="passingLeaders"
-                          index={index}
-                          field="touchdowns"
-                          value={leader.touchdowns}
-                          className="text-center mx-auto pr-0"
+                        <Input
+                          type="number"
+                          value={leader.touchdowns || ""}
+                          onChange={(e) => handleLeaderChange("passingLeaders", index, "touchdowns", e.target.value)}
+                          className="text-center mx-auto"
                         />
                       </TableCell>
                       <TableCell>
-                        <LeaderInputWithAdd
-                          category="passingLeaders"
-                          index={index}
-                          field="interceptions"
-                          value={leader.interceptions}
-                          className="text-center mx-auto pr-0"
+                        <Input
+                          type="number"
+                          value={leader.interceptions || ""}
+                          onChange={(e) => handleLeaderChange("passingLeaders", index, "interceptions", e.target.value)}
+                          className="text-center mx-auto"
                         />
                       </TableCell>
                       <TableCell className="bg-gray-100 dark:bg-gray-800">
@@ -1202,30 +799,27 @@ const TeamStats: React.FC = () => {
                         </Select>
                       </TableCell>
                       <TableCell>
-                        <LeaderInputWithAdd
-                          category="rushingLeaders"
-                          index={index}
-                          field="carries"
-                          value={leader.carries}
-                          className="text-center mx-auto pr-0"
+                        <Input
+                          type="number"
+                          value={leader.carries || ""}
+                          onChange={(e) => handleLeaderChange("rushingLeaders", index, "carries", e.target.value)}
+                          className="text-center mx-auto"
                         />
                       </TableCell>
                       <TableCell>
-                        <LeaderInputWithAdd
-                          category="rushingLeaders"
-                          index={index}
-                          field="yards"
-                          value={leader.yards}
-                          className="text-center mx-auto pr-0"
+                        <Input
+                          type="number"
+                          value={leader.yards || ""}
+                          onChange={(e) => handleLeaderChange("rushingLeaders", index, "yards", e.target.value)}
+                          className="text-center mx-auto"
                         />
                       </TableCell>
                       <TableCell>
-                        <LeaderInputWithAdd
-                          category="rushingLeaders"
-                          index={index}
-                          field="touchdowns"
-                          value={leader.touchdowns}
-                          className="text-center mx-auto pr-0"
+                        <Input
+                          type="number"
+                          value={leader.touchdowns || ""}
+                          onChange={(e) => handleLeaderChange("rushingLeaders", index, "touchdowns", e.target.value)}
+                          className="text-center mx-auto"
                         />
                       </TableCell>
                       <TableCell className="bg-gray-100 dark:bg-gray-800">
@@ -1348,30 +942,27 @@ const TeamStats: React.FC = () => {
                           </Select>
                         </TableCell>
                         <TableCell>
-                          <LeaderInputWithAdd
-                            category="receivingLeaders"
-                            index={index}
-                            field="receptions"
-                            value={leader.receptions}
-                            className="text-center mx-auto pr-0"
+                          <Input
+                            type="number"
+                            value={leader.receptions || ""}
+                            onChange={(e) => handleLeaderChange("receivingLeaders", index, "receptions", e.target.value)}
+                            className="text-center mx-auto"
                           />
                         </TableCell>
                         <TableCell>
-                          <LeaderInputWithAdd
-                            category="receivingLeaders"
-                            index={index}
-                            field="yards"
-                            value={leader.yards}
-                            className="text-center mx-auto pr-0"
+                          <Input
+                            type="number"
+                            value={leader.yards || ""}
+                            onChange={(e) => handleLeaderChange("receivingLeaders", index, "yards", e.target.value)}
+                            className="text-center mx-auto"
                           />
                         </TableCell>
                         <TableCell>
-                          <LeaderInputWithAdd
-                            category="receivingLeaders"
-                            index={index}
-                            field="touchdowns"
-                            value={leader.touchdowns}
-                            className="text-center mx-auto pr-0"
+                          <Input
+                            type="number"
+                            value={leader.touchdowns || ""}
+                            onChange={(e) => handleLeaderChange("receivingLeaders", index, "touchdowns", e.target.value)}
+                            className="text-center mx-auto"
                           />
                         </TableCell>
                         <TableCell className="bg-gray-100 dark:bg-gray-800">
@@ -1484,12 +1075,11 @@ const TeamStats: React.FC = () => {
                         </Select>
                       </TableCell>
                       <TableCell>
-                        <LeaderInputWithAdd
-                          category="tackleLeaders"
-                          index={index}
-                          field="total"
-                          value={leader.total}
-                          className="text-center mx-auto pr-0"
+                        <Input
+                          type="number"
+                          value={leader.total || ""}
+                          onChange={(e) => handleLeaderChange("tackleLeaders", index, "total", e.target.value)}
+                          className="text-center mx-auto"
                         />
                       </TableCell>
                       <TableCell className="bg-gray-100 dark:bg-gray-800">
@@ -1582,12 +1172,11 @@ const TeamStats: React.FC = () => {
                         </Select>
                       </TableCell>
                       <TableCell>
-                        <LeaderInputWithAdd
-                          category="tflLeaders"
-                          index={index}
-                          field="total"
-                          value={leader.total}
-                          className="text-center mx-auto pr-0"
+                        <Input
+                          type="number"
+                          value={leader.total || ""}
+                          onChange={(e) => handleLeaderChange("tflLeaders", index, "total", e.target.value)}
+                          className="text-center mx-auto"
                         />
                       </TableCell>
                       <TableCell className="bg-gray-100 dark:bg-gray-800">
@@ -1678,13 +1267,12 @@ const TeamStats: React.FC = () => {
                         </Select>
                       </TableCell>
                       <TableCell>
-                        <LeaderInputWithAdd
-                          category="sackLeaders"
-                          index={index}
-                          field="total"
-                          value={leader.total}
+                        <Input
+                          type="number"
                           step="0.5"
-                          className="text-center mx-auto pr-0"
+                          value={leader.total || ""}
+                          onChange={(e) => handleLeaderChange("sackLeaders", index, "total", e.target.value)}
+                          className="text-center mx-auto"
                         />
                       </TableCell>
                       <TableCell className="bg-gray-100 dark:bg-gray-800">
@@ -1775,12 +1363,11 @@ const TeamStats: React.FC = () => {
                         </Select>
                       </TableCell>
                       <TableCell>
-                        <LeaderInputWithAdd
-                          category="intLeaders"
-                          index={index}
-                          field="total"
-                          value={leader.total}
-                          className="text-center mx-auto pr-0"
+                        <Input
+                          type="number"
+                          value={leader.total || ""}
+                          onChange={(e) => handleLeaderChange("intLeaders", index, "total", e.target.value)}
+                          className="text-center mx-auto"
                         />
                       </TableCell>
                       <TableCell className="bg-gray-100 dark:bg-gray-800">
