@@ -552,7 +552,9 @@ const TeamStats: React.FC = () => {
 
     // Sync local value with prop value when it changes externally
     React.useEffect(() => {
-      setLocalValue(value !== undefined && value !== null ? value.toString() : "");
+      setLocalValue(
+        value !== undefined && value !== null ? value.toString() : ""
+      );
     }, [value]);
 
     const handleInputChange = (newValue: string) => {
@@ -578,7 +580,11 @@ const TeamStats: React.FC = () => {
           </div>
           <Input
             type="number"
-            value={addValue !== undefined && addValue !== null ? addValue.toString() : ""}
+            value={
+              addValue !== undefined && addValue !== null
+                ? addValue.toString()
+                : ""
+            }
             onChange={(e) => handleAddValueChange(field, e.target.value)}
             placeholder="0"
             className="pl-16 pr-16"
@@ -649,7 +655,9 @@ const TeamStats: React.FC = () => {
 
     // Sync local value with prop value when it changes externally
     React.useEffect(() => {
-      setLocalValue(value !== undefined && value !== null ? value.toString() : "");
+      setLocalValue(
+        value !== undefined && value !== null ? value.toString() : ""
+      );
     }, [value]);
 
     const handleInputChange = (newValue: string) => {
@@ -686,7 +694,11 @@ const TeamStats: React.FC = () => {
           <Input
             type="number"
             step={step}
-            value={addValue !== undefined && addValue !== null ? addValue.toString() : ""}
+            value={
+              addValue !== undefined && addValue !== null
+                ? addValue.toString()
+                : ""
+            }
             onChange={(e) =>
               handleLeaderAddValueChange(category, index, field, e.target.value)
             }
@@ -957,7 +969,7 @@ const TeamStats: React.FC = () => {
       {/* Offensive Team Leaders Section */}
       <Card
         id="OffenseTeamLeaders"
-        className="flex flex-col items-center w-full max-w-4xl "
+        className="flex flex-col items-center w-full"
       >
         <CardHeader>
           <CardTitle>Offensive Team Leaders</CardTitle>
@@ -1406,7 +1418,7 @@ const TeamStats: React.FC = () => {
       {/* Defensive Team Leaders Section */}
       <Card
         id="DefenseTeamLeaders"
-        className="flex flex-col items-center w-full max-w-4xl"
+        className="flex flex-col items-center w-full"
       >
         <CardHeader className="flex flex-col items-center w-full">
           <CardTitle>Defensive Team Leaders</CardTitle>
