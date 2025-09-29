@@ -53,10 +53,10 @@ const isRecruit = (obj: any): obj is Recruit => {
 
 const getDevTraitColor = (trait?: string): string => {
   const colors = {
-    Elite: "bg-red-400 text-purple-100 dark:bg-red-700 dark:text-purple-0",
-    Star: "bg-yellow-500 text-yellow-900 dark:bg-yellow-500 dark:text-black",
-    Impact: "bg-gray-400 text-gray-100 dark:bg-gray-600 dark:text-green-0",
-    Normal: "bg-yellow-800 text-gray-100 dark:bg-yellow-900 dark:text-gray-0",
+    Elite: "bg-green-500 text-white dark:bg-green-500 dark:text-white",
+    Star: "bg-blue-500 text-white dark:bg-blue-500 dark:text-white",
+    Impact: "bg-yellow-500 text-white dark:bg-yellow-500 dark:text-white",
+    Normal: "bg-red-500 text-white dark:bg-red-500 dark:text-white",
   } as const;
   return colors[trait as keyof typeof colors] || colors["Normal"];
 };
@@ -712,8 +712,14 @@ const PlayerCard: React.FC<PlayerCardProps> = ({ player, isOpen, onClose }) => {
                           }
                         />
                         {/* Optional attributes */}
-                        <InfoItem label="Height" value={player.height || 'N/A'} />
-                        <InfoItem label="Weight" value={player.weight ? `${player.weight} lbs` : 'N/A'} />
+                        <InfoItem
+                          label="Height"
+                          value={player.height || "N/A"}
+                        />
+                        <InfoItem
+                          label="Weight"
+                          value={player.weight ? `${player.weight} lbs` : "N/A"}
+                        />
                       </div>
 
                       {/* Notes Section */}

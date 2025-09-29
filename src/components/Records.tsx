@@ -89,10 +89,11 @@ const SCHEDULE_SIZE = 21;
 // Helper component for Dev Trait Badges
 const DevTraitBadge: React.FC<{ trait: string }> = ({ trait }) => {
   const colors = {
-    Elite: "bg-red-400 text-purple-100 dark:bg-red-700",
-    Star: "bg-yellow-500 text-yellow-900 dark:bg-yellow-500 dark:text-black",
-    Impact: "bg-gray-400 text-gray-100 dark:bg-gray-600",
-    Normal: "bg-yellow-800 text-gray-100 dark:bg-yellow-900",
+    Elite: "bg-green-500 text-green-900 dark:bg-green-500 dark:text-green-900",
+    Star: "bg-blue-500 text-blue-900 dark:bg-blue-500 dark:text-blue-900",
+    Impact:
+      "bg-yellow-500 text-yellow-900 dark:bg-yellow-500 dark:text-yellow-900",
+    Normal: "bg-red-500 text-red-900 dark:bg-red-500 dark:text-red-900",
   } as const;
   const traitKey = trait as keyof typeof colors;
   return (
@@ -244,13 +245,17 @@ const Records: React.FC = () => {
           ...recordForDisplay,
           teamStats: getTeamStats(currentDynastyId, selectedYear),
           teamLeaders: getTeamLeaders(currentDynastyId, selectedYear),
-          rivalTrophies: recordForDisplay.rivalTrophies || getRivalTrophiesForYear(selectedYear),
+          rivalTrophies:
+            recordForDisplay.rivalTrophies ||
+            getRivalTrophiesForYear(selectedYear),
         };
       } else if (recordForDisplay) {
         // Ensure rival trophies are loaded even without dynasty ID
         recordForDisplay = {
           ...recordForDisplay,
-          rivalTrophies: recordForDisplay.rivalTrophies || getRivalTrophiesForYear(selectedYear),
+          rivalTrophies:
+            recordForDisplay.rivalTrophies ||
+            getRivalTrophiesForYear(selectedYear),
         };
       }
     }
@@ -655,23 +660,27 @@ const Records: React.FC = () => {
                         </div>
                       </div>
                     )}
-                    {activeRecord.rivalTrophies && activeRecord.rivalTrophies.length > 0 && (
-                      <div className="space-y-2">
-                        {activeRecord.rivalTrophies.map((trophy, index) => (
-                          <div key={index} className="flex items-center gap-3 p-3 bg-orange-50 dark:bg-orange-900/20 rounded-lg">
-                            <Trophy className="h-5 w-5 text-orange-600" />
-                            <div>
-                              <p className="font-semibold text-orange-800 dark:text-orange-200">
-                                Rival Trophy
-                              </p>
-                              <p className="text-sm text-orange-600 dark:text-orange-400">
-                                {trophy}
-                              </p>
+                    {activeRecord.rivalTrophies &&
+                      activeRecord.rivalTrophies.length > 0 && (
+                        <div className="space-y-2">
+                          {activeRecord.rivalTrophies.map((trophy, index) => (
+                            <div
+                              key={index}
+                              className="flex items-center gap-3 p-3 bg-orange-50 dark:bg-orange-900/20 rounded-lg"
+                            >
+                              <Trophy className="h-5 w-5 text-orange-600" />
+                              <div>
+                                <p className="font-semibold text-orange-800 dark:text-orange-200">
+                                  Rival Trophy
+                                </p>
+                                <p className="text-sm text-orange-600 dark:text-orange-400">
+                                  {trophy}
+                                </p>
+                              </div>
                             </div>
-                          </div>
-                        ))}
-                      </div>
-                    )}
+                          ))}
+                        </div>
+                      )}
                   </CardContent>
                 </Card>
 
@@ -747,8 +756,10 @@ const Records: React.FC = () => {
                         </div>
                         <div className="space-y-2">
                           {(activeRecord.playersDrafted || [])
-                            .filter(p => p.playerName.trim())
-                            .sort((a, b) => a.round - b.round || a.pick - b.pick)
+                            .filter((p) => p.playerName.trim())
+                            .sort(
+                              (a, b) => a.round - b.round || a.pick - b.pick
+                            )
                             .slice(0, 3)
                             .map((player) => (
                               <div
@@ -765,9 +776,15 @@ const Records: React.FC = () => {
                                 </div>
                               </div>
                             ))}
-                          {(activeRecord.playersDrafted || []).filter(p => p.playerName.trim()).length > 3 && (
+                          {(activeRecord.playersDrafted || []).filter((p) =>
+                            p.playerName.trim()
+                          ).length > 3 && (
                             <p className="text-xs text-center text-blue-600 dark:text-blue-400 mt-2">
-                              +{(activeRecord.playersDrafted || []).filter(p => p.playerName.trim()).length - 3} more
+                              +
+                              {(activeRecord.playersDrafted || []).filter((p) =>
+                                p.playerName.trim()
+                              ).length - 3}{" "}
+                              more
                             </p>
                           )}
                         </div>
@@ -1499,7 +1516,8 @@ const Records: React.FC = () => {
                   <CardHeader className="flex flex-row items-center justify-between">
                     <CardTitle className="flex items-center gap-2">
                       <ShieldCheck className="text-blue-600" />
-                      NFL Draft Class ({(activeRecord.playersDrafted || []).length})
+                      NFL Draft Class (
+                      {(activeRecord.playersDrafted || []).length})
                     </CardTitle>
                     <Button
                       onClick={addDraftedPlayer}
@@ -1553,7 +1571,9 @@ const Records: React.FC = () => {
                                     />
                                   </div>
                                   <Button
-                                    onClick={() => removeDraftedPlayer(player.id)}
+                                    onClick={() =>
+                                      removeDraftedPlayer(player.id)
+                                    }
                                     variant="ghost"
                                     size="icon"
                                     className="h-8 w-8"
@@ -1582,7 +1602,8 @@ const Records: React.FC = () => {
                                     </p>
                                     <p className="text-xs text-blue-600 dark:text-blue-400">
                                       Round {player.round}
-                                      {player.pick > 0 && `, Pick ${player.pick}`}
+                                      {player.pick > 0 &&
+                                        `, Pick ${player.pick}`}
                                     </p>
                                   </div>
                                 </div>
