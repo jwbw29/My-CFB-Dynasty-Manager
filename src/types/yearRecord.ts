@@ -95,3 +95,41 @@ export interface Game {
 export type AllRecords = {
   [year: number]: YearRecord;
 };
+
+// Record types for player records
+export type RecordType = "career" | "season" | "game";
+export type RecordLevel = "national" | "conference" | "school";
+export type RecordCategory =
+  | "passingYards"
+  | "passingTDs"
+  | "rushingYards"
+  | "rushingTDs"
+  | "receptions"
+  | "receivingYards"
+  | "receivingTDs"
+  | "sacks"
+  | "interceptions";
+
+export interface PlayerRecord {
+  id: string;
+  playerName: string;
+  recordType: RecordType;
+  levels: RecordLevel[]; // Can be multiple: national, conference, school
+  stats: {
+    passingYards?: number;
+    passingTDs?: number;
+    rushingYards?: number;
+    rushingTDs?: number;
+    receptions?: number;
+    receivingYards?: number;
+    receivingTDs?: number;
+    sacks?: number;
+    interceptions?: number;
+  };
+}
+
+export interface RecordsData {
+  career: PlayerRecord[];
+  season: PlayerRecord[];
+  game: PlayerRecord[];
+}

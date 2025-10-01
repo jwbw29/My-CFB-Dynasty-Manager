@@ -49,7 +49,7 @@ const Navigation: React.FC<NavigationProps> = memo(
       { name: "Roster", path: "/roster" },
       { name: "Recruiting", path: "/recruiting" },
       { name: "Transfers", path: "/transfers" },
-      { name: "Team Stats", path: "/team-stats" },
+      { name: "Stats & Records", path: "/team-stats" },
       // { name: 'Player Stats', path: '/player-stats' },
       { name: "Player Awards", path: "/awards" },
       { name: "Season History", path: "/records" },
