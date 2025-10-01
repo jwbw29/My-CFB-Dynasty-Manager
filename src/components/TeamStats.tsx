@@ -28,7 +28,7 @@ import {
   RecordsData,
   PlayerRecord,
   RecordType,
-  RecordLevel
+  RecordLevel,
 } from "@/types/yearRecord";
 import { useDynasty } from "@/contexts/DynastyContext";
 import { ChevronUp, ChevronDown, Plus, Trash2 } from "lucide-react";
@@ -563,7 +563,7 @@ const TeamStats: React.FC = () => {
       </div>
 
       <Tabs
-        defaultValue="records"
+        defaultValue="stats"
         className="flex flex-col items-center gap-6 space-y-6 w-full"
       >
         {/* Tabs List  */}
@@ -1804,9 +1804,21 @@ const TeamStats: React.FC = () => {
                 <TabsContent value="career">
                   <ScrollArea className="h-[600px] pr-4">
                     <div className="space-y-6 mt-4">
-                      {renderRecordsSection("career", "national", "National Records")}
-                      {renderRecordsSection("career", "conference", "Conference Records")}
-                      {renderRecordsSection("career", "school", "School Records")}
+                      {renderRecordsSection(
+                        "career",
+                        "national",
+                        "National Records"
+                      )}
+                      {renderRecordsSection(
+                        "career",
+                        "conference",
+                        "Conference Records"
+                      )}
+                      {renderRecordsSection(
+                        "career",
+                        "school",
+                        "School Records"
+                      )}
                     </div>
                   </ScrollArea>
                 </TabsContent>
@@ -1814,9 +1826,21 @@ const TeamStats: React.FC = () => {
                 <TabsContent value="season">
                   <ScrollArea className="h-[600px] pr-4">
                     <div className="space-y-6 mt-4">
-                      {renderRecordsSection("season", "national", "National Records")}
-                      {renderRecordsSection("season", "conference", "Conference Records")}
-                      {renderRecordsSection("season", "school", "School Records")}
+                      {renderRecordsSection(
+                        "season",
+                        "national",
+                        "National Records"
+                      )}
+                      {renderRecordsSection(
+                        "season",
+                        "conference",
+                        "Conference Records"
+                      )}
+                      {renderRecordsSection(
+                        "season",
+                        "school",
+                        "School Records"
+                      )}
                     </div>
                   </ScrollArea>
                 </TabsContent>
@@ -1824,8 +1848,16 @@ const TeamStats: React.FC = () => {
                 <TabsContent value="game">
                   <ScrollArea className="h-[600px] pr-4">
                     <div className="space-y-6 mt-4">
-                      {renderRecordsSection("game", "national", "National Records")}
-                      {renderRecordsSection("game", "conference", "Conference Records")}
+                      {renderRecordsSection(
+                        "game",
+                        "national",
+                        "National Records"
+                      )}
+                      {renderRecordsSection(
+                        "game",
+                        "conference",
+                        "Conference Records"
+                      )}
                       {renderRecordsSection("game", "school", "School Records")}
                     </div>
                   </ScrollArea>
@@ -1867,7 +1899,10 @@ const TeamStats: React.FC = () => {
                         checked={newRecord.levels.includes("national")}
                         onCheckedChange={() => handleLevelToggle("national")}
                       />
-                      <Label htmlFor="national" className="font-normal cursor-pointer">
+                      <Label
+                        htmlFor="national"
+                        className="font-normal cursor-pointer"
+                      >
                         National
                       </Label>
                     </div>
@@ -1877,7 +1912,10 @@ const TeamStats: React.FC = () => {
                         checked={newRecord.levels.includes("conference")}
                         onCheckedChange={() => handleLevelToggle("conference")}
                       />
-                      <Label htmlFor="conference" className="font-normal cursor-pointer">
+                      <Label
+                        htmlFor="conference"
+                        className="font-normal cursor-pointer"
+                      >
                         Conference
                       </Label>
                     </div>
@@ -1887,7 +1925,10 @@ const TeamStats: React.FC = () => {
                         checked={newRecord.levels.includes("school")}
                         onCheckedChange={() => handleLevelToggle("school")}
                       />
-                      <Label htmlFor="school" className="font-normal cursor-pointer">
+                      <Label
+                        htmlFor="school"
+                        className="font-normal cursor-pointer"
+                      >
                         School
                       </Label>
                     </div>
@@ -1904,19 +1945,28 @@ const TeamStats: React.FC = () => {
                     >
                       <div className="flex items-center space-x-2">
                         <RadioGroupItem value="career" id="career-radio" />
-                        <Label htmlFor="career-radio" className="font-normal cursor-pointer">
+                        <Label
+                          htmlFor="career-radio"
+                          className="font-normal cursor-pointer"
+                        >
                           Career
                         </Label>
                       </div>
                       <div className="flex items-center space-x-2">
                         <RadioGroupItem value="season" id="season-radio" />
-                        <Label htmlFor="season-radio" className="font-normal cursor-pointer">
+                        <Label
+                          htmlFor="season-radio"
+                          className="font-normal cursor-pointer"
+                        >
                           Season
                         </Label>
                       </div>
                       <div className="flex items-center space-x-2">
                         <RadioGroupItem value="game" id="game-radio" />
-                        <Label htmlFor="game-radio" className="font-normal cursor-pointer">
+                        <Label
+                          htmlFor="game-radio"
+                          className="font-normal cursor-pointer"
+                        >
                           Game
                         </Label>
                       </div>
@@ -2070,7 +2120,8 @@ const TeamStats: React.FC = () => {
                     onClick={handleAddRecord}
                     className="w-full"
                     disabled={
-                      !newRecord.playerName.trim() || newRecord.levels.length === 0
+                      !newRecord.playerName.trim() ||
+                      newRecord.levels.length === 0
                     }
                   >
                     <Plus className="h-4 w-4 mr-2" />
