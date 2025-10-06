@@ -112,6 +112,8 @@ const Records: React.FC = () => {
   const [selectedYear, setSelectedYear] = useState<number | null>(null);
   const [activeRecord, setActiveRecord] = useState<YearRecord | null>(null);
   const [hasChanges, setHasChanges] = useState(false);
+  const [editingDraftPlayerId, setEditingDraftPlayerId] = useState<string | null>(null);
+  const [draftPlayerEditValues, setDraftPlayerEditValues] = useState<{playerName: string; round: number}>({playerName: '', round: 1});
 
   // --- MODIFICATION: Get current year and dynasty ID ---
   const { dataVersion, currentDynastyId } = useDynasty();
@@ -353,6 +355,32 @@ const Records: React.FC = () => {
       ...(activeRecord.playersDrafted || []),
       newPlayer,
     ]);
+    // Enter edit mode for this new player
+    setEditingDraftPlayerId(newPlayer.id);
+    setDraftPlayerEditValues({playerName: '', round: 1});
+  };
+
+  const saveDraftedPlayer = (id: string) => {
+    if (!activeRecord) return;
+    const updatedPlayers = (activeRecord.playersDrafted || []).map(p =>
+      p.id === id
+        ? {...p, playerName: draftPlayerEditValues.playerName, round: draftPlayerEditValues.round}
+        : p
+    );
+    handleFieldChange("playersDrafted", updatedPlayers);
+    setEditingDraftPlayerId(null);
+    setDraftPlayerEditValues({playerName: '', round: 1});
+  };
+
+  const cancelDraftedPlayerEdit = (id: string) => {
+    // If the player has no name, remove them entirely (they were just added)
+    if (!activeRecord) return;
+    const player = (activeRecord.playersDrafted || []).find(p => p.id === id);
+    if (player && !player.playerName.trim()) {
+      removeDraftedPlayer(id);
+    }
+    setEditingDraftPlayerId(null);
+    setDraftPlayerEditValues({playerName: '', round: 1});
   };
 
   const removeDraftedPlayer = (id: string) => {
@@ -1533,58 +1561,63 @@ const Records: React.FC = () => {
                         {(activeRecord.playersDrafted || [])
                           .sort((a, b) => a.round - b.round || a.pick - b.pick)
                           .map((player, index) => {
-                            // If player has no name, show input mode for editing
-                            if (!player.playerName.trim()) {
+                            // If player is being edited, show edit mode
+                            if (editingDraftPlayerId === player.id) {
                               return (
                                 <div
                                   key={player.id}
-                                  className="grid grid-cols-[1fr,auto,auto] gap-2 items-center p-2 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-800/50"
+                                  className="grid grid-cols-[1fr,auto] gap-2 items-center p-2 border-2 border-dashed border-blue-400 dark:border-blue-600 rounded-lg bg-blue-50 dark:bg-blue-900/20"
                                 >
-                                  <Input
-                                    value={player.playerName}
-                                    onChange={(e) =>
-                                      updateDraftedPlayer(
-                                        index,
-                                        "playerName",
-                                        e.target.value
-                                      )
-                                    }
-                                    placeholder="Player Name"
-                                    className="h-8"
-                                    autoFocus
-                                  />
-                                  <div className="flex items-center gap-1">
-                                    <span className="text-xs">R</span>
+                                  <div className="space-y-2">
                                     <Input
-                                      type="number"
-                                      value={player.round}
+                                      value={draftPlayerEditValues.playerName}
                                       onChange={(e) =>
-                                        updateDraftedPlayer(
-                                          index,
-                                          "round",
-                                          parseInt(e.target.value) || 1
-                                        )
+                                        setDraftPlayerEditValues(prev => ({...prev, playerName: e.target.value}))
                                       }
-                                      className="h-8 w-14 text-center"
-                                      min="1"
-                                      max="7"
+                                      placeholder="Player Name"
+                                      className="h-8"
+                                      autoFocus
                                     />
+                                    <div className="flex items-center gap-2">
+                                      <label className="text-xs font-medium">Round:</label>
+                                      <Input
+                                        type="number"
+                                        value={draftPlayerEditValues.round}
+                                        onChange={(e) =>
+                                          setDraftPlayerEditValues(prev => ({...prev, round: parseInt(e.target.value) || 1}))
+                                        }
+                                        className="h-8 w-16 text-center"
+                                        min="1"
+                                        max="7"
+                                      />
+                                    </div>
                                   </div>
-                                  <Button
-                                    onClick={() =>
-                                      removeDraftedPlayer(player.id)
-                                    }
-                                    variant="ghost"
-                                    size="icon"
-                                    className="h-8 w-8"
-                                  >
-                                    <X className="h-4 w-4 text-destructive" />
-                                  </Button>
+                                  <div className="flex flex-col gap-1">
+                                    <Button
+                                      onClick={() => saveDraftedPlayer(player.id)}
+                                      variant="default"
+                                      size="sm"
+                                      className="h-8"
+                                      disabled={!draftPlayerEditValues.playerName.trim()}
+                                    >
+                                      <Save className="h-3 w-3 mr-1" />
+                                      Save
+                                    </Button>
+                                    <Button
+                                      onClick={() => cancelDraftedPlayerEdit(player.id)}
+                                      variant="ghost"
+                                      size="sm"
+                                      className="h-8"
+                                    >
+                                      <X className="h-3 w-3 mr-1" />
+                                      Cancel
+                                    </Button>
+                                  </div>
                                 </div>
                               );
                             }
 
-                            // Show solid display mode for players with names
+                            // Show display mode for players with names
                             return (
                               <div
                                 key={player.id}
@@ -1598,7 +1631,7 @@ const Records: React.FC = () => {
                                   </div>
                                   <div className="min-w-0">
                                     <p className="font-semibold text-blue-800 dark:text-blue-200 truncate">
-                                      {player.playerName}
+                                      {player.playerName || '(Unnamed)'}
                                     </p>
                                     <p className="text-xs text-blue-600 dark:text-blue-400">
                                       Round {player.round}
