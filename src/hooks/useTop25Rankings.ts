@@ -34,6 +34,6 @@ export function useTop25Rankings() {
     latestUnlockedWeek,
     getRankingsForWeek,
     updateRankingsForWeek,
-    history,
+    top25History,
   };
 }

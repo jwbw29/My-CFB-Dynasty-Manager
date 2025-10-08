@@ -623,7 +623,7 @@ const DynastyLaunch: React.FC<DynastyLaunchProps> = ({ onDynastySelected }) => {
                 // --- THIS IS THE SECTION TO UPDATE ---
                 const schoolInfo = getSchoolInfo(dynasty);
                 const actualRecord = calculateDynastyRecord(dynasty.id);
-                const teamRank = getLatestRank(dynasty.id, dynasty.schoolName);
+                const teamRank = getLatestRank(dynasty.id, schoolInfo.name);
                 const advanceSchedule = getDynastyAdvanceSchedule(dynasty.id);
 
                 return (
