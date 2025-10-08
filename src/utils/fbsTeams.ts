@@ -1248,6 +1248,15 @@ export const fbsTeams: Team[] = [
     stadium: "War Memorial Stadium",
     abbrev: "WYO",
   },
+  {
+    name: "JUCO",
+    nickName: "JUCO",
+    city: "",
+    state: "",
+    conference: "Independents",
+    stadium: "",
+    abbrev: "JUCO",
+  },
 ];
 
 export function getTeamByName(name: string): Team | undefined {
