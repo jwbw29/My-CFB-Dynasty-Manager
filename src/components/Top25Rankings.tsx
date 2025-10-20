@@ -18,19 +18,12 @@ import { toast } from "react-hot-toast";
 import { useTop25Rankings, RankedTeam } from "@/hooks/useTop25Rankings";
 import { TeamLogo } from "./ui/TeamLogo";
 import { getWeekDisplayName } from "@/utils/weekUtils";
-import { getCurrentYear } from "@/utils/localStorage";
+import { getCurrentYear, getUsernameForTeam } from "@/utils/localStorage";
 import { useDynasty } from "@/contexts/DynastyContext";
-import { isTeamUserControlled as isUserControlled } from "@/utils/localStorage";
 import { TeamDisplay } from "./TeamHome";
 
 // --- WEEKS array for the dropdown selector ---
 const WEEKS = Array.from({ length: 22 }, (_, i) => i); // Weeks 0-21
-
-// --- HELPER: Check if a team is user-controlled ---
-// Now using the new centralized user teams data source
-const isTeamUserControlled = (teamName: string): boolean => {
-  return isUserControlled(teamName);
-};
 
 // --- Updated TeamRankingRow Component ---
 interface TeamRankingRowProps {
@@ -77,7 +70,7 @@ const TeamRankingRow: React.FC<TeamRankingRowProps> = ({
                   <TeamLogo teamName={team.name} size="sm" />
                   <TeamDisplay
                     name={team.name}
-                    isUserControlled={isTeamUserControlled(team.name)}
+                    username={getUsernameForTeam(team.name)}
                     custom_classes="font-semibold"
                   />
                   {team.record && team.record.trim() && (
@@ -101,7 +94,7 @@ const TeamRankingRow: React.FC<TeamRankingRowProps> = ({
               >
                 <TeamDisplay
                   name={optionTeam.name}
-                  isUserControlled={isTeamUserControlled(optionTeam.name)}
+                  username={getUsernameForTeam(optionTeam.name)}
                 />
               </SelectItem>
             ))}

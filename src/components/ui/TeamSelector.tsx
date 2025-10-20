@@ -1,11 +1,17 @@
 // src/components/ui/TeamSelector.tsx
-import React from 'react';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { TeamLogo, ConferenceLogo } from './TeamLogo';
-import { getTeamWithLogo } from '@/utils/logoUtils';
-import { fbsTeams } from '@/utils/fbsTeams';
-import { CustomTeamManager } from '@/utils/customTeamManager';
-import { isTeamUserControlled } from '@/utils/localStorage';
+import React from "react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { TeamLogo, ConferenceLogo } from "./TeamLogo";
+import { getTeamWithLogo } from "@/utils/logoUtils";
+import { fbsTeams } from "@/utils/fbsTeams";
+import { CustomTeamManager } from "@/utils/customTeamManager";
+import { getUsernameForTeam } from "@/utils/localStorage";
 
 interface TeamSelectorProps {
   value: string;
@@ -20,9 +26,9 @@ export const TeamSelector: React.FC<TeamSelectorProps> = ({
   onValueChange,
   placeholder = "Select a team",
   includeCustomTeams = true,
-  className = ''
+  className = "",
 }) => {
-  const availableTeams = includeCustomTeams 
+  const availableTeams = includeCustomTeams
     ? CustomTeamManager.getAllAvailableTeams()
     : fbsTeams;
 
@@ -35,8 +41,11 @@ export const TeamSelector: React.FC<TeamSelectorProps> = ({
               <TeamLogo teamName={value} size="sm" />
               <span>
                 {value}
-                {isTeamUserControlled(value) && (
-                  <span className="text-xs text-blue-600 font-medium"> (User)</span>
+                {getUsernameForTeam(value) && (
+                  <span className="text-xs text-blue-600 font-medium">
+                    {" "}
+                    ({getUsernameForTeam(value)})
+                  </span>
                 )}
               </span>
             </div>
@@ -44,7 +53,7 @@ export const TeamSelector: React.FC<TeamSelectorProps> = ({
         </SelectValue>
       </SelectTrigger>
       <SelectContent className="max-h-60">
-        {availableTeams.map(team => {
+        {availableTeams.map((team) => {
           const isCustom = CustomTeamManager.isCustomTeam(team.name);
           return (
             <SelectItem key={team.name} value={team.name}>
@@ -53,15 +62,18 @@ export const TeamSelector: React.FC<TeamSelectorProps> = ({
                   <TeamLogo teamName={team.name} size="sm" />
                   <span>
                     {team.name}
-                    {isTeamUserControlled(team.name) && (
-                      <span className="text-xs text-blue-600 font-medium"> (User)</span>
+                    {getUsernameForTeam(team.name) && (
+                      <span className="text-xs text-blue-600 font-medium">
+                        {" "}
+                        ({getUsernameForTeam(team.name)})
+                      </span>
                     )}
                   </span>
                 </div>
                 <div className="flex items-center gap-2 ml-4">
                   <ConferenceLogo conference={team.conference} size="xs" />
                   <span className="text-sm text-gray-500">
-                    ({team.conference}) {isCustom && '🎨'}
+                    ({team.conference}) {isCustom && "🎨"}
                   </span>
                 </div>
               </div>
