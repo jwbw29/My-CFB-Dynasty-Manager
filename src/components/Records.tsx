@@ -60,6 +60,7 @@ import { toast } from "react-hot-toast";
 import { MESSAGES } from "@/utils/notification-utils";
 import { Badge } from "@/components/ui/badge";
 import { useDynasty } from "@/contexts/DynastyContext";
+import { MatchupRow } from "@/components/ui/matchup-row";
 
 const classOptions = [
   "FR",
@@ -1121,47 +1122,31 @@ const Records: React.FC = () => {
                   {/* MODIFICATION: Make this a read-only display */}
                   {activeRecord.schedule
                     .filter((g) => g.opponent && g.opponent !== "BYE")
-                    .map((game) => (
-                      <div
-                        key={game.id}
-                        className={`flex items-center justify-between p-3 rounded-lg border-l-4 ${
-                          game.result === "Win"
-                            ? "border-l-green-500 bg-green-50 dark:bg-green-900/20"
-                            : game.result === "Loss"
-                            ? "border-l-red-500 bg-red-50 dark:bg-red-900/20"
-                            : "border-l-gray-300 dark:border-l-gray-600"
-                        }`}
-                      >
-                        <div className="flex items-center gap-4">
-                          <div className="font-mono text-center text-muted-foreground text-sm w-10">{`W${game.week}`}</div>
-                          <div className="flex items-center gap-2">
-                            <TeamLogo teamName={game.opponent} size="md" />
-                            <div className="font-semibold text-lg">
-                              {game.location === "@" ? "@" : "vs"}{" "}
-                              {game.opponent}
+                    .map((game) => {
+                      const locationLabel =
+                        game.location === "@"
+                          ? "@"
+                          : game.location === "neutral"
+                          ? "Neutral vs"
+                          : "vs";
+
+                      return (
+                        <MatchupRow
+                          key={game.id}
+                          weekLabel={`W${game.week}`}
+                          leading={
+                            <div className="flex items-center gap-3">
+                              <TeamLogo teamName={game.opponent} size="md" />
+                              <div className="font-semibold text-base sm:text-lg">
+                                {locationLabel} {game.opponent}
+                              </div>
                             </div>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-4">
-                          <div className="font-bold text-lg text-right w-24">
-                            {game.score}
-                          </div>
-                          {game.result && game.result !== "N/A" && (
-                            <Badge
-                              className={`w-16 justify-center ${
-                                game.result === "Win"
-                                  ? "bg-green-600"
-                                  : game.result === "Loss"
-                                  ? "bg-red-600"
-                                  : "bg-gray-500"
-                              } text-white`}
-                            >
-                              {game.result}
-                            </Badge>
-                          )}
-                        </div>
-                      </div>
-                    ))}
+                          }
+                          scoreLabel={game.score}
+                          resultLabel={game.result || undefined}
+                        />
+                      );
+                    })}
                 </div>
               </CardContent>
             </Card>

@@ -27,7 +27,6 @@ import {
   calculateStats,
   getYearStats,
   getCoachProfile,
-  isTeamUserControlled,
 } from "@/utils/localStorage";
 import { getTeamData } from "@/utils/fbsTeams";
 import { fcsTeams } from "@/utils/fcsTeams";
@@ -42,6 +41,7 @@ import {
 import { CustomTeamManager } from "@/utils/customTeamManager";
 import { useDynasty } from "@/contexts/DynastyContext"; // <-- IMPORT CONTEXT HOOK
 import { Game } from "@/types/yearRecord";
+import { useOpponents } from "@/hooks/useOpponents";
 
 type UpdateableField =
   | "location"
@@ -73,10 +73,17 @@ interface GameRowProps {
   availableTeams: any[];
   onUpdateGame: (week: number, field: UpdateableField, value: any) => void;
   getRankForTeam: (teamName: string, week: number) => number | null; // <-- NEW PROP
+  getUserForTeam: (teamName: string | null | undefined) => string | null;
 }
 
 const GameRow = React.memo(
-  ({ game, availableTeams, onUpdateGame, getRankForTeam }: GameRowProps) => {
+  ({
+    game,
+    availableTeams,
+    onUpdateGame,
+    getRankForTeam,
+    getUserForTeam,
+  }: GameRowProps) => {
     const [localTeamScore, setLocalTeamScore] = useState("");
     const [localOppScore, setLocalOppScore] = useState("");
 
@@ -87,6 +94,7 @@ const GameRow = React.memo(
     const opponentDisplayName = opponentRank
       ? `#${opponentRank} ${game.opponent}`
       : game.opponent;
+    const opponentUser = getUserForTeam(game.opponent);
 
     useEffect(() => {
       if (game.score) {
@@ -183,8 +191,10 @@ const GameRow = React.memo(
                     <TeamLogo teamName={game.opponent} size="xs" />
                     <span>
                       {opponentDisplayName}
-                      {isTeamUserControlled(game.opponent) && (
-                        <span className="text-xs text-blue-600 font-medium"> (User)</span>
+                      {opponentUser && (
+                        <span className="text-xs text-blue-600 font-medium">
+                          {" "}(User: {opponentUser})
+                        </span>
                       )}
                     </span>
                   </div>
@@ -199,6 +209,7 @@ const GameRow = React.memo(
               {availableTeams.map((team) => {
                 const isCustom = CustomTeamManager.isCustomTeam(team.name);
                 const isFCS = "isFCS" in team && team.isFCS;
+                const assignedUser = getUserForTeam(team.name);
                 return (
                   <SelectItem key={team.name} value={team.name}>
                     <div className="flex items-center justify-between w-full">
@@ -206,8 +217,10 @@ const GameRow = React.memo(
                         <TeamLogo teamName={team.name} size="xs" />
                         <span>
                           {team.name}
-                          {isTeamUserControlled(team.name) && (
-                            <span className="text-xs text-blue-600 font-medium"> (User)</span>
+                          {assignedUser && (
+                            <span className="text-xs text-blue-600 font-medium">
+                              {" "}(User: {assignedUser})
+                            </span>
                           )}
                         </span>
                       </div>
@@ -304,6 +317,7 @@ const SchedulePage = () => {
   // --- GET GLOBAL STATE AND ACTIONS FROM CONTEXT ---
   const { dataVersion, activeWeek, setActiveWeek, getRankingsForWeek } =
     useDynasty();
+  const { getOpponentForTeam, refresh: refreshOpponents } = useOpponents();
 
   const saveScheduleNow = useCallback(
     (scheduleToSave: Game[]) => {
@@ -317,16 +331,28 @@ const SchedulePage = () => {
         );
         const currentStats = getYearStats(currentYear);
         setYearStats(currentYear, { ...currentStats, ...calculatedStats });
+        refreshOpponents();
       } catch (error) {
         console.error("Save failed:", error);
       }
     },
-    [currentYear]
+    [currentYear, refreshOpponents]
   );
 
   const teamData = useMemo(
     () => (teamName ? getTeamData(teamName) : null),
     [teamName, dataVersion]
+  );
+
+  const getUserForTeam = useCallback(
+    (teamName: string | null | undefined) => {
+      if (!teamName || teamName === "NONE" || teamName === "BYE") {
+        return null;
+      }
+      const opponent = getOpponentForTeam(currentYear, teamName);
+      return opponent?.displayName || null;
+    },
+    [currentYear, getOpponentForTeam]
   );
   const record = useMemo(() => {
     const wins = currentSchedule.filter((g) => g.result === "Win").length;
@@ -585,6 +611,7 @@ const SchedulePage = () => {
                 availableTeams={availableTeams}
                 onUpdateGame={handleUpdateGame}
                 getRankForTeam={getRankForTeam}
+                getUserForTeam={getUserForTeam}
               />
             ))}
           </div>

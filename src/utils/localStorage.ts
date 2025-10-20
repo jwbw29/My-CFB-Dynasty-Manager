@@ -9,6 +9,11 @@ import { getTeamByName, Team, getTeamData } from "./fbsTeams";
 import { PlayerStat } from "@/types/playerStats";
 import { CustomTeamManager } from "./customTeamManager";
 import { RankedTeam, Top25History } from "@/hooks/useTop25Rankings";
+import {
+  OpponentsState,
+  Opponent,
+  OpponentMatchup,
+} from "@/types/opponents";
 
 const COACH_PROFILE_KEY = "coachProfile";
 const CURRENT_YEAR_KEY = "currentYear";
@@ -61,6 +66,14 @@ const setCurrentDynastyData = (data: Record<string, any>): void => {
   } catch (e) {
     console.error("Failed to save dynasty data", e);
   }
+};
+
+const createGeneratedId = (prefix: string): string => {
+  const cryptoRef = typeof globalThis !== "undefined" ? (globalThis as any).crypto : null;
+  if (cryptoRef?.randomUUID) {
+    return `${prefix}_${cryptoRef.randomUUID()}`;
+  }
+  return `${prefix}_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`;
 };
 
 // --- Coach Profile ---
@@ -772,6 +785,116 @@ export const isTeamUserControlled = (teamName: string): boolean => {
   if (!teamName) return false;
   const userControlledTeams = getUserControlledTeams();
   return userControlledTeams.includes(teamName);
+};
+
+// --- OPPONENT MANAGEMENT ---
+
+const OPPONENTS_STATE_VERSION = 1;
+const OPPONENTS_STATE_KEY = "opponentsState";
+
+const emptyOpponentsState = (): OpponentsState => ({
+  version: OPPONENTS_STATE_VERSION,
+  opponents: [],
+  updatedAt: new Date().toISOString(),
+});
+
+const normalizeOpponentsState = (
+  state: Partial<OpponentsState> | null | undefined
+): OpponentsState => {
+  if (!state) {
+    return emptyOpponentsState();
+  }
+
+  const opponents = Array.isArray(state.opponents) ? state.opponents : [];
+  const matchups = Array.isArray(state.matchups) ? state.matchups : [];
+
+  return {
+    version:
+      typeof state.version === "number"
+        ? state.version
+        : OPPONENTS_STATE_VERSION,
+    opponents: opponents.map((opponent) => ({
+      ...opponent,
+      teamHistory: opponent?.teamHistory || {},
+    })) as Opponent[],
+    matchups: matchups.map((matchup) => ({
+      ...matchup,
+    })) as OpponentMatchup[],
+    updatedAt: state.updatedAt || new Date().toISOString(),
+  };
+};
+
+const persistOpponentsState = (state: OpponentsState): void => {
+  const dynastyId = safeLocalStorage.getItem("currentDynastyId");
+  if (!dynastyId) return;
+
+  const normalizedState = normalizeOpponentsState(state);
+  const dynastyData = getCurrentDynastyData() || {};
+  dynastyData[OPPONENTS_STATE_KEY] = {
+    ...normalizedState,
+    matchups: undefined,
+    version: OPPONENTS_STATE_VERSION,
+    updatedAt: new Date().toISOString(),
+  };
+
+  safeLocalStorage.setItem(
+    `dynasty_${dynastyId}`,
+    JSON.stringify(dynastyData)
+  );
+};
+
+export const getOpponentsState = (): OpponentsState => {
+  const dynastyData = getCurrentDynastyData();
+  const rawState = dynastyData?.[OPPONENTS_STATE_KEY];
+
+  if (!rawState) {
+    return emptyOpponentsState();
+  }
+
+  const normalized = normalizeOpponentsState(rawState as OpponentsState);
+
+  if (normalized.version !== OPPONENTS_STATE_VERSION) {
+    return {
+      ...normalized,
+      version: OPPONENTS_STATE_VERSION,
+      updatedAt: new Date().toISOString(),
+    };
+  }
+
+  return normalized;
+};
+
+export const setOpponentsState = (state: OpponentsState): void => {
+  persistOpponentsState(state);
+};
+
+export const deriveUserControlledTeamsFromOpponents = (
+  state?: OpponentsState
+): string[] => {
+  const sourceState = state ?? getOpponentsState();
+  const assignedTeams = new Set<string>();
+
+  sourceState.opponents.forEach((opponent) => {
+    if (opponent?.defaultTeamId) {
+      assignedTeams.add(opponent.defaultTeamId);
+    }
+  });
+
+  return Array.from(assignedTeams);
+};
+
+export const syncUserControlledTeamsFromOpponents = (
+  state?: OpponentsState
+): void => {
+  const derivedTeams = deriveUserControlledTeamsFromOpponents(state);
+  const existingTeams = getUserControlledTeams();
+  const setsMatch =
+    derivedTeams.length === existingTeams.length &&
+    derivedTeams.every((team) => existingTeams.includes(team));
+
+  if (!setsMatch) {
+    setUserControlledTeams(derivedTeams);
+  }
 };
 
 // --- TEAM STATS MANAGEMENT ---
