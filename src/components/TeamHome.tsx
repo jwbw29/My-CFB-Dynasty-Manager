@@ -38,6 +38,7 @@ import {
   progressRosterForNewSeason,
   isTeamUserControlled,
   getUsernameForTeam,
+  saveUserTeamMappingsForYear,
 } from "@/utils/localStorage";
 import useLocalStorage from "@/hooks/useLocalStorage";
 import { validateYear } from "@/utils/validationUtils";
@@ -401,6 +402,10 @@ const TeamHome: React.FC = () => {
       return;
     }
     try {
+      // IMPORTANT: Save user-to-team mappings BEFORE advancing to next season
+      // This preserves which users controlled which teams during this season
+      saveUserTeamMappingsForYear(currentYear);
+
       const finalRecord = getYearRecord(currentYear);
       const finalStats = calculateStats(currentSchedule, teamName);
       const completeFinalRecord: YearRecord = {

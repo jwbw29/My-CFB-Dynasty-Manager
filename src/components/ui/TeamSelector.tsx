@@ -19,6 +19,7 @@ interface TeamSelectorProps {
   placeholder?: string;
   includeCustomTeams?: boolean;
   className?: string;
+  hideUsernames?: boolean; // New prop to hide username tags
 }
 
 export const TeamSelector: React.FC<TeamSelectorProps> = ({
@@ -27,6 +28,7 @@ export const TeamSelector: React.FC<TeamSelectorProps> = ({
   placeholder = "Select a team",
   includeCustomTeams = true,
   className = "",
+  hideUsernames = false, // Default to showing usernames (existing behavior)
 }) => {
   const availableTeams = includeCustomTeams
     ? CustomTeamManager.getAllAvailableTeams()
@@ -41,7 +43,7 @@ export const TeamSelector: React.FC<TeamSelectorProps> = ({
               <TeamLogo teamName={value} size="sm" />
               <span>
                 {value}
-                {getUsernameForTeam(value) && (
+                {!hideUsernames && getUsernameForTeam(value) && (
                   <span className="text-xs text-blue-600 font-medium">
                     {" "}
                     ({getUsernameForTeam(value)})
@@ -62,7 +64,7 @@ export const TeamSelector: React.FC<TeamSelectorProps> = ({
                   <TeamLogo teamName={team.name} size="sm" />
                   <span>
                     {team.name}
-                    {getUsernameForTeam(team.name) && (
+                    {!hideUsernames && getUsernameForTeam(team.name) && (
                       <span className="text-xs text-blue-600 font-medium">
                         {" "}
                         ({getUsernameForTeam(team.name)})

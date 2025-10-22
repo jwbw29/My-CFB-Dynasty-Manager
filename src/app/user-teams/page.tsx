@@ -48,6 +48,7 @@ const UserTeamsPage: React.FC = () => {
             <GameHistoryDetail
               userId={selectedUserId}
               refreshTrigger={refreshTrigger}
+              onGameAdded={handleUsersChange}
             />
           </div>
         </div>

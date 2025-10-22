@@ -991,6 +991,74 @@ export const isTeamUserControlled = (teamName: string): boolean => {
   return isTeamAssignedToUser(teamName);
 };
 
+// --- YEAR-BASED USER-TO-TEAM MAPPINGS ---
+
+/**
+ * Store user-to-team mappings for a specific year
+ * This preserves which users controlled which teams during a season
+ */
+export const saveUserTeamMappingsForYear = (year: number): void => {
+  const users = getUsers();
+  const mappings: Record<string, string> = {}; // teamName -> userId
+
+  users.forEach((user) => {
+    if (user.currentTeamId) {
+      mappings[user.currentTeamId] = user.id;
+    }
+  });
+
+  const key = `userTeamMappings_${year}`;
+  safeLocalStorage.setItem(key, JSON.stringify(mappings));
+};
+
+/**
+ * Get user-to-team mappings for a specific year
+ * Returns a map of teamName -> userId for that year
+ */
+export const getUserTeamMappingsForYear = (
+  year: number
+): Record<string, string> => {
+  const key = `userTeamMappings_${year}`;
+  const stored = safeLocalStorage.getItem(key);
+
+  if (!stored) return {};
+
+  try {
+    return JSON.parse(stored);
+  } catch (error) {
+    console.error(`Error parsing user team mappings for year ${year}:`, error);
+    return {};
+  }
+};
+
+/**
+ * Get the user who controlled a specific team in a specific year
+ * This checks both the year-based mappings and the user's team history
+ */
+export const getUserForTeamInYear = (
+  teamName: string,
+  year: number
+): import("@/types/user").User | undefined => {
+  if (!teamName) return undefined;
+
+  // First check year-based mappings (more reliable)
+  const mappings = getUserTeamMappingsForYear(year);
+  const userId = mappings[teamName];
+
+  if (userId) {
+    return getUserById(userId);
+  }
+
+  // Fallback to checking user team history
+  const users = getUsers();
+  return users.find((user) => {
+    const assignment = user.teamHistory.find(
+      (th) => th.startYear <= year && (!th.endYear || th.endYear >= year)
+    );
+    return assignment?.teamId === teamName;
+  });
+};
+
 /**
  * Calculate head-to-head record against a specific user
  */
@@ -1068,10 +1136,10 @@ export const getHeadToHeadRecord = (
     });
   });
 
-  // Sort games by year and week (most recent first)
+  // Sort games by year and week (oldest first - ascending order)
   games.sort((a, b) => {
-    if (a.year !== b.year) return b.year - a.year;
-    return b.week - a.week;
+    if (a.year !== b.year) return a.year - b.year;
+    return a.week - b.week;
   });
 
   return {
