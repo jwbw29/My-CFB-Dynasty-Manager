@@ -325,12 +325,14 @@ export const removeAllYearRecords = (): void => {
 // --- Trophies ---
 export const getRivalTrophiesForYear = (year: number): string[] => {
   try {
-    const storedTrophies = safeLocalStorage.getItem('allTrophies');
+    const storedTrophies = safeLocalStorage.getItem("allTrophies");
     if (!storedTrophies) return [];
 
     const allTrophies = JSON.parse(storedTrophies);
     return allTrophies
-      .filter((trophy: any) => trophy.year === year && trophy.category === 'rivalry')
+      .filter(
+        (trophy: any) => trophy.year === year && trophy.category === "rivalry"
+      )
       .map((trophy: any) => trophy.name || trophy.type);
   } catch (error) {
     console.error(`Error getting rival trophies for year ${year}:`, error);
@@ -743,7 +745,7 @@ export const setUserControlledTeams = (teams: string[]): void => {
 
   const dynastyData = getCurrentDynastyData() || {};
   dynastyData[USER_CONTROLLED_TEAMS_KEY] = teams;
-  
+
   safeLocalStorage.setItem(`dynasty_${dynastyId}`, JSON.stringify(dynastyData));
 };
 
@@ -762,16 +764,7 @@ export const addUserControlledTeam = (teamName: string): void => {
  */
 export const removeUserControlledTeam = (teamName: string): void => {
   const currentTeams = getUserControlledTeams();
-  setUserControlledTeams(currentTeams.filter(team => team !== teamName));
-};
-
-/**
- * Check if a team is user-controlled
- */
-export const isTeamUserControlled = (teamName: string): boolean => {
-  if (!teamName) return false;
-  const userControlledTeams = getUserControlledTeams();
-  return userControlledTeams.includes(teamName);
+  setUserControlledTeams(currentTeams.filter((team) => team !== teamName));
 };
 
 // --- TEAM STATS MANAGEMENT ---
@@ -779,10 +772,13 @@ export const isTeamUserControlled = (teamName: string): boolean => {
 /**
  * Get team stats for a specific dynasty and year
  */
-export const getTeamStats = (dynastyId: string, year: number): import("@/types/yearRecord").TeamStatsData => {
+export const getTeamStats = (
+  dynastyId: string,
+  year: number
+): import("@/types/yearRecord").TeamStatsData => {
   const key = `teamStats_${dynastyId}_${year}`;
   const stored = safeLocalStorage.getItem(key);
-  
+
   const defaultStats = {
     gamesPlayed: 0,
     totalOffense: 0,
@@ -806,10 +802,13 @@ export const getTeamStats = (dynastyId: string, year: number): import("@/types/y
 /**
  * Get team leaders for a specific dynasty and year
  */
-export const getTeamLeaders = (dynastyId: string, year: number): import("@/types/yearRecord").TeamLeaderStats => {
+export const getTeamLeaders = (
+  dynastyId: string,
+  year: number
+): import("@/types/yearRecord").TeamLeaderStats => {
   const key = `teamLeaders_${dynastyId}_${year}`;
   const stored = safeLocalStorage.getItem(key);
-  
+
   const defaultLeaders = {
     passingLeaders: [],
     rushingLeaders: [],
@@ -823,7 +822,264 @@ export const getTeamLeaders = (dynastyId: string, year: number): import("@/types
   try {
     return stored ? JSON.parse(stored) : defaultLeaders;
   } catch (error) {
-    console.error(`Error parsing team leaders for ${dynastyId}_${year}:`, error);
+    console.error(
+      `Error parsing team leaders for ${dynastyId}_${year}:`,
+      error
+    );
     return defaultLeaders;
   }
+};
+
+// --- USER VS USER TRACKING ---
+
+const USERS_KEY = "users";
+
+/**
+ * Get all users for the current dynasty
+ */
+export const getUsers = (): import("@/types/user").User[] => {
+  const dynastyData = getCurrentDynastyData();
+  return dynastyData?.[USERS_KEY] || [];
+};
+
+/**
+ * Set all users for the current dynasty
+ */
+export const setUsers = (users: import("@/types/user").User[]): void => {
+  const dynastyId = safeLocalStorage.getItem("currentDynastyId");
+  if (!dynastyId) return;
+
+  const dynastyData = getCurrentDynastyData() || {};
+  dynastyData[USERS_KEY] = users;
+
+  safeLocalStorage.setItem(`dynasty_${dynastyId}`, JSON.stringify(dynastyData));
+};
+
+/**
+ * Add a new user to the current dynasty
+ */
+export const addUser = (
+  name: string,
+  teamId: string
+): import("@/types/user").User => {
+  const currentYear = getCurrentYear();
+  const newUser: import("@/types/user").User = {
+    id: Date.now().toString(),
+    name,
+    currentTeamId: teamId,
+    teamHistory: [
+      {
+        teamId,
+        startYear: currentYear,
+      },
+    ],
+  };
+
+  const users = getUsers();
+  users.push(newUser);
+  setUsers(users);
+
+  return newUser;
+};
+
+/**
+ * Update a user's team assignment
+ */
+export const updateUserTeam = (userId: string, newTeamId: string): void => {
+  const users = getUsers();
+  const user = users.find((u) => u.id === userId);
+
+  if (!user) return;
+
+  const currentYear = getCurrentYear();
+
+  // If the team is different from current, update history
+  if (user.currentTeamId !== newTeamId) {
+    // End the current team assignment
+    const currentAssignment = user.teamHistory.find((th) => !th.endYear);
+    if (currentAssignment) {
+      currentAssignment.endYear = currentYear - 1;
+    }
+
+    // Add new team assignment
+    user.teamHistory.push({
+      teamId: newTeamId,
+      startYear: currentYear,
+    });
+
+    user.currentTeamId = newTeamId;
+    setUsers(users);
+  }
+};
+
+/**
+ * Delete a user from the current dynasty
+ */
+export const deleteUser = (userId: string): void => {
+  const users = getUsers();
+  const filteredUsers = users.filter((u) => u.id !== userId);
+  setUsers(filteredUsers);
+};
+
+/**
+ * Get a user by ID
+ */
+export const getUserById = (
+  userId: string
+): import("@/types/user").User | undefined => {
+  const users = getUsers();
+  return users.find((u) => u.id === userId);
+};
+
+/**
+ * Get the team a user controlled during a specific year
+ */
+export const getUserTeamForYear = (
+  userId: string,
+  year: number
+): string | undefined => {
+  const user = getUserById(userId);
+  if (!user) return undefined;
+
+  const assignment = user.teamHistory.find(
+    (th) => th.startYear <= year && (!th.endYear || th.endYear >= year)
+  );
+
+  return assignment?.teamId;
+};
+
+/**
+ * Check if a team is currently assigned to any user
+ */
+export const isTeamAssignedToUser = (
+  teamId: string,
+  excludeUserId?: string
+): boolean => {
+  const users = getUsers();
+  return users.some(
+    (u) => u.currentTeamId === teamId && u.id !== excludeUserId
+  );
+};
+
+/**
+ * Get the user who currently controls a specific team
+ */
+export const getUserForTeam = (
+  teamName: string
+): import("@/types/user").User | undefined => {
+  if (!teamName) return undefined;
+  const users = getUsers();
+  return users.find((user) => user.currentTeamId === teamName);
+};
+
+/**
+ * Get the username for a team (returns undefined if team is not user-controlled)
+ */
+export const getUsernameForTeam = (teamName: string): string | undefined => {
+  const user = getUserForTeam(teamName);
+  return user?.name;
+};
+
+/**
+ * Check if a team is user-controlled (assigned to any user)
+ * This function uses the User vs User tracking system to determine if a team
+ * is currently assigned to any user. It's kept for backward compatibility
+ * with existing code that displays "(User)" tags throughout the app.
+ */
+export const isTeamUserControlled = (teamName: string): boolean => {
+  if (!teamName) return false;
+  return isTeamAssignedToUser(teamName);
+};
+
+/**
+ * Calculate head-to-head record against a specific user
+ */
+export const getHeadToHeadRecord = (
+  userId: string
+): import("@/types/user").HeadToHeadRecord | null => {
+  const user = getUserById(userId);
+  if (!user) return null;
+
+  const coachProfile = getCoachProfile();
+  const dynastyTeam = coachProfile?.schoolName || "";
+
+  const allRecords = getAllYearRecords();
+  const games: import("@/types/user").HeadToHeadGame[] = [];
+  let wins = 0;
+  let losses = 0;
+  let ties = 0;
+
+  // Iterate through all year records
+  allRecords.forEach((record) => {
+    const year = record.year;
+    const userTeamForYear = getUserTeamForYear(userId, year);
+
+    if (!userTeamForYear) return;
+
+    // Load the schedule for this year (schedules are stored separately)
+    const schedule = getSchedule(year);
+
+    // Check each game in the schedule
+    schedule.forEach((game) => {
+      // Check if this game was against the user's team
+      if (game.opponentUserId === userId || game.opponent === userTeamForYear) {
+        // Skip if game hasn't been played yet
+        if (game.result === "N/A" || game.result === "Bye") {
+          return;
+        }
+
+        // Parse the score
+        const scoreParts = game.score.split("-").map((s) => parseInt(s.trim()));
+        if (
+          scoreParts.length !== 2 ||
+          isNaN(scoreParts[0]) ||
+          isNaN(scoreParts[1])
+        ) {
+          return; // Skip if score is invalid
+        }
+
+        // Score format is always "Your Score - Opponent Score" from dynasty team's perspective
+        const myScore = scoreParts[0];
+        const theirScore = scoreParts[1];
+
+        // Use the stored result (already from dynasty team's perspective)
+        const result = game.result as "Win" | "Loss" | "Tie";
+
+        // Update counters
+        if (result === "Win") {
+          wins++;
+        } else if (result === "Loss") {
+          losses++;
+        } else if (result === "Tie") {
+          ties++;
+        }
+
+        games.push({
+          year,
+          week: game.week,
+          myTeam: dynastyTeam,
+          theirTeam: userTeamForYear,
+          myScore,
+          theirScore,
+          result,
+          location: game.location as "@" | "vs" | "neutral",
+        });
+      }
+    });
+  });
+
+  // Sort games by year and week (most recent first)
+  games.sort((a, b) => {
+    if (a.year !== b.year) return b.year - a.year;
+    return b.week - a.week;
+  });
+
+  return {
+    userId,
+    userName: user.name,
+    wins,
+    losses,
+    ties,
+    games,
+  };
 };

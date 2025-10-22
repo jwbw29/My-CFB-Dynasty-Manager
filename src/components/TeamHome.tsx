@@ -37,6 +37,7 @@ import {
   getYearAwards,
   progressRosterForNewSeason,
   isTeamUserControlled,
+  getUsernameForTeam,
 } from "@/utils/localStorage";
 import useLocalStorage from "@/hooks/useLocalStorage";
 import { validateYear } from "@/utils/validationUtils";
@@ -110,16 +111,20 @@ export const TeamDisplay: React.FC<{
   name: string;
   rank?: number | null;
   isUserControlled?: boolean;
+  username?: string;
   custom_classes?: string;
-}> = ({ name, rank, isUserControlled, custom_classes }) => (
+}> = ({ name, rank, isUserControlled, username, custom_classes }) => (
   <div className="flex items-center gap-2 min-w-0">
     <span className={`text-sm min-w-0 ${custom_classes}`}>
       {rank && (
         <span className="font-bold text-muted-foreground">#{rank} </span>
       )}
       {name}
-      {isUserControlled && (
-        <span className="text-xs text-blue-600 font-medium"> (User)</span>
+      {(isUserControlled || username) && (
+        <span className="text-xs text-blue-600 font-medium">
+          {" "}
+          ({username || "User"})
+        </span>
       )}
     </span>
   </div>
@@ -176,7 +181,7 @@ const GameDisplayRow: React.FC<GameDisplayRowProps> = ({
         <TeamDisplay
           name={firstTeam.name}
           rank={firstTeam.rank}
-          isUserControlled={isTeamUserControlled(firstTeam.name)}
+          username={getUsernameForTeam(firstTeam.name)}
         />
       </div>
 
@@ -195,7 +200,7 @@ const GameDisplayRow: React.FC<GameDisplayRowProps> = ({
         <TeamDisplay
           name={secondTeam.name}
           rank={secondTeam.rank}
-          isUserControlled={isTeamUserControlled(secondTeam.name)}
+          username={getUsernameForTeam(secondTeam.name)}
         />
       </div>
 

@@ -9,7 +9,11 @@ import React, {
   ReactNode,
   useCallback,
 } from "react";
-import { getTop25History, getSchedule, getUserControlledTeams } from "@/utils/localStorage"; // <-- Import getSchedule and getUserControlledTeams
+import {
+  getTop25History,
+  getSchedule,
+  getUserControlledTeams,
+} from "@/utils/localStorage"; // <-- Import getSchedule and getUserControlledTeams
 import { RankedTeam, Top25History } from "@/hooks/useTop25Rankings";
 
 interface DynastyContextType {
@@ -34,7 +38,11 @@ interface DynastyContextType {
   getRankingsForWeek: (year: number, week: number) => RankedTeam[];
 
   // --- OTHERS RECEIVING VOTES ---
-  updateOthersReceivingVotes: (year: number, week: number, text: string) => void;
+  updateOthersReceivingVotes: (
+    year: number,
+    week: number,
+    text: string
+  ) => void;
   getOthersReceivingVotes: (year: number, week: number) => string;
 
   // --- ADVANCE SCHEDULE FIELDS ---
@@ -106,19 +114,21 @@ export const DynastyProvider: React.FC<DynastyProviderProps> = ({
       }
 
       // Calculate the correct active week based on schedule progress
-      const currentYear = parseInt(localStorage.getItem("currentYear") || "2025");
+      const currentYear = parseInt(
+        localStorage.getItem("currentYear") || "2025"
+      );
       const schedule = getSchedule(currentYear);
-      
+
       if (schedule && schedule.length > 0) {
         // Find the last completed game
         const lastCompletedGame = [...schedule]
           .reverse()
           .find((g) => g.result !== "N/A");
-        
+
         const calculatedActiveWeek = lastCompletedGame
           ? Math.min(lastCompletedGame.week + 1, 21)
           : 0;
-        
+
         setActiveWeekState(calculatedActiveWeek);
         setLatestUnlockedWeek(calculatedActiveWeek);
       } else {
@@ -252,20 +262,35 @@ export const DynastyProvider: React.FC<DynastyProviderProps> = ({
       // This ensures the most up-to-date version is saved, preventing data loss.
       dynastyData.top25History = top25History;
 
-      // 3.1. Add advance schedule fields, others receiving votes, and user controlled teams
+      // 3.1. Add advance schedule fields, others receiving votes, user controlled teams, and users
       dynastyData.readyToAdvance = readyToAdvance;
       dynastyData.nextAdvance = nextAdvance;
       dynastyData.othersReceivingVotes = othersReceivingVotes;
       dynastyData.userControlledTeams = getUserControlledTeams();
 
+      // Get users data from the dynasty data (it's already stored there by localStorage utils)
+      const currentDynastyData = localStorage.getItem(
+        `dynasty_${currentDynastyId}`
+      );
+      if (currentDynastyData) {
+        try {
+          const parsed = JSON.parse(currentDynastyData);
+          if (parsed.users) {
+            dynastyData.users = parsed.users;
+          }
+        } catch (e) {
+          console.error("Error parsing users from dynasty data", e);
+        }
+      }
+
       // 4. Gather dynamic, year-specific and dynasty-specific keys from localStorage.
       Object.keys(localStorage).forEach((key) => {
         if (
           key &&
-          (key.startsWith("schedule_") || 
-           key.startsWith("yearStats_") ||
-           key.startsWith(`offensiveNeeds_${currentDynastyId}`) ||
-           key.startsWith(`defensiveNeeds_${currentDynastyId}`))
+          (key.startsWith("schedule_") ||
+            key.startsWith("yearStats_") ||
+            key.startsWith(`offensiveNeeds_${currentDynastyId}`) ||
+            key.startsWith(`defensiveNeeds_${currentDynastyId}`))
         ) {
           const data = localStorage.getItem(key);
           if (data) {
@@ -310,7 +335,13 @@ export const DynastyProvider: React.FC<DynastyProviderProps> = ({
     } catch (error) {
       console.error("Error saving dynasty data:", error);
     }
-  }, [currentDynastyId, top25History, readyToAdvance, nextAdvance, othersReceivingVotes]);
+  }, [
+    currentDynastyId,
+    top25History,
+    readyToAdvance,
+    nextAdvance,
+    othersReceivingVotes,
+  ]);
 
   const value: DynastyContextType = {
     currentDynastyId,

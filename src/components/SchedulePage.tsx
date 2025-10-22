@@ -27,7 +27,8 @@ import {
   calculateStats,
   getYearStats,
   getCoachProfile,
-  isTeamUserControlled,
+  getUsernameForTeam,
+  getUserForTeam,
 } from "@/utils/localStorage";
 import { getTeamData } from "@/utils/fbsTeams";
 import { fcsTeams } from "@/utils/fcsTeams";
@@ -43,11 +44,7 @@ import { CustomTeamManager } from "@/utils/customTeamManager";
 import { useDynasty } from "@/contexts/DynastyContext"; // <-- IMPORT CONTEXT HOOK
 import { Game } from "@/types/yearRecord";
 
-type UpdateableField =
-  | "location"
-  | "opponent"
-  | "result"
-  | "score";
+type UpdateableField = "location" | "opponent" | "result" | "score";
 
 const getWeekDisplayName = (weekNumber: number): string => {
   switch (weekNumber) {
@@ -84,9 +81,17 @@ const GameRow = React.memo(
     const opponentRank = game.opponent
       ? getRankForTeam(game.opponent, game.week)
       : null;
-    const opponentDisplayName = opponentRank
-      ? `#${opponentRank} ${game.opponent}`
-      : game.opponent;
+
+    // Get username for opponent team (if user-controlled)
+    const opponentUsername = game.opponent
+      ? getUsernameForTeam(game.opponent)
+      : undefined;
+
+    // Build opponent display name with rank (username will be styled separately)
+    let opponentDisplayName = game.opponent;
+    if (opponentRank) {
+      opponentDisplayName = `#${opponentRank} ${opponentDisplayName}`;
+    }
 
     useEffect(() => {
       if (game.score) {
@@ -183,8 +188,11 @@ const GameRow = React.memo(
                     <TeamLogo teamName={game.opponent} size="xs" />
                     <span>
                       {opponentDisplayName}
-                      {isTeamUserControlled(game.opponent) && (
-                        <span className="text-xs text-blue-600 font-medium"> (User)</span>
+                      {opponentUsername && (
+                        <span className="text-xs text-blue-600 font-medium">
+                          {" "}
+                          ({opponentUsername})
+                        </span>
                       )}
                     </span>
                   </div>
@@ -199,6 +207,7 @@ const GameRow = React.memo(
               {availableTeams.map((team) => {
                 const isCustom = CustomTeamManager.isCustomTeam(team.name);
                 const isFCS = "isFCS" in team && team.isFCS;
+                const teamUsername = getUsernameForTeam(team.name);
                 return (
                   <SelectItem key={team.name} value={team.name}>
                     <div className="flex items-center justify-between w-full">
@@ -206,8 +215,13 @@ const GameRow = React.memo(
                         <TeamLogo teamName={team.name} size="xs" />
                         <span>
                           {team.name}
-                          {isTeamUserControlled(team.name) && (
-                            <span className="text-xs text-blue-600 font-medium"> (User)</span>
+                          {teamUsername && (
+                            <span
+                              id="username"
+                              className="text-xs text-blue-600 font-medium"
+                            >
+                              ({teamUsername})
+                            </span>
                           )}
                         </span>
                       </div>
@@ -453,11 +467,21 @@ const SchedulePage = () => {
             gameToUpdate.opponent = "BYE";
             gameToUpdate.score = "";
           }
+          // Auto-set opponentUserId if opponent is user-controlled
+          if (gameToUpdate.opponent) {
+            const opponentUser = getUserForTeam(gameToUpdate.opponent);
+            if (opponentUser) {
+              gameToUpdate.opponentUserId = opponentUser.id;
+            }
+          }
         } else if (field === "opponent") {
           gameToUpdate.opponent = value === "NONE" ? "" : value;
           if (value === "BYE") {
             gameToUpdate.score = "";
           }
+          // Auto-set opponentUserId if opponent is user-controlled
+          const opponentUser = getUserForTeam(gameToUpdate.opponent);
+          gameToUpdate.opponentUserId = opponentUser?.id;
         } else if (field === "score") {
           gameToUpdate.score = value;
           const [teamScore, oppScore] = value.split("-").map(Number);
@@ -468,6 +492,13 @@ const SchedulePage = () => {
                 : oppScore > teamScore
                 ? "Loss"
                 : "Tie";
+          }
+          // Auto-set opponentUserId if opponent is user-controlled
+          if (gameToUpdate.opponent) {
+            const opponentUser = getUserForTeam(gameToUpdate.opponent);
+            if (opponentUser) {
+              gameToUpdate.opponentUserId = opponentUser.id;
+            }
           }
         } else {
           gameToUpdate[field as "location"] = value;
@@ -577,6 +608,19 @@ const SchedulePage = () => {
         </CardHeader>
 
         <CardContent>
+          {/* Header Row */}
+          <div
+            className="grid gap-2 pb-2 mb-2 border-b font-semibold text-sm text-gray-600 dark:text-gray-400"
+            style={{ gridTemplateColumns: "1fr 2fr 3fr 1fr 3fr 2fr" }}
+          >
+            <div>Week</div>
+            <div>Location</div>
+            <div>Opponent</div>
+            <div>Result</div>
+            <div>Score</div>
+            <div></div>
+          </div>
+
           <div className="grid grid-cols-1 gap-1">
             {currentSchedule.map((game) => (
               <GameRow

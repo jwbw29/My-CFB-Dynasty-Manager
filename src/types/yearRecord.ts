@@ -90,6 +90,7 @@ export interface Game {
   result: "Win" | "Loss" | "Tie" | "Bye" | "N/A";
   score: string;
   isUserControlled?: boolean;
+  opponentUserId?: string; // Reference to User.id if game was against a user
 }
 
 export type AllRecords = {

@@ -1,8 +1,8 @@
 // src/components/TeamInfoDisplay.tsx
 // Component to display team info with custom team support
-import React from 'react';
-import { CustomTeamManager } from '@/utils/customTeamManager';
-import { isTeamUserControlled } from '@/utils/localStorage';
+import React from "react";
+import { CustomTeamManager } from "@/utils/customTeamManager";
+import { getUsernameForTeam } from "@/utils/localStorage";
 
 interface TeamInfoDisplayProps {
   teamName: string;
@@ -15,32 +15,45 @@ export const TeamInfoDisplay: React.FC<TeamInfoDisplayProps> = ({
   teamName,
   showConference = false,
   showStadium = false,
-  className = ''
+  className = "",
 }) => {
   const teamInfo = CustomTeamManager.getEffectiveTeam(teamName);
   const isCustom = CustomTeamManager.isCustomTeam(teamName);
 
   if (!teamInfo) {
+    const username = getUsernameForTeam(teamName);
     return (
       <span className={className}>
         {teamName}
-        {isTeamUserControlled(teamName) && (
-          <span className="text-xs text-blue-600 font-medium"> (User)</span>
+        {username && (
+          <span className="text-xs text-blue-600 font-medium">
+            {" "}
+            ({username})
+          </span>
         )}
       </span>
     );
   }
+
+  const username = getUsernameForTeam(teamInfo.name);
 
   return (
     <div className={className}>
       <div className="flex items-center gap-2">
         <span className="font-semibold">
           {teamInfo.name}
-          {isTeamUserControlled(teamInfo.name) && (
-            <span className="text-xs text-blue-600 font-medium"> (User)</span>
+          {username && (
+            <span className="text-xs text-blue-600 font-medium">
+              {" "}
+              ({username})
+            </span>
           )}
         </span>
-        {isCustom && <span className="text-xs bg-blue-100 text-blue-800 px-1 rounded">Custom</span>}
+        {isCustom && (
+          <span className="text-xs bg-blue-100 text-blue-800 px-1 rounded">
+            Custom
+          </span>
+        )}
       </div>
       {teamInfo.nickName && (
         <div className="text-sm text-gray-600">{teamInfo.nickName}</div>

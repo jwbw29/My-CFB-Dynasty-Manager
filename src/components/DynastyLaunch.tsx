@@ -334,6 +334,7 @@ const DynastyLaunch: React.FC<DynastyLaunchProps> = ({ onDynastySelected }) => {
         allTrophies: [],
         top25Rankings: JSON.parse(localStorage.getItem("top25Rankings")!),
         [`schedule_${d.currentYear}`]: emptySchedule,
+        users: [], // Initialize empty users array for User vs User tracking
       };
       localStorage.setItem(`dynasty_${d.id}`, JSON.stringify(freshDynastyData));
     };
@@ -503,7 +504,9 @@ const DynastyLaunch: React.FC<DynastyLaunchProps> = ({ onDynastySelected }) => {
     };
   };
 
-  const getDynastyAdvanceSchedule = (dynastyId: string): { readyToAdvance: boolean; nextAdvance: string } => {
+  const getDynastyAdvanceSchedule = (
+    dynastyId: string
+  ): { readyToAdvance: boolean; nextAdvance: string } => {
     try {
       const dynastyData = localStorage.getItem(`dynasty_${dynastyId}`);
       if (!dynastyData) return { readyToAdvance: false, nextAdvance: "" };
@@ -514,7 +517,10 @@ const DynastyLaunch: React.FC<DynastyLaunchProps> = ({ onDynastySelected }) => {
         nextAdvance: data.nextAdvance || "",
       };
     } catch (error) {
-      console.error(`Error getting advance schedule for dynasty ${dynastyId}:`, error);
+      console.error(
+        `Error getting advance schedule for dynasty ${dynastyId}:`,
+        error
+      );
       return { readyToAdvance: false, nextAdvance: "" };
     }
   };
@@ -667,14 +673,28 @@ const DynastyLaunch: React.FC<DynastyLaunchProps> = ({ onDynastySelected }) => {
                         </span>
                       </div>
                       <div className="flex items-center gap-2 text-blue-100">
-                        <CheckCircle className={`h-4 w-4 ${advanceSchedule.readyToAdvance ? 'text-green-400' : 'text-gray-400'}`} />
-                        <span>Ready to Advance: {advanceSchedule.readyToAdvance ? 'Yes' : 'No'}</span>
+                        <CheckCircle
+                          className={`h-4 w-4 ${
+                            advanceSchedule.readyToAdvance
+                              ? "text-green-400"
+                              : "text-gray-400"
+                          }`}
+                        />
+                        <span>
+                          Ready to Advance:{" "}
+                          {advanceSchedule.readyToAdvance ? "Yes" : "No"}
+                        </span>
                       </div>
                       {advanceSchedule.nextAdvance && (
                         <div className="flex items-center gap-2 text-blue-100">
                           <Clock className="h-4 w-4" />
                           <span>
-                            Next Advance: {advanceSchedule.nextAdvance ? new Date(advanceSchedule.nextAdvance + 'T12:00:00').toLocaleDateString() : ''}
+                            Next Advance:{" "}
+                            {advanceSchedule.nextAdvance
+                              ? new Date(
+                                  advanceSchedule.nextAdvance + "T12:00:00"
+                                ).toLocaleDateString()
+                              : ""}
                           </span>
                         </div>
                       )}
