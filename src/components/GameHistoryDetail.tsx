@@ -17,7 +17,16 @@ import {
 import { TeamSelector } from "@/components/ui/TeamSelector";
 import { HeadToHeadRecord } from "@/types/user";
 import { Game } from "@/types/yearRecord";
-import { Trophy, TrendingUp, TrendingDown, Minus, Plus, X } from "lucide-react";
+import {
+  Trophy,
+  TrendingUp,
+  TrendingDown,
+  Minus,
+  Plus,
+  X,
+  Edit,
+  Trash2,
+} from "lucide-react";
 import { toast } from "react-hot-toast";
 
 interface GameHistoryDetailProps {
@@ -33,6 +42,12 @@ export const GameHistoryDetail: React.FC<GameHistoryDetailProps> = ({
 }) => {
   const [record, setRecord] = useState<HeadToHeadRecord | null>(null);
   const [showAddForm, setShowAddForm] = useState(false);
+  const [editMode, setEditMode] = useState(false);
+  const [editingGame, setEditingGame] = useState<{
+    year: number;
+    week: number;
+    originalOpponent: string;
+  } | null>(null);
   const [formData, setFormData] = useState({
     year: "",
     week: "",
@@ -147,15 +162,17 @@ export const GameHistoryDetail: React.FC<GameHistoryDetailProps> = ({
     // Load existing schedule for that year
     const schedule = getSchedule(year);
 
-    // Check if this exact matchup already exists (same week, same opponent)
-    const existingGame = schedule.find(
-      (g) => g.week === week && g.opponentUserId === userId
-    );
-    if (existingGame && existingGame.opponent && existingGame.opponent !== "") {
-      toast.error(
-        `Week ${week} already has a game against ${user.name}'s team (${existingGame.opponent})`
+    // If NOT in edit mode, check for duplicates
+    if (!editMode) {
+      const existingGame = schedule.find(
+        (g) => g.week === week && g.opponentUserId === userId && g.opponent
       );
-      return; // STOP HERE - don't save anything
+      if (existingGame) {
+        toast.error(
+          `Week ${week} already has a game against ${user.name}'s team (${existingGame.opponent})`
+        );
+        return; // STOP HERE - don't save anything
+      }
     }
 
     // Create the new game entry
@@ -169,33 +186,63 @@ export const GameHistoryDetail: React.FC<GameHistoryDetailProps> = ({
       opponentUserId: userId,
     };
 
-    // Find if there's an empty slot for this week
-    const emptySlot = schedule.find(
-      (g) => g.week === week && (!g.opponent || g.opponent === "")
-    );
-
-    // Update the schedule
-    if (emptySlot) {
-      // Replace existing empty game slot
-      const updatedSchedule = schedule.map((g) =>
-        g.week === week && (!g.opponent || g.opponent === "") ? newGame : g
-      );
+    // Update the schedule based on mode
+    if (editMode && editingGame) {
+      // EDIT MODE: Replace the specific game being edited
+      const updatedSchedule = schedule.map((g) => {
+        // Match by week and original opponent to find the exact game
+        if (
+          g.week === editingGame.week &&
+          g.opponent === editingGame.originalOpponent
+        ) {
+          return newGame;
+        }
+        return g;
+      });
       setSchedule(year, updatedSchedule);
     } else {
-      // Add new game to schedule
-      schedule.push(newGame);
-      schedule.sort((a, b) => a.week - b.week);
-      setSchedule(year, schedule);
+      // ADD MODE: Check if there's already a game against this team this week
+      const existingGameIndex = schedule.findIndex(
+        (g) => g.week === week && g.opponent === opponentTeam
+      );
+
+      if (existingGameIndex !== -1) {
+        // Replace existing game against this team (update old game with userId)
+        const updatedSchedule = [...schedule];
+        updatedSchedule[existingGameIndex] = newGame;
+        setSchedule(year, updatedSchedule);
+      } else {
+        // Check for empty slot
+        const emptySlotIndex = schedule.findIndex(
+          (g) => g.week === week && (!g.opponent || g.opponent === "")
+        );
+
+        if (emptySlotIndex !== -1) {
+          // Replace existing empty game slot
+          const updatedSchedule = [...schedule];
+          updatedSchedule[emptySlotIndex] = newGame;
+          setSchedule(year, updatedSchedule);
+        } else {
+          // Add new game to schedule
+          const updatedSchedule = [...schedule, newGame];
+          updatedSchedule.sort((a, b) => a.week - b.week);
+          setSchedule(year, updatedSchedule);
+        }
+      }
     }
 
     // Show success message
-    toast.success(`Added ${year} Week ${week} game vs ${opponentTeam}`);
+    if (editMode) {
+      toast.success(`Updated ${year} Week ${week} game vs ${opponentTeam}`);
+    } else {
+      toast.success(`Added ${year} Week ${week} game vs ${opponentTeam}`);
+    }
 
-    // Reset form
+    // Reset form and state
     setFormData({ year: "", week: "", opponentTeam: "", score: "" });
-
-    // Close form
     setShowAddForm(false);
+    setEditMode(false);
+    setEditingGame(null);
 
     // Immediately refresh the record display
     const h2hRecord = getHeadToHeadRecord(userId);
@@ -205,6 +252,83 @@ export const GameHistoryDetail: React.FC<GameHistoryDetailProps> = ({
     if (onGameAdded) {
       onGameAdded();
     }
+  };
+
+  const handleEditGame = (game: {
+    year: number;
+    week: number;
+    myTeam: string;
+    theirTeam: string;
+    myScore: number;
+    theirScore: number;
+  }) => {
+    // Populate form with game data
+    setFormData({
+      year: game.year.toString(),
+      week: game.week.toString(),
+      opponentTeam: game.theirTeam,
+      score: `${game.myScore}-${game.theirScore}`,
+    });
+
+    // Set edit mode
+    setEditMode(true);
+    setEditingGame({
+      year: game.year,
+      week: game.week,
+      originalOpponent: game.theirTeam,
+    });
+
+    // Show form
+    setShowAddForm(true);
+  };
+
+  const handleDeleteGame = (game: {
+    year: number;
+    week: number;
+    theirTeam: string;
+  }) => {
+    if (!userId) return;
+
+    const user = getUserById(userId);
+    if (!user) return;
+
+    // Confirm deletion
+    const confirmMessage = `Are you sure you want to delete this game from ${game.year} Week ${game.week} vs ${game.theirTeam}?`;
+    if (!confirm(confirmMessage)) {
+      return;
+    }
+
+    // Load schedule for that year
+    const schedule = getSchedule(game.year);
+
+    // Remove the game by filtering it out
+    const updatedSchedule = schedule.filter(
+      (g) => !(g.week === game.week && g.opponent === game.theirTeam)
+    );
+
+    // Save updated schedule
+    setSchedule(game.year, updatedSchedule);
+
+    // Show success message
+    toast.success(
+      `Deleted ${game.year} Week ${game.week} game vs ${game.theirTeam}`
+    );
+
+    // Immediately refresh the record display
+    const h2hRecord = getHeadToHeadRecord(userId);
+    setRecord(h2hRecord);
+
+    // Notify parent component to refresh other views
+    if (onGameAdded) {
+      onGameAdded();
+    }
+  };
+
+  const handleCancelEdit = () => {
+    setFormData({ year: "", week: "", opponentTeam: "", score: "" });
+    setShowAddForm(false);
+    setEditMode(false);
+    setEditingGame(null);
   };
 
   if (!userId || !record) {
@@ -272,7 +396,13 @@ export const GameHistoryDetail: React.FC<GameHistoryDetailProps> = ({
         {/* Add Previous Matchups Button */}
         <div className="mb-4">
           <Button
-            onClick={() => setShowAddForm(!showAddForm)}
+            onClick={() => {
+              if (showAddForm) {
+                handleCancelEdit();
+              } else {
+                setShowAddForm(true);
+              }
+            }}
             variant="outline"
             size="sm"
             className="w-full"
@@ -291,10 +421,12 @@ export const GameHistoryDetail: React.FC<GameHistoryDetailProps> = ({
           </Button>
         </div>
 
-        {/* Add Historical Game Form */}
+        {/* Add/Edit Historical Game Form */}
         {showAddForm && (
           <div className="mb-4 p-4 border rounded-lg bg-muted/50">
-            <h3 className="text-sm font-semibold mb-3">Add Historical Game</h3>
+            <h3 className="text-sm font-semibold mb-3">
+              {editMode ? "Edit Historical Game" : "Add Historical Game"}
+            </h3>
             <div className="space-y-3">
               <div className="grid grid-cols-2 gap-3">
                 <div>
@@ -360,18 +492,10 @@ export const GameHistoryDetail: React.FC<GameHistoryDetailProps> = ({
                   size="sm"
                   className="flex-1"
                 >
-                  Save Game
+                  {editMode ? "Update Game" : "Save Game"}
                 </Button>
                 <Button
-                  onClick={() => {
-                    setShowAddForm(false);
-                    setFormData({
-                      year: "",
-                      week: "",
-                      opponentTeam: "",
-                      score: "",
-                    });
-                  }}
+                  onClick={handleCancelEdit}
                   variant="outline"
                   size="sm"
                   className="flex-1"
@@ -389,7 +513,7 @@ export const GameHistoryDetail: React.FC<GameHistoryDetailProps> = ({
             {record.games.map((game, index) => (
               <div
                 key={`${game.year}-${game.week}-${index}`}
-                className={`p-3 rounded-lg border-l-4 ${
+                className={`p-3 rounded-lg border-l-4 relative ${
                   game.result === "Win"
                     ? "border-l-green-500 bg-green-50 dark:bg-green-900/20"
                     : game.result === "Loss"
@@ -397,7 +521,35 @@ export const GameHistoryDetail: React.FC<GameHistoryDetailProps> = ({
                     : "border-l-yellow-500 bg-yellow-50 dark:bg-yellow-900/20"
                 }`}
               >
-                <div className="flex items-center justify-between gap-4">
+                {/* Edit and Delete Buttons */}
+                <div className="absolute top-2 right-2 flex gap-1">
+                  <Button
+                    onClick={() => handleEditGame(game)}
+                    variant="ghost"
+                    size="sm"
+                    className="h-7 w-7 p-0 hover:bg-blue-100 dark:hover:bg-blue-900/30"
+                    title="Edit game"
+                  >
+                    <Edit
+                      size={14}
+                      className="text-blue-600 dark:text-blue-400"
+                    />
+                  </Button>
+                  <Button
+                    onClick={() => handleDeleteGame(game)}
+                    variant="ghost"
+                    size="sm"
+                    className="h-7 w-7 p-0 hover:bg-red-100 dark:hover:bg-red-900/30"
+                    title="Delete game"
+                  >
+                    <Trash2
+                      size={14}
+                      className="text-red-600 dark:text-red-400"
+                    />
+                  </Button>
+                </div>
+
+                <div className="flex items-center justify-between gap-4 pr-16">
                   {/* Year and Week */}
                   <div className="text-sm font-medium text-muted-foreground min-w-[80px]">
                     {game.year} • Wk {game.week}
