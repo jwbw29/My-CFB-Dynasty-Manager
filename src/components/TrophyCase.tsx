@@ -197,6 +197,7 @@ const TROPHY_CATEGORIES = {
       "Shillelagh Trophy (ND-Purdue)",
       "Silver Spade",
       "Stanford Axe",
+      "TechMo Bowl",
       "Territorial Cup",
       "Textile Bowl",
       "The Bell",
