@@ -353,7 +353,6 @@ const Records: React.FC = () => {
       originalTeam: "",
       draftedTeam: "",
       round: 1,
-      pick: 1,
       year: selectedYear!,
     };
     handleFieldChange("playersDrafted", [
@@ -794,9 +793,7 @@ const Records: React.FC = () => {
                         <div className="space-y-2">
                           {(activeRecord.playersDrafted || [])
                             .filter((p) => p.playerName.trim())
-                            .sort(
-                              (a, b) => a.round - b.round || a.pick - b.pick
-                            )
+                            .sort((a, b) => a.round - b.round)
                             .slice(0, 3)
                             .map((player) => (
                               <div
@@ -1568,7 +1565,7 @@ const Records: React.FC = () => {
                     <ScrollArea className="h-48 pr-3">
                       <div className="space-y-2">
                         {(activeRecord.playersDrafted || [])
-                          .sort((a, b) => a.round - b.round || a.pick - b.pick)
+                          .sort((a, b) => a.round - b.round)
                           .map((player, index) => {
                             // If player is being edited, show edit mode
                             if (editingDraftPlayerId === player.id) {
@@ -1659,8 +1656,6 @@ const Records: React.FC = () => {
                                     </p>
                                     <p className="text-xs text-blue-600 dark:text-blue-400">
                                       Round {player.round}
-                                      {player.pick > 0 &&
-                                        `, Pick ${player.pick}`}
                                     </p>
                                   </div>
                                 </div>
