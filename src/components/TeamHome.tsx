@@ -308,12 +308,17 @@ const TeamHome: React.FC = () => {
   const statLeaders = useMemo<StatLeaders>(() => {
     if (typeof window === "undefined") return {};
     try {
+      // Calculate games played for per-game averages
+      const gamesPlayed = currentSchedule.filter(
+        (g) => g.result !== "N/A" && g.result !== "Bye" && g.opponent !== "BYE"
+      ).length;
+
       // Get the top leader from each category based on Team Stats data
       const getTopLeader = (
         leaders: PlayerLeaderStat[],
         sortField: keyof PlayerLeaderStat
       ) => {
-        if (!leaders || leaders.length === 0) return undefined;
+        if (!leaders || leaders.length === 0 || gamesPlayed === 0) return undefined;
         return leaders
           .filter((leader) => leader.name && leader[sortField] != null)
           .sort(
@@ -321,17 +326,35 @@ const TeamHome: React.FC = () => {
           )[0];
       };
 
+      const passingLeader = getTopLeader(teamLeaders.passingLeaders, "yards");
+      const rushingLeader = getTopLeader(teamLeaders.rushingLeaders, "yards");
+      const receivingLeader = getTopLeader(teamLeaders.receivingLeaders, "yards");
+      const tacklesLeader = getTopLeader(teamLeaders.tackleLeaders, "total");
+
+      // Calculate per-game averages
       return {
-        passingLeader: getTopLeader(teamLeaders.passingLeaders, "yards"),
-        rushingLeader: getTopLeader(teamLeaders.rushingLeaders, "yards"),
-        receivingLeader: getTopLeader(teamLeaders.receivingLeaders, "yards"),
-        tacklesLeader: getTopLeader(teamLeaders.tackleLeaders, "total"),
+        passingLeader: passingLeader ? {
+          ...passingLeader,
+          yards: gamesPlayed > 0 ? Number((passingLeader.yards! / gamesPlayed).toFixed(1)) : 0
+        } : undefined,
+        rushingLeader: rushingLeader ? {
+          ...rushingLeader,
+          yards: gamesPlayed > 0 ? Number((rushingLeader.yards! / gamesPlayed).toFixed(1)) : 0
+        } : undefined,
+        receivingLeader: receivingLeader ? {
+          ...receivingLeader,
+          yards: gamesPlayed > 0 ? Number((receivingLeader.yards! / gamesPlayed).toFixed(1)) : 0
+        } : undefined,
+        tacklesLeader: tacklesLeader ? {
+          ...tacklesLeader,
+          total: gamesPlayed > 0 ? Number((tacklesLeader.total! / gamesPlayed).toFixed(1)) : 0
+        } : undefined,
       };
     } catch (error) {
       console.error("Error parsing teamLeaders for leaders:", error);
       return {};
     }
-  }, [teamLeaders]);
+  }, [teamLeaders, currentSchedule]);
 
   const locationRecords = useMemo<{
     home: LocationRecord;
@@ -781,7 +804,7 @@ const TeamHome: React.FC = () => {
                     {statLeaders.passingLeader?.yards ?? "-"}
                   </div>
                   <div className="text-xs sm:text-sm text-muted-foreground">
-                    YDS
+                    YPG
                   </div>
                 </div>
               </div>
@@ -808,7 +831,7 @@ const TeamHome: React.FC = () => {
                     {statLeaders.rushingLeader?.yards ?? "-"}
                   </div>
                   <div className="text-xs sm:text-sm text-muted-foreground">
-                    YDS
+                    YPG
                   </div>
                 </div>
               </div>
@@ -835,7 +858,7 @@ const TeamHome: React.FC = () => {
                     {statLeaders.receivingLeader?.yards ?? "-"}
                   </div>
                   <div className="text-xs sm:text-sm text-muted-foreground">
-                    YDS
+                    YPG
                   </div>
                 </div>
               </div>
@@ -862,7 +885,7 @@ const TeamHome: React.FC = () => {
                     {statLeaders.tacklesLeader?.total ?? "-"}
                   </div>
                   <div className="text-xs sm:text-sm text-muted-foreground">
-                    TKL
+                    TPG
                   </div>
                 </div>
               </div>
