@@ -289,6 +289,9 @@ export const DynastyProvider: React.FC<DynastyProviderProps> = ({
           key &&
           (key.startsWith("schedule_") ||
             key.startsWith("yearStats_") ||
+            key.startsWith(`records_${currentDynastyId}`) ||
+            key.startsWith(`teamStats_${currentDynastyId}`) ||
+            key.startsWith(`teamLeaders_${currentDynastyId}`) ||
             key.startsWith(`offensiveNeeds_${currentDynastyId}`) ||
             key.startsWith(`defensiveNeeds_${currentDynastyId}`))
         ) {

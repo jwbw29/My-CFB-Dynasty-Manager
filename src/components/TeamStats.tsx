@@ -159,6 +159,7 @@ const TeamStats: React.FC = () => {
   // Form state for adding new records
   const [newRecord, setNewRecord] = useState<{
     playerName: string;
+    year: number;
     recordType: RecordType;
     levels: RecordLevel[];
     stats: {
@@ -174,6 +175,7 @@ const TeamStats: React.FC = () => {
     };
   }>({
     playerName: "",
+    year: currentYear,
     recordType: "career",
     levels: [],
     stats: {
@@ -441,6 +443,7 @@ const TeamStats: React.FC = () => {
     const record: PlayerRecord = {
       id: Date.now().toString(),
       playerName: newRecord.playerName,
+      year: newRecord.year,
       recordType: newRecord.recordType,
       levels: newRecord.levels,
       stats,
@@ -454,6 +457,7 @@ const TeamStats: React.FC = () => {
     // Reset form
     setNewRecord({
       playerName: "",
+      year: currentYear,
       recordType: "career",
       levels: [],
       stats: {
@@ -532,7 +536,10 @@ const TeamStats: React.FC = () => {
             {levelRecords.map((record) => (
               <Card key={record.id} className="p-3">
                 <div className="flex justify-between items-start mb-2">
-                  <h4 className="font-bold text-lg">{record.playerName}</h4>
+                  <div>
+                    <h4 className="font-bold text-lg">{record.playerName}</h4>
+                    <p className="text-sm text-muted-foreground">{record.year}</p>
+                  </div>
                   <Button
                     variant="ghost"
                     size="icon"
@@ -1885,6 +1892,23 @@ const TeamStats: React.FC = () => {
                         setNewRecord((prev) => ({
                           ...prev,
                           playerName: e.target.value,
+                        }))
+                      }
+                    />
+                  </div>
+
+                  {/* Year Input */}
+                  <div>
+                    <Label htmlFor="recordYear">Year</Label>
+                    <Input
+                      id="recordYear"
+                      type="number"
+                      placeholder="Year"
+                      value={newRecord.year}
+                      onChange={(e) =>
+                        setNewRecord((prev) => ({
+                          ...prev,
+                          year: parseInt(e.target.value) || currentYear,
                         }))
                       }
                     />

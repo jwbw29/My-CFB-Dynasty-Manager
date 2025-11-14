@@ -114,6 +114,7 @@ export type RecordCategory =
 export interface PlayerRecord {
   id: string;
   playerName: string;
+  year: number; // Year the record was set
   recordType: RecordType;
   levels: RecordLevel[]; // Can be multiple: national, conference, school
   stats: {
