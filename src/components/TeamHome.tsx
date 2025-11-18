@@ -160,9 +160,9 @@ const GameDisplayRow: React.FC<GameDisplayRowProps> = ({
     name: game.opponent,
     rank: getRankForTeam(game.opponent, game.week),
   };
-  const locationText = game.location === "@" ? "at" : "vs";
-  const [firstTeam, secondTeam] =
-    game.location === "@" ? [teamB, teamA] : [teamA, teamB];
+  const locationText = game.location === "@" ? "@" : "vs";
+  // Always show the user's team (teamA) on the left side
+  const [firstTeam, secondTeam] = [teamA, teamB];
 
   return (
     <div className="grid grid-cols-[auto_auto_1fr_auto_auto_1fr_auto] items-center gap-2 p-3 sm:p-4 hover:bg-muted/50 transition-colors">
