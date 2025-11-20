@@ -148,7 +148,7 @@ const TeamStats: React.FC = () => {
 
   // Records state management
   const [records, setRecords] = useLocalStorage<RecordsData>(
-    `records_${currentDynastyId}_${currentYear}`,
+    `records_${currentDynastyId}`,
     {
       career: [],
       season: [],
