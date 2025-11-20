@@ -107,5 +107,6 @@ export interface DraftedPlayer {
   originalTeam: string; // Team they were drafted from
   draftedTeam: string; // NFL team that drafted them
   round: number;
+  pick?: number; // Overall pick number
   year: number; // The year they were drafted
 }

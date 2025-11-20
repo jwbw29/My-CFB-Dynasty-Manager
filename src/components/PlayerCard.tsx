@@ -21,6 +21,8 @@ import {
 import { Award } from "@/types/statTypes";
 import { PlayerStat } from "@/types/playerStats";
 import { Recruit, Transfer } from "@/types/playerTypes";
+import { TeamLeaderStats, PlayerLeaderStat } from "@/types/yearRecord";
+import { useDynasty } from "@/contexts/DynastyContext";
 
 // Extended Player interface to include optional properties that may exist in roster
 interface ExtendedPlayer {
@@ -75,6 +77,7 @@ const calculateQBR = (stat: Partial<PlayerStat>): number => {
 };
 
 const PlayerCard: React.FC<PlayerCardProps> = ({ player, isOpen, onClose }) => {
+  const { currentDynastyId } = useDynasty();
   const [careerStats, setCareerStats] = useState<CareerStats>({});
   const [playerAwards, setPlayerAwards] = useState<Award[]>([]);
   // Store the full Recruit or Transfer object
@@ -86,24 +89,116 @@ const PlayerCard: React.FC<PlayerCardProps> = ({ player, isOpen, onClose }) => {
   });
 
   useEffect(() => {
-    if (!isOpen || !player) return;
+    if (!isOpen || !player || !currentDynastyId) return;
     setLoading(true);
     try {
       const coachProfile = getCoachProfile();
       if (coachProfile?.schoolColors)
         setSchoolColors(coachProfile.schoolColors);
 
-      const allStats: PlayerStat[] = getPlayerStats();
+      // Load team leaders from all years and convert to PlayerStat format
       const playerStats: CareerStats = {};
-      allStats.forEach((stat) => {
-        if (stat.playerName === player.name) {
-          if (!playerStats[stat.year]) playerStats[stat.year] = [];
-          playerStats[stat.year].push(stat);
+      const allYearRecords = getAllYearRecords();
+
+      allYearRecords.forEach((yearRecord) => {
+        const year = yearRecord.year;
+
+        // Try to load team leaders for this year
+        const teamLeadersKey = `teamLeaders_${currentDynastyId}_${year}`;
+        const teamLeadersData = localStorage.getItem(teamLeadersKey);
+
+        if (teamLeadersData) {
+          try {
+            const teamLeaders: TeamLeaderStats = JSON.parse(teamLeadersData);
+
+            // Check passing leaders
+            const passingLeader = teamLeaders.passingLeaders?.find(
+              (leader) => leader.name === player.name
+            );
+            if (passingLeader && passingLeader.yards) {
+              if (!playerStats[year]) playerStats[year] = [];
+              playerStats[year].push({
+                id: `passing-${year}`,
+                playerName: player.name,
+                year: year,
+                category: "Passing",
+                completions: passingLeader.completions,
+                attempts: passingLeader.attempts,
+                passyards: passingLeader.yards,
+                passtd: passingLeader.touchdowns,
+                passint: passingLeader.interceptions,
+              });
+            }
+
+            // Check rushing leaders
+            const rushingLeader = teamLeaders.rushingLeaders?.find(
+              (leader) => leader.name === player.name
+            );
+            if (rushingLeader && rushingLeader.yards) {
+              if (!playerStats[year]) playerStats[year] = [];
+              playerStats[year].push({
+                id: `rushing-${year}`,
+                playerName: player.name,
+                year: year,
+                category: "Rushing",
+                carries: rushingLeader.carries,
+                rushyards: rushingLeader.yards,
+                rushtd: rushingLeader.touchdowns,
+              });
+            }
+
+            // Check receiving leaders
+            const receivingLeader = teamLeaders.receivingLeaders?.find(
+              (leader) => leader.name === player.name
+            );
+            if (receivingLeader && receivingLeader.yards) {
+              if (!playerStats[year]) playerStats[year] = [];
+              playerStats[year].push({
+                id: `receiving-${year}`,
+                playerName: player.name,
+                year: year,
+                category: "Receiving",
+                receptions: receivingLeader.receptions,
+                recyards: receivingLeader.yards,
+                rectd: receivingLeader.touchdowns,
+              });
+            }
+
+            // Check defensive leaders
+            const tackleLeader = teamLeaders.tackleLeaders?.find(
+              (leader) => leader.name === player.name
+            );
+            const tflLeader = teamLeaders.tflLeaders?.find(
+              (leader) => leader.name === player.name
+            );
+            const sackLeader = teamLeaders.sackLeaders?.find(
+              (leader) => leader.name === player.name
+            );
+            const intLeader = teamLeaders.intLeaders?.find(
+              (leader) => leader.name === player.name
+            );
+
+            if (tackleLeader || tflLeader || sackLeader || intLeader) {
+              if (!playerStats[year]) playerStats[year] = [];
+              playerStats[year].push({
+                id: `defense-${year}`,
+                playerName: player.name,
+                year: year,
+                category: "Defense",
+                tackles: tackleLeader?.total,
+                tfl: tflLeader?.total,
+                sacks: sackLeader?.total,
+                defint: intLeader?.total,
+              });
+            }
+          } catch (e) {
+            console.error(`Error parsing team leaders for year ${year}:`, e);
+          }
         }
       });
+
       setCareerStats(playerStats);
 
-      const allYearRecords = getAllYearRecords();
       const awards: Award[] = [];
       allYearRecords.forEach((record) => {
         if (record.playerAwards) {
@@ -133,7 +228,7 @@ const PlayerCard: React.FC<PlayerCardProps> = ({ player, isOpen, onClose }) => {
     } finally {
       setLoading(false);
     }
-  }, [isOpen, player]);
+  }, [isOpen, player, currentDynastyId]);
 
   const enhancedPlayer = player;
   const sortedYears = Object.keys(careerStats)

@@ -1069,7 +1069,7 @@ const YearRecordModal: React.FC<YearRecordModalProps> = ({ year, onClose }) => {
                         {record.playersDrafted?.length > 0 ? (
                           record.playersDrafted
                             .sort(
-                              (a, b) => a.round - b.round || a.pick - b.pick
+                              (a, b) => a.round - b.round || (a.pick || 0) - (b.pick || 0)
                             )
                             .map((player, index) => (
                               <div
