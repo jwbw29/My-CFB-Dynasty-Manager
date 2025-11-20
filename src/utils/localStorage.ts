@@ -9,8 +9,10 @@ import { getTeamByName, Team, getTeamData } from "./fbsTeams";
 import { PlayerStat } from "@/types/playerStats";
 import { CustomTeamManager } from "./customTeamManager";
 import { RankedTeam, Top25History } from "@/hooks/useTop25Rankings";
+import { CoachStaff, Coach, CoachPosition, CoachType, CoachPrestige } from "@/types/coaches";
 
 const COACH_PROFILE_KEY = "coachProfile";
+const COACHES_KEY = "coaches";
 const CURRENT_YEAR_KEY = "currentYear";
 const ALL_RECRUITS_KEY = "allRecruits";
 const ALL_TRANSFERS_KEY = "allTransfers";
@@ -80,6 +82,26 @@ export const setCoachProfile = (profile: CoachProfile): void => {
     safeLocalStorage.setItem(COACH_PROFILE_KEY, JSON.stringify(profile));
   } catch (error) {
     console.error("Error saving coach profile to localStorage:", error);
+  }
+};
+
+// --- Coaches ---
+export const getCoaches = (): CoachStaff | null => {
+  const coachesData = safeLocalStorage.getItem(COACHES_KEY);
+  try {
+    return coachesData ? (JSON.parse(coachesData) as CoachStaff) : null;
+  } catch (error) {
+    console.error("Error retrieving coaches from localStorage:", error);
+    safeLocalStorage.removeItem(COACHES_KEY);
+    return null;
+  }
+};
+
+export const setCoaches = (coaches: CoachStaff): void => {
+  try {
+    safeLocalStorage.setItem(COACHES_KEY, JSON.stringify(coaches));
+  } catch (error) {
+    console.error("Error saving coaches to localStorage:", error);
   }
 };
 
@@ -402,6 +424,7 @@ export const clearActiveSessionData = (): void => {
 
   const keysToRemove = [
     COACH_PROFILE_KEY,
+    COACHES_KEY,
     CURRENT_YEAR_KEY,
     ALL_RECRUITS_KEY,
     ALL_TRANSFERS_KEY,

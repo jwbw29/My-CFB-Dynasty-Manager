@@ -68,6 +68,10 @@ import { Label } from "@/components/ui/label";
 import { usePlayerCard } from "@/hooks/usePlayerCard";
 import PlayerCard from "./PlayerCard";
 import { v4 as uuidv4 } from "uuid";
+import { CoachStaff, Coach, CoachType, CoachPrestige, CoachPosition } from "@/types/coaches";
+import { getCoaches, setCoaches } from "@/utils/localStorage";
+import { getCoachProfile } from "@/utils/localStorage";
+import { useDynasty } from "@/contexts/DynastyContext";
 
 interface Player {
   id: string;
@@ -96,6 +100,21 @@ const years = [
   "SR (RS)",
 ];
 const devTraits = ["Normal", "Impact", "Star", "Elite"] as const;
+
+const coachTypes: CoachType[] = [
+  "Motivator",
+  "Architect",
+  "Tactician",
+  "Strategist",
+  "Recruiter",
+  "Talent Developer",
+  "Program Builder",
+  "CEO",
+];
+
+const coachPrestiges: CoachPrestige[] = [
+  "F", "F+", "D-", "D", "D+", "C-", "C", "C+", "B-", "B", "B+", "A-", "A", "A+"
+];
 type SortField =
   | "jersey #"
   | "name"
@@ -153,6 +172,7 @@ const DevTraitBadge: React.FC<DevTraitBadgeProps> = ({ trait }) => {
 };
 
 const Roster: React.FC = () => {
+  const { saveDynastyData, dataVersion } = useDynasty();
   const [players, setPlayers] = useLocalStorage<Player[]>("players", []);
   const [filteredPlayers, setFilteredPlayers] = useState<Player[]>([]);
   const [newPlayer, setNewPlayer] = useState<Omit<Player, "id">>(
@@ -168,6 +188,57 @@ const Roster: React.FC = () => {
   const { selectedPlayer, isOpen, openPlayerCard, closePlayerCard } =
     usePlayerCard();
   const [isFormOpen, setIsFormOpen] = useState(false);
+
+  // Coaches state
+  const [coaches, setCoachesState] = useState<CoachStaff>(() => {
+    const savedCoaches = getCoaches();
+    const coachProfile = getCoachProfile();
+
+    if (savedCoaches) {
+      // Sync HC name with coach profile if it exists
+      if (coachProfile?.coachName && savedCoaches.headCoach.name !== coachProfile.coachName) {
+        savedCoaches.headCoach.name = coachProfile.coachName;
+      }
+      return savedCoaches;
+    }
+
+    // Default coaches if none exist
+    return {
+      headCoach: {
+        name: coachProfile?.coachName || "",
+        position: "HC",
+        type: "CEO",
+        prestige: "C",
+      },
+      offensiveCoordinator: {
+        name: "",
+        position: "OC",
+        type: "Architect",
+        prestige: "C",
+      },
+      defensiveCoordinator: {
+        name: "",
+        position: "DC",
+        type: "Tactician",
+        prestige: "C",
+      },
+    };
+  });
+  const [editingCoach, setEditingCoach] = useState<CoachPosition | null>(null);
+
+  // Sync HC name with coach profile
+  useEffect(() => {
+    const coachProfile = getCoachProfile();
+    if (coachProfile?.coachName && coaches.headCoach.name !== coachProfile.coachName) {
+      setCoachesState(prev => ({
+        ...prev,
+        headCoach: {
+          ...prev.headCoach,
+          name: coachProfile.coachName,
+        },
+      }));
+    }
+  }, [dataVersion]);
 
   useEffect(() => {
     if (posFilter === FILTER_ALL) setFilteredPlayers(players);
@@ -367,6 +438,45 @@ const Roster: React.FC = () => {
     [setPlayers]
   );
 
+  // Coach handling functions
+  const handleSaveCoaches = useCallback(() => {
+    setCoaches(coaches);
+    saveDynastyData();
+    notifySuccess("Coaches updated successfully!");
+  }, [coaches, saveDynastyData]);
+
+  const updateCoach = useCallback((position: CoachPosition, updates: Partial<Coach>) => {
+    setCoachesState(prev => {
+      const key = position === "HC" ? "headCoach" :
+                  position === "OC" ? "offensiveCoordinator" :
+                  "defensiveCoordinator";
+      return {
+        ...prev,
+        [key]: { ...prev[key], ...updates },
+      };
+    });
+  }, []);
+
+  const handleEditCoach = useCallback((position: CoachPosition) => {
+    setEditingCoach(position);
+  }, []);
+
+  const handleSaveCoach = useCallback(() => {
+    setEditingCoach(null);
+    handleSaveCoaches();
+  }, [handleSaveCoaches]);
+
+  const getCoach = useCallback((position: CoachPosition): Coach => {
+    switch (position) {
+      case "HC":
+        return coaches.headCoach;
+      case "OC":
+        return coaches.offensiveCoordinator;
+      case "DC":
+        return coaches.defensiveCoordinator;
+    }
+  }, [coaches]);
+
   const getRowClassName = useCallback((player: Player) => {
     return `border-t transition-colors ${
       player.isRedshirted
@@ -378,6 +488,129 @@ const Roster: React.FC = () => {
   return (
     <div className="space-y-8">
       <h1 className="text-3xl font-bold text-center">Roster Management</h1>
+
+      {/* Coaches Section */}
+      <Card className="shadow-lg">
+        <CardHeader>
+          <CardTitle className="text-xl font-semibold">Coaching Staff</CardTitle>
+          <CardDescription>Manage your Head Coach and coordinators</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="text-center">Name</TableHead>
+                  <TableHead className="text-center">Position</TableHead>
+                  <TableHead className="text-center">Prestige</TableHead>
+                  <TableHead className="text-center">Type</TableHead>
+                  <TableHead className="text-center">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {(["HC", "OC", "DC"] as CoachPosition[]).map((position) => {
+                  const coach = getCoach(position);
+                  const isEditing = editingCoach === position;
+                  const isHC = position === "HC";
+
+                  return (
+                    <TableRow key={position}>
+                      {/* Name */}
+                      <TableCell className="text-center">
+                        {isEditing && !isHC ? (
+                          <Input
+                            value={coach.name}
+                            onChange={(e) => updateCoach(position, { name: e.target.value })}
+                            placeholder="Coach Name"
+                            className="w-full"
+                          />
+                        ) : (
+                          <span className={isHC ? "font-semibold" : ""}>
+                            {coach.name || (isHC ? "Head Coach" : `${position} Name`)}
+                          </span>
+                        )}
+                      </TableCell>
+
+                      {/* Position */}
+                      <TableCell className="text-center font-medium">
+                        {position}
+                      </TableCell>
+
+                      {/* Prestige */}
+                      <TableCell className="text-center">
+                        {isEditing ? (
+                          <Select
+                            value={coach.prestige}
+                            onValueChange={(value) => updateCoach(position, { prestige: value as CoachPrestige })}
+                          >
+                            <SelectTrigger className="w-full">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {coachPrestiges.map((prestige) => (
+                                <SelectItem key={prestige} value={prestige}>
+                                  {prestige}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        ) : (
+                          <span className="font-semibold">{coach.prestige}</span>
+                        )}
+                      </TableCell>
+
+                      {/* Type */}
+                      <TableCell className="text-center">
+                        {isEditing ? (
+                          <Select
+                            value={coach.type}
+                            onValueChange={(value) => updateCoach(position, { type: value as CoachType })}
+                          >
+                            <SelectTrigger className="w-full">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {coachTypes.map((type) => (
+                                <SelectItem key={type} value={type}>
+                                  {type}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        ) : (
+                          <span>{coach.type}</span>
+                        )}
+                      </TableCell>
+
+                      {/* Actions */}
+                      <TableCell className="text-center">
+                        {isEditing ? (
+                          <Button
+                            variant="default"
+                            size="sm"
+                            onClick={handleSaveCoach}
+                          >
+                            Save
+                          </Button>
+                        ) : (
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => handleEditCoach(position)}
+                            title="Edit Coach"
+                          >
+                            <Pencil className="h-4 w-4" />
+                          </Button>
+                        )}
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+              </TableBody>
+            </Table>
+          </div>
+        </CardContent>
+      </Card>
 
       <Card className="shadow-lg">
         <CardHeader>

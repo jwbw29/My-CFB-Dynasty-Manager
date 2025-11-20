@@ -2,20 +2,46 @@
 
 "use client";
 
-import React, { useState, useEffect } from 'react';
-import { Card, CardHeader, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import useLocalStorage from '@/hooks/useLocalStorage';
-import { Player } from '@/types/playerTypes';
-import { Award } from '@/types/statTypes';
-import { toast } from 'react-hot-toast';
-import { getCoachProfile, getYearRecord, setYearRecord } from '@/utils/localStorage';
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogTitle, AlertDialogTrigger } from './ui/alert-dialog';
-import { AlertDialogFooter, AlertDialogHeader } from './ui/alert-dialog';
-import { Pencil, Trash2 } from 'lucide-react';
+import React, { useState, useEffect } from "react";
+import { Card, CardHeader, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import useLocalStorage from "@/hooks/useLocalStorage";
+import { Player } from "@/types/playerTypes";
+import { Award } from "@/types/statTypes";
+import { toast } from "react-hot-toast";
+import {
+  getCoachProfile,
+  getYearRecord,
+  setYearRecord,
+  getCoaches,
+} from "@/utils/localStorage";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "./ui/alert-dialog";
+import { AlertDialogFooter, AlertDialogHeader } from "./ui/alert-dialog";
+import { Pencil, Trash2 } from "lucide-react";
 
 const predefinedAwards = [
   "All-American",
@@ -46,78 +72,94 @@ const predefinedAwards = [
 const teamAwards = ["All-American", "All-Conference"];
 
 const AwardTracker: React.FC = () => {
-  const [currentYear] = useLocalStorage<number>('currentYear', new Date().getFullYear());
-  const [players] = useLocalStorage<Player[]>('players', []);
+  const [currentYear] = useLocalStorage<number>(
+    "currentYear",
+    new Date().getFullYear()
+  );
+  const [players] = useLocalStorage<Player[]>("players", []);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [selectedYear, setSelectedYear] = useState<number>(currentYear);
 
-  const [awardsForSelectedYear, setAwardsForSelectedYear] = useState<Award[]>([]);
+  const [awardsForSelectedYear, setAwardsForSelectedYear] = useState<Award[]>(
+    []
+  );
 
   useEffect(() => {
     const record = getYearRecord(selectedYear);
     setAwardsForSelectedYear(record.playerAwards || []);
   }, [selectedYear]);
 
-  const [selectedAwardName, setSelectedAwardName] = useState('');
-  const [selectedPlayerName, setSelectedPlayerName] = useState('');
-  const [selectedTeam, setSelectedTeam] = useState<'1st Team' | '2nd Team' | 'Freshman' | undefined>(undefined);
-  const [broylesName, setBroylesName] = useState('');
-  const [broylesPosition, setBroylesPosition] = useState<'OC' | 'DC'>('OC');
+  const [selectedAwardName, setSelectedAwardName] = useState("");
+  const [selectedPlayerName, setSelectedPlayerName] = useState("");
+  const [selectedTeam, setSelectedTeam] = useState<
+    "1st Team" | "2nd Team" | "Freshman" | undefined
+  >(undefined);
+  const [broylesName, setBroylesName] = useState("");
+  const [broylesPosition, setBroylesPosition] = useState<"OC" | "DC">("OC");
 
   const coachProfile = getCoachProfile();
+  const coaches = getCoaches();
 
   const resetForm = () => {
-    setSelectedAwardName('');
-    setSelectedPlayerName('');
+    setSelectedAwardName("");
+    setSelectedPlayerName("");
     setSelectedTeam(undefined);
-    setBroylesName('');
-    setBroylesPosition('OC');
+    setBroylesName("");
+    setBroylesPosition("OC");
     setEditingId(null);
   };
 
   const handleSave = () => {
     if (!selectedAwardName) {
-      toast.error('Please select an award');
+      toast.error("Please select an award");
       return;
     }
 
     let finalPlayerName = selectedPlayerName;
-    if (selectedAwardName === 'Head Coach of the Year') {
-      finalPlayerName = coachProfile?.coachName || 'Head Coach';
-    } else if (selectedAwardName === 'Broyles Award') {
-      if (!broylesName.trim()) {
-        toast.error("Please enter the coordinator's name.");
+    if (selectedAwardName === "Bear Bryant Coach of the Year Award") {
+      finalPlayerName = coachProfile?.coachName || "Head Coach";
+    } else if (selectedAwardName === "Broyles Award") {
+      // Get coordinator name from coaches roster
+      const coordinatorName = broylesPosition === "OC"
+        ? coaches?.offensiveCoordinator.name
+        : coaches?.defensiveCoordinator.name;
+
+      if (!coordinatorName || !coordinatorName.trim()) {
+        toast.error(`Please add the ${broylesPosition} name in the Roster Management page first.`);
         return;
       }
-      finalPlayerName = `${broylesName} - ${broylesPosition}`;
+      finalPlayerName = `${coordinatorName} - ${broylesPosition}`;
     }
 
     if (!finalPlayerName) {
-      toast.error('Please select a player or enter a name.');
+      toast.error("Please select a player or enter a name.");
       return;
     }
 
     if (teamAwards.includes(selectedAwardName) && !selectedTeam) {
-      toast.error('Please select a team (1st, 2nd, or Freshman).');
+      toast.error("Please select a team (1st, 2nd, or Freshman).");
       return;
     }
 
-    const awardData: Omit<Award, 'id'> = {
+    const awardData: Omit<Award, "id"> = {
       playerName: finalPlayerName,
       awardName: selectedAwardName,
       year: selectedYear,
-      team: selectedTeam
+      team: selectedTeam,
     };
 
     let updatedAwards: Award[];
     if (editingId) {
-      updatedAwards = awardsForSelectedYear.map(award =>
+      updatedAwards = awardsForSelectedYear.map((award) =>
         award.id === editingId ? { ...awardData, id: editingId } : award
       );
-      toast.success('Award updated successfully');
+      toast.success("Award updated successfully");
     } else {
-      updatedAwards = [...awardsForSelectedYear, { ...awardData, id: Date.now() }];
-      toast.success('Award added successfully');
+      updatedAwards = [
+        ...awardsForSelectedYear,
+        { ...awardData, id: Date.now() },
+      ];
+      toast.success("Award added successfully");
     }
 
     const record = getYearRecord(selectedYear);
@@ -132,27 +174,32 @@ const AwardTracker: React.FC = () => {
     setSelectedAwardName(award.awardName);
     setSelectedTeam(award.team);
 
-    if (award.awardName === "Broyles Award" && award.playerName.includes(' - ')) {
-      const [name, pos] = award.playerName.split(' - ');
+    if (
+      award.awardName === "Broyles Award" &&
+      award.playerName.includes(" - ")
+    ) {
+      const [name, pos] = award.playerName.split(" - ");
       setBroylesName(name);
-      setBroylesPosition(pos as 'OC' | 'DC');
-      setSelectedPlayerName('');
+      setBroylesPosition(pos as "OC" | "DC");
+      setSelectedPlayerName("");
     } else {
       setSelectedPlayerName(award.playerName);
-      setBroylesName('');
+      setBroylesName("");
     }
   };
 
   const removeAward = (id: number) => {
-    const updatedAwards = awardsForSelectedYear.filter(award => award.id !== id);
+    const updatedAwards = awardsForSelectedYear.filter(
+      (award) => award.id !== id
+    );
     const record = getYearRecord(selectedYear);
     setYearRecord(selectedYear, { ...record, playerAwards: updatedAwards });
     setAwardsForSelectedYear(updatedAwards);
-    toast.success('Award removed successfully');
+    toast.success("Award removed successfully");
   };
 
   const isTeamAwardSelected = teamAwards.includes(selectedAwardName);
-  const isCoachAward = selectedAwardName === "Head Coach of the Year";
+  const isCoachAward = selectedAwardName === "Bear Bryant Coach of the Year Award";
   const isBroylesAward = selectedAwardName === "Broyles Award";
   const isPlayerAward = !isCoachAward && !isBroylesAward;
 
@@ -163,49 +210,93 @@ const AwardTracker: React.FC = () => {
       <Card>
         <CardHeader className="text-xl font-semibold">
           <div className="flex justify-between items-center">
-            <span>{editingId ? 'Edit' : 'Add New'} Award for Year: {selectedYear}</span>
+            <span>
+              {editingId ? "Edit" : "Add New"} Award for Year: {selectedYear}
+            </span>
           </div>
         </CardHeader>
         <CardContent>
           <div className={`grid grid-cols-1 md:grid-cols-4 gap-4 mb-4`}>
             {isPlayerAward && (
-              <Select value={selectedPlayerName} onValueChange={setSelectedPlayerName}>
-                <SelectTrigger><SelectValue placeholder="Select Player" /></SelectTrigger>
+              <Select
+                value={selectedPlayerName}
+                onValueChange={setSelectedPlayerName}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select Player" />
+                </SelectTrigger>
                 <SelectContent>
-                  {[...players].sort((a, b) => parseInt(a.jerseyNumber) - parseInt(b.jerseyNumber)).map(player => (
-                    <SelectItem key={player.id} value={player.name}>{player.name} - {player.position} #{player.jerseyNumber}</SelectItem>
-                  ))}
+                  {[...players]
+                    .sort(
+                      (a, b) =>
+                        parseInt(a.jerseyNumber) - parseInt(b.jerseyNumber)
+                    )
+                    .map((player) => (
+                      <SelectItem key={player.id} value={player.name}>
+                        {player.name} - {player.position} #{player.jerseyNumber}
+                      </SelectItem>
+                    ))}
                 </SelectContent>
               </Select>
             )}
 
             {isCoachAward && (
-              <Input value={coachProfile?.coachName || ''} readOnly disabled />
+              <Input value={coachProfile?.coachName || ""} readOnly disabled />
             )}
 
             {isBroylesAward && (
               <>
-                <Input value={broylesName} onChange={(e) => setBroylesName(e.target.value)} placeholder="Coordinator Name" />
-                <Select value={broylesPosition} onValueChange={(value: 'OC' | 'DC') => setBroylesPosition(value)}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
+                <Select
+                  value={broylesPosition}
+                  onValueChange={(value: "OC" | "DC") =>
+                    setBroylesPosition(value)
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select Coordinator Position" />
+                  </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="OC">Offensive Coordinator</SelectItem>
                     <SelectItem value="DC">Defensive Coordinator</SelectItem>
                   </SelectContent>
                 </Select>
+                <Input
+                  value={
+                    broylesPosition === "OC"
+                      ? coaches?.offensiveCoordinator.name || "OC Name not set"
+                      : coaches?.defensiveCoordinator.name || "DC Name not set"
+                  }
+                  readOnly
+                  disabled
+                  placeholder="Coordinator Name"
+                />
               </>
             )}
 
-            <Select value={selectedAwardName} onValueChange={setSelectedAwardName}>
-              <SelectTrigger><SelectValue placeholder="Select Award" /></SelectTrigger>
+            <Select
+              value={selectedAwardName}
+              onValueChange={setSelectedAwardName}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select Award" />
+              </SelectTrigger>
               <SelectContent>
-                {predefinedAwards.map(award => (<SelectItem key={award} value={award}>{award}</SelectItem>))}
+                {predefinedAwards.map((award) => (
+                  <SelectItem key={award} value={award}>
+                    {award}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
-            
+
             {isTeamAwardSelected && (
-              <Select value={selectedTeam} onValueChange={(value: any) => setSelectedTeam(value)}>
-                <SelectTrigger><SelectValue placeholder="Select Team" /></SelectTrigger>
+              <Select
+                value={selectedTeam}
+                onValueChange={(value: any) => setSelectedTeam(value)}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select Team" />
+                </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="1st Team">1st Team</SelectItem>
                   <SelectItem value="2nd Team">2nd Team</SelectItem>
@@ -215,8 +306,14 @@ const AwardTracker: React.FC = () => {
             )}
 
             <div className="flex space-x-2">
-              <Button onClick={handleSave}>{editingId ? 'Save' : 'Add Award'}</Button>
-              {editingId && <Button onClick={resetForm} variant="outline">Cancel</Button>}
+              <Button onClick={handleSave}>
+                {editingId ? "Save" : "Add Award"}
+              </Button>
+              {editingId && (
+                <Button onClick={resetForm} variant="outline">
+                  Cancel
+                </Button>
+              )}
             </div>
           </div>
         </CardContent>
@@ -238,21 +335,56 @@ const AwardTracker: React.FC = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {awardsForSelectedYear.map(award => (
+              {awardsForSelectedYear.map((award) => (
                 <TableRow key={award.id}>
-                  <TableCell className="text-center">{award.playerName}</TableCell>
+                  <TableCell className="text-center">
+                    {award.playerName}
+                  </TableCell>
                   <TableCell className="text-center">
                     {award.awardName}
-                    {award.team && <span className="ml-2 font-semibold text-gray-600 dark:text-gray-400">({award.team})</span>}
+                    {award.team && (
+                      <span className="ml-2 font-semibold text-gray-600 dark:text-gray-400">
+                        ({award.team})
+                      </span>
+                    )}
                   </TableCell>
                   <TableCell className="text-center">
                     <div className="flex items-center gap-1 justify-center">
-                      <Button variant="ghost" size="icon" onClick={() => startEditing(award)} title="Edit"> <Pencil className="h-4 w-4" /></Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => startEditing(award)}
+                        title="Edit"
+                      >
+                        {" "}
+                        <Pencil className="h-4 w-4" />
+                      </Button>
                       <AlertDialog>
-                        <AlertDialogTrigger asChild><Button variant="ghost" size="icon" title="Remove Player"><Trash2 className="h-4 w-4 text-red-500" /></Button></AlertDialogTrigger>
+                        <AlertDialogTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            title="Remove Player"
+                          >
+                            <Trash2 className="h-4 w-4 text-red-500" />
+                          </Button>
+                        </AlertDialogTrigger>
                         <AlertDialogContent>
-                          <AlertDialogHeader><AlertDialogTitle>Remove Player</AlertDialogTitle><AlertDialogDescription>Are you sure you want to remove {award.awardName} from this player?</AlertDialogDescription></AlertDialogHeader>
-                          <AlertDialogFooter><AlertDialogCancel>Cancel</AlertDialogCancel><AlertDialogAction onClick={() => removeAward(award.id)}>Remove</AlertDialogAction></AlertDialogFooter>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Remove Player</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              Are you sure you want to remove {award.awardName}{" "}
+                              from this player?
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction
+                              onClick={() => removeAward(award.id)}
+                            >
+                              Remove
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
                         </AlertDialogContent>
                       </AlertDialog>
                     </div>
