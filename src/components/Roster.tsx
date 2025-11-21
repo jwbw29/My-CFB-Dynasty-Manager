@@ -68,7 +68,13 @@ import { Label } from "@/components/ui/label";
 import { usePlayerCard } from "@/hooks/usePlayerCard";
 import PlayerCard from "./PlayerCard";
 import { v4 as uuidv4 } from "uuid";
-import { CoachStaff, Coach, CoachType, CoachPrestige, CoachPosition } from "@/types/coaches";
+import {
+  CoachStaff,
+  Coach,
+  CoachType,
+  CoachPrestige,
+  CoachPosition,
+} from "@/types/coaches";
 import { getCoaches, setCoaches } from "@/utils/localStorage";
 import { getCoachProfile } from "@/utils/localStorage";
 import { useDynasty } from "@/contexts/DynastyContext";
@@ -102,18 +108,33 @@ const years = [
 const devTraits = ["Normal", "Impact", "Star", "Elite"] as const;
 
 const coachTypes: CoachType[] = [
-  "Motivator",
-  "Architect",
-  "Tactician",
-  "Strategist",
   "Recruiter",
+  "Elite Recruiter",
+  "Motivator",
+  "Master Motivator",
+  "Tactician",
+  "Scheme Guru",
+  "Architect",
   "Talent Developer",
+  "Strategist",
   "Program Builder",
   "CEO",
 ];
 
 const coachPrestiges: CoachPrestige[] = [
-  "F", "F+", "D-", "D", "D+", "C-", "C", "C+", "B-", "B", "B+", "A-", "A", "A+"
+  "A+",
+  "A",
+  "A-",
+  "B+",
+  "B",
+  "B-",
+  "C+",
+  "C",
+  "C-",
+  "D+",
+  "D",
+  "D-",
+  "F",
 ];
 type SortField =
   | "jersey #"
@@ -196,7 +217,10 @@ const Roster: React.FC = () => {
 
     if (savedCoaches) {
       // Sync HC name with coach profile if it exists
-      if (coachProfile?.coachName && savedCoaches.headCoach.name !== coachProfile.coachName) {
+      if (
+        coachProfile?.coachName &&
+        savedCoaches.headCoach.name !== coachProfile.coachName
+      ) {
         savedCoaches.headCoach.name = coachProfile.coachName;
       }
       return savedCoaches;
@@ -229,8 +253,11 @@ const Roster: React.FC = () => {
   // Sync HC name with coach profile
   useEffect(() => {
     const coachProfile = getCoachProfile();
-    if (coachProfile?.coachName && coaches.headCoach.name !== coachProfile.coachName) {
-      setCoachesState(prev => ({
+    if (
+      coachProfile?.coachName &&
+      coaches.headCoach.name !== coachProfile.coachName
+    ) {
+      setCoachesState((prev) => ({
         ...prev,
         headCoach: {
           ...prev.headCoach,
@@ -445,17 +472,23 @@ const Roster: React.FC = () => {
     notifySuccess("Coaches updated successfully!");
   }, [coaches, saveDynastyData]);
 
-  const updateCoach = useCallback((position: CoachPosition, updates: Partial<Coach>) => {
-    setCoachesState(prev => {
-      const key = position === "HC" ? "headCoach" :
-                  position === "OC" ? "offensiveCoordinator" :
-                  "defensiveCoordinator";
-      return {
-        ...prev,
-        [key]: { ...prev[key], ...updates },
-      };
-    });
-  }, []);
+  const updateCoach = useCallback(
+    (position: CoachPosition, updates: Partial<Coach>) => {
+      setCoachesState((prev) => {
+        const key =
+          position === "HC"
+            ? "headCoach"
+            : position === "OC"
+            ? "offensiveCoordinator"
+            : "defensiveCoordinator";
+        return {
+          ...prev,
+          [key]: { ...prev[key], ...updates },
+        };
+      });
+    },
+    []
+  );
 
   const handleEditCoach = useCallback((position: CoachPosition) => {
     setEditingCoach(position);
@@ -466,16 +499,19 @@ const Roster: React.FC = () => {
     handleSaveCoaches();
   }, [handleSaveCoaches]);
 
-  const getCoach = useCallback((position: CoachPosition): Coach => {
-    switch (position) {
-      case "HC":
-        return coaches.headCoach;
-      case "OC":
-        return coaches.offensiveCoordinator;
-      case "DC":
-        return coaches.defensiveCoordinator;
-    }
-  }, [coaches]);
+  const getCoach = useCallback(
+    (position: CoachPosition): Coach => {
+      switch (position) {
+        case "HC":
+          return coaches.headCoach;
+        case "OC":
+          return coaches.offensiveCoordinator;
+        case "DC":
+          return coaches.defensiveCoordinator;
+      }
+    },
+    [coaches]
+  );
 
   const getRowClassName = useCallback((player: Player) => {
     return `border-t transition-colors ${
@@ -492,8 +528,12 @@ const Roster: React.FC = () => {
       {/* Coaches Section */}
       <Card className="shadow-lg">
         <CardHeader>
-          <CardTitle className="text-xl font-semibold">Coaching Staff</CardTitle>
-          <CardDescription>Manage your Head Coach and coordinators</CardDescription>
+          <CardTitle className="text-xl font-semibold">
+            Coaching Staff
+          </CardTitle>
+          <CardDescription>
+            Manage your Head Coach and coordinators
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="overflow-x-auto">
@@ -520,13 +560,16 @@ const Roster: React.FC = () => {
                         {isEditing && !isHC ? (
                           <Input
                             value={coach.name}
-                            onChange={(e) => updateCoach(position, { name: e.target.value })}
+                            onChange={(e) =>
+                              updateCoach(position, { name: e.target.value })
+                            }
                             placeholder="Coach Name"
                             className="w-full"
                           />
                         ) : (
                           <span className={isHC ? "font-semibold" : ""}>
-                            {coach.name || (isHC ? "Head Coach" : `${position} Name`)}
+                            {coach.name ||
+                              (isHC ? "Head Coach" : `${position} Name`)}
                           </span>
                         )}
                       </TableCell>
@@ -541,7 +584,11 @@ const Roster: React.FC = () => {
                         {isEditing ? (
                           <Select
                             value={coach.prestige}
-                            onValueChange={(value) => updateCoach(position, { prestige: value as CoachPrestige })}
+                            onValueChange={(value) =>
+                              updateCoach(position, {
+                                prestige: value as CoachPrestige,
+                              })
+                            }
                           >
                             <SelectTrigger className="w-full">
                               <SelectValue />
@@ -555,7 +602,9 @@ const Roster: React.FC = () => {
                             </SelectContent>
                           </Select>
                         ) : (
-                          <span className="font-semibold">{coach.prestige}</span>
+                          <span className="font-semibold">
+                            {coach.prestige}
+                          </span>
                         )}
                       </TableCell>
 
@@ -564,7 +613,11 @@ const Roster: React.FC = () => {
                         {isEditing ? (
                           <Select
                             value={coach.type}
-                            onValueChange={(value) => updateCoach(position, { type: value as CoachType })}
+                            onValueChange={(value) =>
+                              updateCoach(position, {
+                                type: value as CoachType,
+                              })
+                            }
                           >
                             <SelectTrigger className="w-full">
                               <SelectValue />

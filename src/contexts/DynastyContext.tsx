@@ -236,6 +236,7 @@ export const DynastyProvider: React.FC<DynastyProviderProps> = ({
       // NOTE: 'top25History' is intentionally REMOVED from this list.
       const keysToReadFromStorage = [
         "coachProfile",
+        "coaches",
         "currentYear",
         "players",
         "playerStats",

@@ -1,30 +1,32 @@
 export type CoachPosition = "HC" | "OC" | "DC";
 
 export type CoachType =
-  | "Motivator"
-  | "Architect"
-  | "Tactician"
-  | "Strategist"
   | "Recruiter"
+  | "Elite Recruiter"
+  | "Motivator"
+  | "Master Motivator"
+  | "Tactician"
+  | "Scheme Guru"
+  | "Architect"
   | "Talent Developer"
+  | "Strategist"
   | "Program Builder"
   | "CEO";
 
 export type CoachPrestige =
-  | "F"
-  | "F+"
-  | "D-"
-  | "D"
-  | "D+"
-  | "C-"
-  | "C"
-  | "C+"
-  | "B-"
-  | "B"
-  | "B+"
-  | "A-"
+  | "A+"
   | "A"
-  | "A+";
+  | "A-"
+  | "B+"
+  | "B"
+  | "B-"
+  | "C+"
+  | "C"
+  | "C-"
+  | "D+"
+  | "D"
+  | "D-"
+  | "F";
 
 export interface Coach {
   name: string;
