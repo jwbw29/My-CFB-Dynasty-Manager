@@ -586,10 +586,7 @@ const DynastyLaunch: React.FC<DynastyLaunchProps> = ({ onDynastySelected }) => {
   };
 
   return (
-    <div className="relative min-h-screen bg-gradient-to-bl from-gray-700 via-plum-900 to-slateblue-500 flex items-center justify-center p-4 overflow-hidden">
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,_rgba(255,255,255,0.4),_transparent_70%)] mix-blend-screen animate-flicker pointer-events-none" />
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_rgba(255,255,255,0.2),_transparent_70%)] mix-blend-screen animate-flicker pointer-events-none" />
-      <div className="absolute inset-0 bg-[url('/noise.svg')] opacity-5 mix-blend-overlay pointer-events-none" />
+    <div className="relative min-h-screen bg-gray-800 flex items-center justify-center p-4 overflow-hidden">
       <div className="w-full max-w-6xl">
         <div className="text-center mb-8">
           <h1 className="text-5xl font-bold text-white mb-4 flex items-center justify-center gap-3">
