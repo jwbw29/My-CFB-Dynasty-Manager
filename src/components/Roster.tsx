@@ -192,6 +192,36 @@ const DevTraitBadge: React.FC<DevTraitBadgeProps> = ({ trait }) => {
   );
 };
 
+interface CoachTypeBadgeProps {
+  type: CoachType;
+}
+
+const CoachTypeBadge: React.FC<CoachTypeBadgeProps> = ({ type }) => {
+  const colors = {
+    Recruiter: "bg-red-700 text-white dark:bg-red-700 dark:text-white",
+    "Elite Recruiter": "bg-red-700 text-white dark:bg-red-700 dark:text-white",
+    Motivator: "bg-yellow-500 text-white dark:bg-yellow-500 dark:text-white",
+    "Master Motivator":
+      "bg-yellow-500 text-white dark:bg-yellow-500 dark:text-white",
+    Tactician: "bg-blue-800 text-white dark:bg-blue-800 dark:text-white",
+    "Scheme Guru": "bg-blue-800 text-white dark:bg-blue-800 dark:text-white",
+    Architect: "bg-purple-800 text-white dark:bg-purple-800 dark:text-white",
+    "Talent Developer":
+      "bg-green-800 text-white dark:bg-green-800 dark:text-white",
+    Strategist: "bg-orange-600 text-white dark:bg-orange-600 dark:text-white",
+    "Program Builder":
+      "bg-gray-400 text-white dark:bg-gray-400 dark:text-white",
+    CEO: "bg-yellow-600 text-white dark:bg-yellow-600 dark:text-white",
+  } as const;
+  return (
+    <span
+      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-sm/6 font-medium ${colors[type]}`}
+    >
+      {type}
+    </span>
+  );
+};
+
 const Roster: React.FC = () => {
   const { saveDynastyData, dataVersion } = useDynasty();
   const [players, setPlayers] = useLocalStorage<Player[]>("players", []);
@@ -631,7 +661,7 @@ const Roster: React.FC = () => {
                             </SelectContent>
                           </Select>
                         ) : (
-                          <span>{coach.type}</span>
+                          <CoachTypeBadge type={coach.type} />
                         )}
                       </TableCell>
 
