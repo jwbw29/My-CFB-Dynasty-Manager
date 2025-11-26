@@ -438,7 +438,9 @@ export const clearActiveSessionData = (): void => {
 
   keysToRemove.forEach((key) => safeLocalStorage.removeItem(key));
 
-  // Also remove any dynamic schedule, year stats, and recruiting needs keys from the previous session
+  // Also remove any dynamic schedule, year stats, recruiting needs, and dynasty-specific keys from the previous session
+  // IMPORTANT: Dynasty-specific keys (records_, teamStats_, teamLeaders_) are cleared here
+  // to prevent old dynasty data from lingering when switching dynasties
   if (typeof window !== "undefined") {
     const keysToDelete: string[] = [];
     for (let i = 0; i < localStorage.length; i++) {
@@ -448,7 +450,11 @@ export const clearActiveSessionData = (): void => {
         (key.startsWith("schedule_") ||
           key.startsWith("yearStats_") ||
           key.startsWith("offensiveNeeds_") ||
-          key.startsWith("defensiveNeeds_"))
+          key.startsWith("defensiveNeeds_") ||
+          key.startsWith("records_") ||
+          key.startsWith("teamStats_") ||
+          key.startsWith("teamLeaders_") ||
+          key.startsWith("userTeamMappings_"))
       ) {
         keysToDelete.push(key);
       }
@@ -731,6 +737,21 @@ export const prepareNextSeason = (year: number): void => {
  * @param data - The complete data object for a dynasty.
  */
 export const restoreDynastyFromSnapshot = (data: Record<string, any>): void => {
+  // CRITICAL: Back up records before clearing to prevent data loss
+  // Records should NEVER be lost - they persist for the life of the dynasty
+  const recordsBackup: Record<string, string> = {};
+  if (typeof window !== "undefined") {
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key && key.startsWith("records_")) {
+        const value = localStorage.getItem(key);
+        if (value) {
+          recordsBackup[key] = value;
+        }
+      }
+    }
+  }
+
   // 1. Clear out all potentially conflicting keys from the previous session.
   clearActiveSessionData();
 
@@ -743,6 +764,19 @@ export const restoreDynastyFromSnapshot = (data: Record<string, any>): void => {
       } catch (error) {
         console.error(`Failed to restore key "${key}" from snapshot`, error);
       }
+    }
+  });
+
+  // 3. SAFETY MECHANISM: If records keys are missing from the snapshot but existed before,
+  // restore them from backup. This prevents records from being lost if an older dynasty
+  // save file doesn't include records yet.
+  Object.keys(recordsBackup).forEach((key) => {
+    // Only restore if the key is not in the snapshot data
+    if (!data[key]) {
+      console.warn(
+        `Records key "${key}" was missing from dynasty snapshot. Restoring from backup.`
+      );
+      safeLocalStorage.setItem(key, recordsBackup[key]);
     }
   });
 };
