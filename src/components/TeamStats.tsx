@@ -31,7 +31,7 @@ import {
   RecordLevel,
 } from "@/types/yearRecord";
 import { useDynasty } from "@/contexts/DynastyContext";
-import { ChevronUp, ChevronDown, Plus, Trash2 } from "lucide-react";
+import { ChevronUp, ChevronDown, Plus, Trash2, Edit2, Save, X } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 import { ScrollArea } from "./ui/scroll-area";
 
@@ -155,6 +155,10 @@ const TeamStats: React.FC = () => {
       game: [],
     }
   );
+
+  // State for editing records
+  const [editingRecordId, setEditingRecordId] = useState<string | null>(null);
+  const [editingRecord, setEditingRecord] = useState<PlayerRecord | null>(null);
 
   // Form state for adding new records
   const [newRecord, setNewRecord] = useState<{
@@ -484,6 +488,62 @@ const TeamStats: React.FC = () => {
     [setRecords]
   );
 
+  // Handle starting to edit a record
+  const handleEditRecord = useCallback((record: PlayerRecord) => {
+    setEditingRecordId(record.id);
+    setEditingRecord({ ...record });
+  }, []);
+
+  // Handle canceling edit
+  const handleCancelEdit = useCallback(() => {
+    setEditingRecordId(null);
+    setEditingRecord(null);
+  }, []);
+
+  // Handle saving edited record
+  const handleSaveEdit = useCallback(() => {
+    if (!editingRecord) return;
+
+    setRecords((prev) => ({
+      ...prev,
+      [editingRecord.recordType]: prev[editingRecord.recordType].map((r) =>
+        r.id === editingRecord.id ? editingRecord : r
+      ),
+    }));
+
+    setEditingRecordId(null);
+    setEditingRecord(null);
+  }, [editingRecord, setRecords]);
+
+  // Handle updating editing record fields
+  const handleEditFieldChange = useCallback(
+    (field: keyof PlayerRecord, value: any) => {
+      if (!editingRecord) return;
+      setEditingRecord((prev) => (prev ? { ...prev, [field]: value } : null));
+    },
+    [editingRecord]
+  );
+
+  // Handle updating editing record stats
+  const handleEditStatChange = useCallback(
+    (stat: keyof PlayerRecord["stats"], value: string) => {
+      if (!editingRecord) return;
+      const numValue = value === "" ? undefined : Number(value);
+      setEditingRecord((prev) =>
+        prev
+          ? {
+              ...prev,
+              stats: {
+                ...prev.stats,
+                [stat]: numValue,
+              },
+            }
+          : null
+      );
+    },
+    [editingRecord]
+  );
+
   // Helper to get records by type and level
   const getRecordsByLevel = useCallback(
     (recordType: RecordType, level: RecordLevel) => {
@@ -520,6 +580,38 @@ const TeamStats: React.FC = () => {
       ));
   };
 
+  const renderEditableRecordStats = (record: PlayerRecord) => {
+    const statLabels: Record<keyof PlayerRecord["stats"], string> = {
+      passingYards: "Passing Yards",
+      passingTDs: "Passing TDs",
+      rushingYards: "Rushing Yards",
+      rushingTDs: "Rushing TDs",
+      receptions: "Receptions",
+      receivingYards: "Receiving Yards",
+      receivingTDs: "Receiving TDs",
+      sacks: "Sacks",
+      interceptions: "Interceptions",
+    };
+
+    return Object.entries(statLabels).map(([key, label]) => {
+      const statKey = key as keyof PlayerRecord["stats"];
+      const value = record.stats[statKey];
+
+      return (
+        <div key={key} className="flex justify-between items-center gap-2">
+          <span className="text-sm text-muted-foreground">{label}:</span>
+          <Input
+            type="number"
+            value={value ?? ""}
+            onChange={(e) => handleEditStatChange(statKey, e.target.value)}
+            className="w-24 h-7 text-sm"
+            placeholder="0"
+          />
+        </div>
+      );
+    });
+  };
+
   // Render records section by level
   const renderRecordsSection = (
     recordType: RecordType,
@@ -533,25 +625,97 @@ const TeamStats: React.FC = () => {
         <h3 className="font-semibold text-lg mb-3">{title}</h3>
         {levelRecords.length > 0 ? (
           <div className="space-y-3">
-            {levelRecords.map((record) => (
-              <Card key={record.id} className="p-3">
-                <div className="flex justify-between items-start mb-2">
-                  <div>
-                    <h4 className="font-bold text-lg">{record.playerName}</h4>
-                    <p className="text-sm text-muted-foreground">{record.year}</p>
+            {levelRecords.map((record) => {
+              const isEditing = editingRecordId === record.id;
+              const displayRecord = isEditing ? editingRecord : record;
+
+              if (!displayRecord) return null;
+
+              return (
+                <Card key={record.id} className="p-3">
+                  <div className="flex justify-between items-start mb-2">
+                    <div className="flex-1">
+                      {isEditing ? (
+                        <div className="space-y-2">
+                          <Input
+                            value={displayRecord.playerName}
+                            onChange={(e) =>
+                              handleEditFieldChange("playerName", e.target.value)
+                            }
+                            className="font-bold text-lg"
+                            placeholder="Player name"
+                          />
+                          <Input
+                            type="number"
+                            value={displayRecord.year}
+                            onChange={(e) =>
+                              handleEditFieldChange("year", Number(e.target.value))
+                            }
+                            className="text-sm w-24"
+                            placeholder="Year"
+                          />
+                        </div>
+                      ) : (
+                        <>
+                          <h4 className="font-bold text-lg">
+                            {displayRecord.playerName}
+                          </h4>
+                          <p className="text-sm text-muted-foreground">
+                            {displayRecord.year}
+                          </p>
+                        </>
+                      )}
+                    </div>
+                    <div className="flex gap-1">
+                      {isEditing ? (
+                        <>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-6 w-6 text-green-600"
+                            onClick={handleSaveEdit}
+                          >
+                            <Save className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-6 w-6"
+                            onClick={handleCancelEdit}
+                          >
+                            <X className="h-4 w-4" />
+                          </Button>
+                        </>
+                      ) : (
+                        <>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-6 w-6"
+                            onClick={() => handleEditRecord(record)}
+                          >
+                            <Edit2 className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-6 w-6 text-destructive"
+                            onClick={() => handleDeleteRecord(recordType, record.id)}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </>
+                      )}
+                    </div>
                   </div>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-6 w-6 text-destructive"
-                    onClick={() => handleDeleteRecord(recordType, record.id)}
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </div>
-                <div className="space-y-1">{renderRecordStats(record)}</div>
-              </Card>
-            ))}
+                  <div className="space-y-1">
+                    {isEditing
+                      ? renderEditableRecordStats(displayRecord)
+                      : renderRecordStats(displayRecord)}
+                  </div>
+                </Card>
+              );
+            })}
           </div>
         ) : (
           <p className="text-sm text-muted-foreground">No records yet</p>
