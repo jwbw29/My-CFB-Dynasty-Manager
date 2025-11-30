@@ -140,6 +140,7 @@ const TROPHY_CATEGORIES = {
       "Anniversary Award",
       "Apple Cup",
       "Bayou Bucket",
+      "Battle Line",
       "Battle of I-75 Trophy",
       "Bedlam Bell",
       "Beehive Boot",
