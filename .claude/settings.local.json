@@ -12,7 +12,8 @@
       "Bash(timeout 10 npm run dev)",
       "Bash(chmod:*)",
       "Bash(mkdir:*)",
-      "Bash(cp:*)"
+      "Bash(cp:*)",
+      "Bash(node -e:*)"
     ],
     "deny": []
   }

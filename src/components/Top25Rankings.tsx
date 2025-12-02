@@ -18,9 +18,10 @@ import { toast } from "react-hot-toast";
 import { useTop25Rankings, RankedTeam } from "@/hooks/useTop25Rankings";
 import { TeamLogo } from "./ui/TeamLogo";
 import { getWeekDisplayName } from "@/utils/weekUtils";
-import { getCurrentYear, getUsernameForTeam } from "@/utils/localStorage";
+import { getCurrentYear } from "@/utils/localStorage";
 import { useDynasty } from "@/contexts/DynastyContext";
 import { TeamDisplay } from "./TeamHome";
+import { useUsernameLookup } from "@/hooks/useUsernameLookup";
 
 // --- WEEKS array for the dropdown selector ---
 const WEEKS = Array.from({ length: 22 }, (_, i) => i); // Weeks 0-21
@@ -35,14 +36,16 @@ interface TeamRankingRowProps {
     teamName: string,
     currentRank: number
   ) => React.ReactNode;
+  getUsernameForTeam: (teamName: string) => string | undefined;
 }
 
-const TeamRankingRow: React.FC<TeamRankingRowProps> = ({
+const TeamRankingRow: React.FC<TeamRankingRowProps> = React.memo(({
   team,
   index,
   unrankedTeams,
   onTeamChange,
   renderRankingChange,
+  getUsernameForTeam,
 }) => {
   const dropdownOptions = useMemo(() => {
     const options = [...unrankedTeams];
@@ -55,13 +58,23 @@ const TeamRankingRow: React.FC<TeamRankingRowProps> = ({
     return options;
   }, [unrankedTeams, team.name]);
 
+  const handleChange = useCallback(
+    (val: string) => onTeamChange(index, val),
+    [index, onTeamChange]
+  );
+
+  const teamUsername = useMemo(
+    () => (team.name ? getUsernameForTeam(team.name) : undefined),
+    [team.name, getUsernameForTeam]
+  );
+
   return (
     <div className="grid grid-cols-[auto_1fr_auto] items-center gap-2 px-2 py-1.5 border-b last:border-b-0 hover:bg-muted/50 transition-colors">
       <div className="text-right w-8 font-bold text-lg">{index + 1}</div>
       <div className="flex items-center">
         <Select
           value={team.name || "unranked"}
-          onValueChange={(val) => onTeamChange(index, val)}
+          onValueChange={handleChange}
         >
           <SelectTrigger className="h-9">
             <SelectValue>
@@ -70,7 +83,7 @@ const TeamRankingRow: React.FC<TeamRankingRowProps> = ({
                   <TeamLogo teamName={team.name} size="sm" />
                   <TeamDisplay
                     name={team.name}
-                    username={getUsernameForTeam(team.name)}
+                    username={teamUsername}
                     custom_classes="font-semibold"
                   />
                   {team.record && team.record.trim() && (
@@ -106,7 +119,19 @@ const TeamRankingRow: React.FC<TeamRankingRowProps> = ({
       </div>
     </div>
   );
-};
+}, (prevProps, nextProps) => {
+  // Custom comparison function for React.memo
+  // Only re-render if these specific props change
+  return (
+    prevProps.team.name === nextProps.team.name &&
+    prevProps.team.record === nextProps.team.record &&
+    prevProps.index === nextProps.index &&
+    prevProps.unrankedTeams === nextProps.unrankedTeams &&
+    prevProps.onTeamChange === nextProps.onTeamChange &&
+    prevProps.renderRankingChange === nextProps.renderRankingChange &&
+    prevProps.getUsernameForTeam === nextProps.getUsernameForTeam
+  );
+});
 
 // --- OthersReceivingVotes Editor Component ---
 interface OthersReceivingVotesProps {
@@ -187,6 +212,9 @@ const OthersReceivingVotes: React.FC<OthersReceivingVotesProps> = ({
 const Top25Rankings: React.FC = () => {
   const currentYear = getCurrentYear();
 
+  // Use the memoized username lookup hook for performance
+  const { getUsernameForTeam } = useUsernameLookup();
+
   // --- FIX 1: Call useTop25Rankings with NO arguments ---
   const {
     activeWeek,
@@ -240,12 +268,12 @@ const Top25Rankings: React.FC = () => {
     [currentRankings, activeWeek, updateRankingsForWeek, currentYear]
   );
 
-  const handleSave = () => {
+  const handleSave = useCallback(() => {
     // The `updateRankingsForWeek` now handles saving via the context, so this button is just for user feedback.
     toast.success(`${getWeekDisplayName(activeWeek)} rankings saved!`);
-  };
+  }, [activeWeek]);
 
-  const renderRankingChange = (teamName: string, currentRank: number) => {
+  const renderRankingChange = useCallback((teamName: string, currentRank: number) => {
     if (!teamName || activeWeek === 0)
       return <Minus className="text-gray-400" size={16} />;
     const previousRank = previousRankings.findIndex(
@@ -269,7 +297,7 @@ const Top25Rankings: React.FC = () => {
         </div>
       );
     return <Minus className="text-gray-400" size={16} />;
-  };
+  }, [activeWeek, previousRankings]);
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
@@ -315,6 +343,7 @@ const Top25Rankings: React.FC = () => {
                   unrankedTeams={unrankedTeams}
                   onTeamChange={handleTeamChange}
                   renderRankingChange={renderRankingChange}
+                  getUsernameForTeam={getUsernameForTeam}
                 />
               ))}
             </div>
@@ -327,6 +356,7 @@ const Top25Rankings: React.FC = () => {
                   unrankedTeams={unrankedTeams}
                   onTeamChange={handleTeamChange}
                   renderRankingChange={renderRankingChange}
+                  getUsernameForTeam={getUsernameForTeam}
                 />
               ))}
             </div>
@@ -339,6 +369,7 @@ const Top25Rankings: React.FC = () => {
                   unrankedTeams={unrankedTeams}
                   onTeamChange={handleTeamChange}
                   renderRankingChange={renderRankingChange}
+                  getUsernameForTeam={getUsernameForTeam}
                 />
               ))}
             </div>
