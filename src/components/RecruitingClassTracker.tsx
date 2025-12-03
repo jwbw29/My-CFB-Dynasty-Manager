@@ -348,6 +348,14 @@ const RecruitingClassTracker: React.FC = () => {
     allRecruits.filter((recruit) => recruit.recruitedYear === selectedYear)
   );
 
+  // Debounced save notification for recruiting needs
+  const debouncedSaveNotification = useCallback(() => {
+    const timeoutId = setTimeout(() => {
+      notifySuccess("Recruiting needs saved");
+    }, 500);
+    return () => clearTimeout(timeoutId);
+  }, []);
+
   // Update Offensive Needs
   const updateOffensiveNeed = useCallback(
     (
@@ -360,8 +368,9 @@ const RecruitingClassTracker: React.FC = () => {
           need.position === position ? { ...need, [field]: value } : need
         )
       );
+      debouncedSaveNotification();
     },
-    [setOffensiveNeeds]
+    [setOffensiveNeeds, debouncedSaveNotification]
   );
 
   // Update Defensive Needs
@@ -376,8 +385,9 @@ const RecruitingClassTracker: React.FC = () => {
           need.position === position ? { ...need, [field]: value } : need
         )
       );
+      debouncedSaveNotification();
     },
-    [setDefensiveNeeds]
+    [setDefensiveNeeds, debouncedSaveNotification]
   );
 
   const DevTraitBadge: React.FC<DevTraitBadgeProps> = ({ trait }) => {
@@ -479,6 +489,39 @@ const RecruitingClassTracker: React.FC = () => {
       <h1 className="text-3xl font-bold text-center">
         Recruiting Class Tracker
       </h1>
+
+      {/* Recruiting Needs Section */}
+      <Card>
+        <CardHeader
+          className="text-xl font-semibold cursor-pointer flex flex-row items-center justify-between"
+          onClick={() => setIsNeedsExpanded(!isNeedsExpanded)}
+        >
+          <span>Recruiting Needs Board</span>
+          {isNeedsExpanded ? (
+            <ChevronUp className="h-5 w-5" />
+          ) : (
+            <ChevronDown className="h-5 w-5" />
+          )}
+        </CardHeader>
+        {isNeedsExpanded && (
+          <CardContent>
+            <div className="space-y-6">
+              <RecruitingNeedsTable
+                title="OFFENSIVE NEEDS"
+                needs={offensiveNeeds}
+                updateNeed={updateOffensiveNeed}
+                tableType="offensive"
+              />
+              <RecruitingNeedsTable
+                title="DEFENSIVE NEEDS"
+                needs={defensiveNeeds}
+                updateNeed={updateDefensiveNeed}
+                tableType="defensive"
+              />
+            </div>
+          </CardContent>
+        )}
+      </Card>
 
       <Card>
         <CardHeader className="text-xl font-semibold">
