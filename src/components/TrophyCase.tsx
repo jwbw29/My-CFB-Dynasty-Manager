@@ -167,6 +167,7 @@ const TROPHY_CATEGORIES = {
       "Hardee's Trophy",
       "Heartland Trophy",
       "Heroes Trophy",
+      "Holy War",
       "Illibuck",
       "Ireland Trophy",
       "Iron Skillet",
@@ -307,6 +308,7 @@ const TrophyCase: React.FC = () => {
         "Annual Series Winner": "rivalry",
         "Crosstown Trophy": "rivalry",
         "Border War Trophy": "rivalry",
+        "Holy War": "rivalry",
         "Custom Rivalry Trophy": "rivalry",
       };
 
