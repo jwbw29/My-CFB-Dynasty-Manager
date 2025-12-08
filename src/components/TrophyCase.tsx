@@ -790,7 +790,11 @@ const TrophyCase: React.FC = () => {
                                   ? "default"
                                   : "secondary"
                               }
-                              className="ml-auto"
+                              className={`ml-auto ${
+                                trophy.significance === "Medium"
+                                  ? "bg-gray-300 text-gray-800 dark:bg-secondary dark:text-secondary-foreground"
+                                  : ""
+                              }`}
                             >
                               {trophy.significance}
                             </Badge>
@@ -914,7 +918,11 @@ const TrophyCase: React.FC = () => {
                                       ? "default"
                                       : "secondary"
                                   }
-                                  className="inline-flex"
+                                  className={`inline-flex ${
+                                    trophy.significance === "Medium"
+                                      ? "bg-gray-300 text-gray-800 dark:bg-secondary dark:text-secondary-foreground"
+                                      : ""
+                                  }`}
                                 >
                                   {trophy.significance} Significance
                                 </Badge>
