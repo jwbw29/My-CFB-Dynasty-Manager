@@ -27,8 +27,8 @@ import {
   calculateStats,
   getYearStats,
   getCoachProfile,
-  getUsernameForTeam,
   getUserForTeam,
+  getUsers,
 } from "@/utils/localStorage";
 import { getTeamData } from "@/utils/fbsTeams";
 import { fcsTeams } from "@/utils/fcsTeams";
@@ -69,11 +69,12 @@ interface GameRowProps {
   game: Game;
   availableTeams: any[];
   onUpdateGame: (week: number, field: UpdateableField, value: any) => void;
-  getRankForTeam: (teamName: string, week: number) => number | null; // <-- NEW PROP
+  getRankForTeam: (teamName: string, week: number) => number | null;
+  teamUsernameMap: Map<string, string>; // <-- Memoized username lookup
 }
 
 const GameRow = React.memo(
-  ({ game, availableTeams, onUpdateGame, getRankForTeam }: GameRowProps) => {
+  ({ game, availableTeams, onUpdateGame, getRankForTeam, teamUsernameMap }: GameRowProps) => {
     const [localTeamScore, setLocalTeamScore] = useState("");
     const [localOppScore, setLocalOppScore] = useState("");
 
@@ -82,9 +83,9 @@ const GameRow = React.memo(
       ? getRankForTeam(game.opponent, game.week)
       : null;
 
-    // Get username for opponent team (if user-controlled)
+    // Get username for opponent team using memoized map (avoids localStorage reads)
     const opponentUsername = game.opponent
-      ? getUsernameForTeam(game.opponent)
+      ? teamUsernameMap.get(game.opponent)
       : undefined;
 
     // Build opponent display name with rank (username will be styled separately)
@@ -207,7 +208,7 @@ const GameRow = React.memo(
               {availableTeams.map((team) => {
                 const isCustom = CustomTeamManager.isCustomTeam(team.name);
                 const isFCS = "isFCS" in team && team.isFCS;
-                const teamUsername = getUsernameForTeam(team.name);
+                const teamUsername = teamUsernameMap.get(team.name);
                 return (
                   <SelectItem key={team.name} value={team.name}>
                     <div className="flex items-center justify-between w-full">
@@ -319,6 +320,11 @@ const SchedulePage = () => {
   const { dataVersion, activeWeek, setActiveWeek, getRankingsForWeek } =
     useDynasty();
 
+  const scheduleRef = useRef<Game[]>(currentSchedule);
+  useEffect(() => {
+    scheduleRef.current = currentSchedule;
+  }, [currentSchedule]);
+
   const saveScheduleNow = useCallback(
     (scheduleToSave: Game[]) => {
       try {
@@ -379,8 +385,9 @@ const SchedulePage = () => {
       setIsSaving(true);
       // We pass `currentSchedule` directly to avoid stale closure issues
       saveScheduleNow(currentSchedule);
+      setHasUnsavedChanges(false);
       setIsSaving(false);
-    }, 1000); // Increased to 1 second for better user experience
+    }, 1000); // Debounced for better performance and user experience
   }, [currentSchedule, hasUnsavedChanges, isSaving, saveScheduleNow]);
 
   useEffect(() => {
@@ -388,17 +395,17 @@ const SchedulePage = () => {
       debouncedSave();
     }
 
-    // --- THIS IS THE KEY FIX ---
-    // This cleanup function runs when the component unmounts (e.g., user navigates away)
+    // Cleanup function runs when the component unmounts (e.g., user navigates away)
     return () => {
       if (saveTimeoutRef.current) {
         clearTimeout(saveTimeoutRef.current);
       }
-      // If there are unsaved changes when we leave, save them immediately.
-      // We need to access the "latest" version of hasUnsavedChanges.
-      // A ref is perfect for this. We'll add it now.
+      // If there are unsaved changes when we leave, save them immediately
+      if (unsavedChangesRef.current) {
+        saveScheduleNow(scheduleRef.current);
+      }
     };
-  }, [hasUnsavedChanges, debouncedSave]);
+  }, [hasUnsavedChanges, debouncedSave, saveScheduleNow]);
 
   const unsavedChangesRef = useRef(hasUnsavedChanges);
   useEffect(() => {
@@ -416,6 +423,18 @@ const SchedulePage = () => {
       .filter((team) => team && team.name)
       .sort((a, b) => (a.name || "").localeCompare(b.name || ""));
   }, []);
+
+  // Memoize username lookups for performance - eliminates ~2,940 localStorage reads on render
+  const teamUsernameMap = useMemo(() => {
+    const users = getUsers();
+    const map = new Map<string, string>();
+    users.forEach((user) => {
+      if (user.currentTeamId) {
+        map.set(user.currentTeamId, user.name);
+      }
+    });
+    return map;
+  }, [dataVersion]);
 
   useEffect(() => {
     const fetchData = () => {
@@ -442,15 +461,32 @@ const SchedulePage = () => {
     fetchData();
   }, [dataVersion]);
 
-  // --- NEW FUNCTION TO GET RANK FROM CONTEXT, TO BE PASSED DOWN ---
+  // Cache rankings Maps by week for performance
+  const rankingsMapsCache = useRef<Map<number, Map<string, number>>>(new Map());
+
+  // Optimized rank lookup using cached Maps for O(1) access
   const getRankForTeam = useCallback(
     (teamNameToRank: string, week: number) => {
-      const rankings = getRankingsForWeek(currentYear, week);
-      const rankIndex = rankings.findIndex((t) => t.name === teamNameToRank);
-      return rankIndex !== -1 ? rankIndex + 1 : null;
+      const cacheKey = week;
+
+      // Check if we have a cached Map for this week
+      if (!rankingsMapsCache.current.has(cacheKey)) {
+        const rankings = getRankingsForWeek(currentYear, week);
+        const rankMap = new Map(
+          rankings.map((team, index) => [team.name, index + 1])
+        );
+        rankingsMapsCache.current.set(cacheKey, rankMap);
+      }
+
+      return rankingsMapsCache.current.get(cacheKey)?.get(teamNameToRank) || null;
     },
     [currentYear, getRankingsForWeek]
   );
+
+  // Clear rankings cache when year or data version changes
+  useEffect(() => {
+    rankingsMapsCache.current.clear();
+  }, [currentYear, dataVersion]);
 
   const handleUpdateGame = useCallback(
     (week: number, field: UpdateableField, value: any) => {
@@ -517,12 +553,13 @@ const SchedulePage = () => {
           setActiveWeek(newActiveWeek);
         }
 
-        saveScheduleNow(updatedSchedule);
+        // Mark as unsaved instead of immediate save - debounced save will handle it
+        setHasUnsavedChanges(true);
 
         return updatedSchedule;
       });
     },
-    [activeWeek, setActiveWeek, saveScheduleNow]
+    [activeWeek, setActiveWeek]
   );
 
   return (
@@ -629,6 +666,7 @@ const SchedulePage = () => {
                 availableTeams={availableTeams}
                 onUpdateGame={handleUpdateGame}
                 getRankForTeam={getRankForTeam}
+                teamUsernameMap={teamUsernameMap}
               />
             ))}
           </div>
