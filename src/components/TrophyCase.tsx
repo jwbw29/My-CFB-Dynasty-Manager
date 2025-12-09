@@ -69,10 +69,16 @@ const TROPHY_CATEGORIES = {
     borderColor: "border-green-200 dark:border-green-800",
     textColor: "text-green-800 dark:text-green-200",
     types: [
-      "Conference Championship",
-      "Conference Tournament Championship",
-      "Division Title",
-      "Regular Season Champion",
+      "AAC Champions",
+      "ACC Champions",
+      "Big 12 Champions",
+      "Big Ten Champions",
+      "C-USA Champions",
+      "MAC Champions",
+      "MWC Champions",
+      "Pac-12 Champions",
+      "SEC Champions",
+      "SBC Champions",
     ],
   },
   bowl: {
@@ -297,10 +303,19 @@ const TrophyCase: React.FC = () => {
 
         "College Football Playoff National Championship": "championship",
 
-        "Conference Tournament Championship": "conference",
-        "Division Title": "conference",
-        "Regular Season Champion": "conference",
+        // Conference Championship Trophies
+        "AAC Champions": "conference",
+        "ACC Champions": "conference",
+        "Big 12 Champions": "conference",
+        "Big Ten Champions": "conference",
+        "C-USA Champions": "conference",
+        "MAC Champions": "conference",
+        "MWC Champions": "conference",
+        "Pac-12 Champions": "conference",
+        "SEC Champions": "conference",
+        "SBC Champions": "conference",
 
+        // Rivalry Trophies
         "The Game Trophy": "rivalry",
         "Iron Bowl Trophy": "rivalry",
         "Red River Trophy": "rivalry",
