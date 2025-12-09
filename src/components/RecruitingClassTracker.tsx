@@ -485,26 +485,33 @@ const RecruitingClassTracker: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6">
-      <h1 className="text-3xl font-bold text-center">
-        Recruiting Class Tracker
-      </h1>
+    <div className="space-y-8">
+      {/* Hero Header */}
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 dark:from-blue-950/30 dark:via-purple-950/30 dark:to-pink-950/30 border border-gray-200 dark:border-gray-700 shadow-lg">
+        <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
+        <div className="relative p-6 md:p-8 text-center">
+          <h1 className="text-4xl md:text-5xl font-black bg-gradient-to-r from-gray-900 via-gray-700 to-gray-900 dark:from-gray-100 dark:via-gray-300 dark:to-gray-100 bg-clip-text text-transparent">
+            Recruiting Class Tracker
+          </h1>
+        </div>
+      </div>
 
       {/* Recruiting Needs Section */}
-      <Card>
-        <CardHeader
-          className="text-xl font-semibold cursor-pointer flex flex-row items-center justify-between"
+      <Card className="border-2 border-gray-200 dark:border-gray-700 shadow-xl overflow-hidden">
+        <div
+          className="bg-gradient-to-r from-green-600 to-emerald-600 p-6 cursor-pointer flex flex-row items-center justify-between hover:from-green-700 hover:to-emerald-700 transition-all"
           onClick={() => setIsNeedsExpanded(!isNeedsExpanded)}
         >
-          <span>Recruiting Needs Board</span>
+          <span className="text-2xl font-black text-white">Recruiting Needs Board</span>
           {isNeedsExpanded ? (
-            <ChevronUp className="h-5 w-5" />
+            <ChevronUp className="h-6 w-6 text-white" />
           ) : (
-            <ChevronDown className="h-5 w-5" />
+            <ChevronDown className="h-6 w-6 text-white" />
           )}
-        </CardHeader>
+        </div>
+        <CardHeader className="hidden"></CardHeader>
         {isNeedsExpanded && (
-          <CardContent>
+          <CardContent className="bg-gradient-to-br from-gray-50 to-white dark:from-gray-900 dark:to-gray-800">
             <div className="space-y-6">
               <RecruitingNeedsTable
                 title="OFFENSIVE NEEDS"
@@ -523,13 +530,14 @@ const RecruitingClassTracker: React.FC = () => {
         )}
       </Card>
 
-      <Card>
-        <CardHeader className="text-xl font-semibold">
+      <Card className="border-2 border-gray-200 dark:border-gray-700 shadow-xl overflow-hidden">
+        <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-6">
           <div className="flex justify-between items-center">
-            <span>Add New Recruit for Year: {selectedYear}</span>
+            <span className="text-2xl font-black text-white">Add New Recruit for Year: {selectedYear}</span>
           </div>
-        </CardHeader>
-        <CardContent>
+        </div>
+        <CardHeader className="hidden"></CardHeader>
+        <CardContent className="bg-gradient-to-br from-gray-50 to-white dark:from-gray-900 dark:to-gray-800">
           <div className="grid grid-cols-1 md:grid-cols-8 gap-4 mb-4 items-end">
             <Input
               value={newRecruit.name}

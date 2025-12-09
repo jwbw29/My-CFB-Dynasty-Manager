@@ -39,99 +39,101 @@ interface TeamRankingRowProps {
   getUsernameForTeam: (teamName: string) => string | undefined;
 }
 
-const TeamRankingRow: React.FC<TeamRankingRowProps> = React.memo(({
-  team,
-  index,
-  unrankedTeams,
-  onTeamChange,
-  renderRankingChange,
-  getUsernameForTeam,
-}) => {
-  const dropdownOptions = useMemo(() => {
-    const options = [...unrankedTeams];
-    if (team.name && !unrankedTeams.some((t) => t.name === team.name)) {
-      const currentTeamObject = fbsTeams.find((t) => t.name === team.name);
-      if (currentTeamObject) {
-        options.unshift(currentTeamObject);
+const TeamRankingRow: React.FC<TeamRankingRowProps> = React.memo(
+  ({
+    team,
+    index,
+    unrankedTeams,
+    onTeamChange,
+    renderRankingChange,
+    getUsernameForTeam,
+  }) => {
+    const dropdownOptions = useMemo(() => {
+      const options = [...unrankedTeams];
+      if (team.name && !unrankedTeams.some((t) => t.name === team.name)) {
+        const currentTeamObject = fbsTeams.find((t) => t.name === team.name);
+        if (currentTeamObject) {
+          options.unshift(currentTeamObject);
+        }
       }
-    }
-    return options;
-  }, [unrankedTeams, team.name]);
+      return options;
+    }, [unrankedTeams, team.name]);
 
-  const handleChange = useCallback(
-    (val: string) => onTeamChange(index, val),
-    [index, onTeamChange]
-  );
+    const handleChange = useCallback(
+      (val: string) => onTeamChange(index, val),
+      [index, onTeamChange]
+    );
 
-  const teamUsername = useMemo(
-    () => (team.name ? getUsernameForTeam(team.name) : undefined),
-    [team.name, getUsernameForTeam]
-  );
+    const teamUsername = useMemo(
+      () => (team.name ? getUsernameForTeam(team.name) : undefined),
+      [team.name, getUsernameForTeam]
+    );
 
-  return (
-    <div className="grid grid-cols-[auto_1fr_auto] items-center gap-2 px-2 py-1.5 border-b last:border-b-0 hover:bg-muted/50 transition-colors">
-      <div className="text-right w-8 font-bold text-lg">{index + 1}</div>
-      <div className="flex items-center">
-        <Select
-          value={team.name || "unranked"}
-          onValueChange={handleChange}
-        >
-          <SelectTrigger className="h-9">
-            <SelectValue>
-              {team.name ? (
-                <div className="flex items-center gap-2">
-                  <TeamLogo teamName={team.name} size="sm" />
+    return (
+      <div className="grid grid-cols-[auto_1fr_auto] items-center gap-2 px-2 py-1.5 border-b last:border-b-0 hover:bg-muted/50 transition-colors">
+        <div className="text-right w-8 font-bold text-lg">{index + 1}</div>
+        <div className="flex items-center">
+          <Select value={team.name || "unranked"} onValueChange={handleChange}>
+            <SelectTrigger className="h-9">
+              <SelectValue>
+                {team.name ? (
+                  <div className="flex items-center gap-2">
+                    <TeamLogo teamName={team.name} size="sm" />
+                    <TeamDisplay
+                      name={team.name}
+                      username={teamUsername}
+                      custom_classes="font-semibold"
+                    />
+                    {team.record && team.record.trim() && (
+                      <span className="text-muted-foreground text-xs">
+                        ({team.record})
+                      </span>
+                    )}
+                  </div>
+                ) : (
+                  <span className="text-muted-foreground">
+                    Select a team...
+                  </span>
+                )}
+              </SelectValue>
+            </SelectTrigger>
+            <SelectContent className="max-h-72">
+              <SelectItem value="unranked">-- Unranked --</SelectItem>
+              {dropdownOptions.map((optionTeam) => (
+                <SelectItem
+                  key={optionTeam.name}
+                  value={optionTeam.name}
+                  className="flex flex-row"
+                >
                   <TeamDisplay
-                    name={team.name}
-                    username={teamUsername}
-                    custom_classes="font-semibold"
+                    name={optionTeam.name}
+                    username={getUsernameForTeam(optionTeam.name)}
                   />
-                  {team.record && team.record.trim() && (
-                    <span className="text-muted-foreground text-xs">
-                      ({team.record})
-                    </span>
-                  )}
-                </div>
-              ) : (
-                <span className="text-muted-foreground">Select a team...</span>
-              )}
-            </SelectValue>
-          </SelectTrigger>
-          <SelectContent className="max-h-72">
-            <SelectItem value="unranked">-- Unranked --</SelectItem>
-            {dropdownOptions.map((optionTeam) => (
-              <SelectItem
-                key={optionTeam.name}
-                value={optionTeam.name}
-                className="flex flex-row"
-              >
-                <TeamDisplay
-                  name={optionTeam.name}
-                  username={getUsernameForTeam(optionTeam.name)}
-                />
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="text-center w-16 flex justify-center">
+          {renderRankingChange(team.name, index)}
+        </div>
       </div>
-      <div className="text-center w-16 flex justify-center">
-        {renderRankingChange(team.name, index)}
-      </div>
-    </div>
-  );
-}, (prevProps, nextProps) => {
-  // Custom comparison function for React.memo
-  // Only re-render if these specific props change
-  return (
-    prevProps.team.name === nextProps.team.name &&
-    prevProps.team.record === nextProps.team.record &&
-    prevProps.index === nextProps.index &&
-    prevProps.unrankedTeams === nextProps.unrankedTeams &&
-    prevProps.onTeamChange === nextProps.onTeamChange &&
-    prevProps.renderRankingChange === nextProps.renderRankingChange &&
-    prevProps.getUsernameForTeam === nextProps.getUsernameForTeam
-  );
-});
+    );
+  },
+  (prevProps, nextProps) => {
+    // Custom comparison function for React.memo
+    // Only re-render if these specific props change
+    return (
+      prevProps.team.name === nextProps.team.name &&
+      prevProps.team.record === nextProps.team.record &&
+      prevProps.index === nextProps.index &&
+      prevProps.unrankedTeams === nextProps.unrankedTeams &&
+      prevProps.onTeamChange === nextProps.onTeamChange &&
+      prevProps.renderRankingChange === nextProps.renderRankingChange &&
+      prevProps.getUsernameForTeam === nextProps.getUsernameForTeam
+    );
+  }
+);
 
 // --- OthersReceivingVotes Editor Component ---
 interface OthersReceivingVotesProps {
@@ -273,66 +275,81 @@ const Top25Rankings: React.FC = () => {
     toast.success(`${getWeekDisplayName(activeWeek)} rankings saved!`);
   }, [activeWeek]);
 
-  const renderRankingChange = useCallback((teamName: string, currentRank: number) => {
-    if (!teamName || activeWeek === 0)
+  const renderRankingChange = useCallback(
+    (teamName: string, currentRank: number) => {
+      if (!teamName || activeWeek === 0)
+        return <Minus className="text-gray-400" size={16} />;
+      const previousRank = previousRankings.findIndex(
+        (t: RankedTeam) => t.name === teamName
+      );
+      if (previousRank === -1)
+        return <ArrowUp className="text-green-500" size={16} />;
+      const diff = previousRank - currentRank;
+      if (diff > 0)
+        return (
+          <div className="text-green-500 flex items-center">
+            <ArrowUp size={16} />
+            {diff}
+          </div>
+        );
+      if (diff < 0)
+        return (
+          <div className="text-red-500 flex items-center">
+            <ArrowDown size={16} />
+            {Math.abs(diff)}
+          </div>
+        );
       return <Minus className="text-gray-400" size={16} />;
-    const previousRank = previousRankings.findIndex(
-      (t: RankedTeam) => t.name === teamName
-    );
-    if (previousRank === -1)
-      return <ArrowUp className="text-green-500" size={16} />;
-    const diff = previousRank - currentRank;
-    if (diff > 0)
-      return (
-        <div className="text-green-500 flex items-center">
-          <ArrowUp size={16} />
-          {diff}
-        </div>
-      );
-    if (diff < 0)
-      return (
-        <div className="text-red-500 flex items-center">
-          <ArrowDown size={16} />
-          {Math.abs(diff)}
-        </div>
-      );
-    return <Minus className="text-gray-400" size={16} />;
-  }, [activeWeek, previousRankings]);
+    },
+    [activeWeek, previousRankings]
+  );
 
   return (
-    <div className="space-y-6 max-w-7xl mx-auto">
-      <div className="text-center">
-        <h1 className="text-3xl font-bold">Top 25 Rankings</h1>
-        <p className="text-muted-foreground">{currentYear} Season</p>
+    <div className="space-y-8 max-w-7xl mx-auto">
+      {/* Hero Header */}
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 dark:from-blue-950/30 dark:via-purple-950/30 dark:to-pink-950/30 border border-gray-200 dark:border-gray-700 shadow-lg">
+        <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
+        <div className="relative p-6 md:p-8 text-center">
+          <h1 className="text-4xl md:text-5xl font-black bg-gradient-to-r from-gray-900 via-gray-700 to-gray-900 dark:from-gray-100 dark:via-gray-300 dark:to-gray-100 bg-clip-text text-transparent">
+            Top 25 Rankings
+          </h1>
+          <p className="text-lg font-semibold text-gray-600 dark:text-gray-400 mt-2">
+            {currentYear} Season
+          </p>
+        </div>
       </div>
 
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between">
-          <div className="flex items-center gap-4">
-            <CardTitle>{getWeekDisplayName(activeWeek)} Poll</CardTitle>
-            <Select
-              value={activeWeek.toString()}
-              onValueChange={(val) => setActiveWeek(Number(val))}
-            >
-              <SelectTrigger className="w-40">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {availableWeeks.map((week) => (
-                  <SelectItem key={week} value={week.toString()}>
-                    {getWeekDisplayName(week)}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+      <Card className="border-2 border-gray-200 dark:border-gray-700 shadow-xl overflow-hidden">
+        <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-6">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 w-full">
+            <div className="flex items-center gap-4">
+              <CardTitle className="text-2xl font-black text-white">
+                {getWeekDisplayName(activeWeek)} Poll
+              </CardTitle>
+              <Select
+                value={activeWeek.toString()}
+                onValueChange={(val) => setActiveWeek(Number(val))}
+              >
+                <SelectTrigger className="w-40">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {availableWeeks.map((week) => (
+                    <SelectItem key={week} value={week.toString()}>
+                      {getWeekDisplayName(week)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
 
-          <Button onClick={handleSave}>
-            <Save className="mr-2 h-4 w-4" />
-            Save Rankings
-          </Button>
-        </CardHeader>
-        <CardContent>
+            <Button onClick={handleSave}>
+              <Save className="mr-2 h-4 w-4" />
+              Save Rankings
+            </Button>
+          </div>
+        </div>
+        <CardContent id="RankingsGrid">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-x-8 gap-y-4">
             <div className="space-y-1 border rounded-lg p-2">
               {currentRankings.slice(0, 10).map((team, index) => (
@@ -379,7 +396,7 @@ const Top25Rankings: React.FC = () => {
 
       <Card>
         <CardHeader className="font-bold">Others Receiving Votes:</CardHeader>
-        <CardContent className="flex flex-col gap-6">
+        <CardContent className="flex flex-col gap-6 pt-0">
           <OthersReceivingVotes
             currentYear={currentYear}
             activeWeek={activeWeek}

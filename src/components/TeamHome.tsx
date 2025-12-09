@@ -51,6 +51,7 @@ import { usePlayerCard } from "@/hooks/usePlayerCard";
 import PlayerCard from "./PlayerCard";
 import { useDynasty } from "@/contexts/DynastyContext";
 import { getTeamData } from "@/utils/fbsTeams";
+import { Trophy, Medal, Star, BarChart2, Calendar } from "lucide-react";
 
 // --- HELPER INTERFACES ---
 interface LocationRecord {
@@ -488,24 +489,41 @@ const TeamHome: React.FC = () => {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="text-center space-y-2">
-        <div className="flex items-center justify-center gap-4">
-          {teamData && <TeamLogo teamName={teamData.name} size="xl" />}
-          <div>
-            <h1 className="text-3xl font-bold">
-              {teamRank && (
-                <span className="text-gray-600 dark:text-gray-400">
-                  <strong>#{teamRank}</strong> -{" "}
-                </span>
+    <div className="space-y-8">
+      {/* Hero Header Section */}
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 dark:from-blue-950/30 dark:via-purple-950/30 dark:to-pink-950/30 border border-gray-200 dark:border-gray-700 shadow-lg">
+        <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
+        <div className="relative p-6 md:p-8">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+            <div className="flex items-center gap-6">
+              {teamData && (
+                <div className="relative">
+                  <div className="absolute inset-0 bg-gradient-to-br from-blue-400 to-purple-400 rounded-full blur-xl opacity-20"></div>
+                  <TeamLogo teamName={teamData.name} size="xl" />
+                </div>
               )}
-              {teamName} Dashboard • {currentYear}
-            </h1>
-            {teamData && teamData.conference && (
-              <div className="flex items-center justify-center gap-2 mt-1">
-                <ConferenceLogo conference={teamData.conference} size="sm" />
-                <span className="text-lg text-gray-600 dark:text-gray-400">
-                  {teamData.conference}
+              <div className="text-center md:text-left">
+                <h1 className="text-4xl md:text-5xl font-black bg-gradient-to-r from-gray-900 via-gray-700 to-gray-900 dark:from-gray-100 dark:via-gray-300 dark:to-gray-100 bg-clip-text text-transparent">
+                  {teamName}
+                </h1>
+                <p className="text-lg font-bold text-gray-600 dark:text-gray-400 mt-1">
+                  {currentYear} Season
+                </p>
+                {teamData && teamData.conference && (
+                  <div className="flex items-center justify-center md:justify-start gap-2 mt-2">
+                    <ConferenceLogo conference={teamData.conference} size="sm" />
+                    <span className="text-base font-semibold text-gray-700 dark:text-gray-300">
+                      {teamData.conference}
+                    </span>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {teamRank && (
+              <div className="px-6 py-3 bg-gradient-to-r from-yellow-400 to-orange-400 dark:from-yellow-500 dark:to-orange-500 rounded-full shadow-md">
+                <span className="text-2xl font-black text-white">
+                  #{teamRank}
                 </span>
               </div>
             )}
@@ -514,25 +532,33 @@ const TeamHome: React.FC = () => {
       </div>
 
       {/* Advance Schedule Controls */}
-      <Card>
-        <CardHeader>
-          <h3 className="text-xl font-semibold">Advance Schedule</h3>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="flex items-center space-x-2">
-              <Checkbox
-                id="ready-to-advance"
-                checked={readyToAdvance}
-                onCheckedChange={(checked) => {
-                  setReadyToAdvance(checked === true);
-                  saveDynastyData();
-                }}
-              />
-              <Label htmlFor="ready-to-advance">Ready to Advance</Label>
+      <Card className="border-2 border-gray-200 dark:border-gray-700 shadow-lg overflow-hidden">
+        <div className="bg-gradient-to-r from-indigo-600 to-purple-600 p-4">
+          <h3 className="text-xl font-black text-white flex items-center gap-2">
+            <Calendar className="h-5 w-5" />
+            Advance Schedule
+          </h3>
+        </div>
+        <CardContent className="p-6 bg-gradient-to-br from-gray-50 to-white dark:from-gray-900 dark:to-gray-800">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-xl p-4 border border-gray-200 dark:border-gray-700 shadow-md">
+              <div className="flex items-center space-x-3">
+                <Checkbox
+                  id="ready-to-advance"
+                  checked={readyToAdvance}
+                  onCheckedChange={(checked) => {
+                    setReadyToAdvance(checked === true);
+                    saveDynastyData();
+                  }}
+                  className="h-5 w-5"
+                />
+                <Label htmlFor="ready-to-advance" className="text-base font-semibold cursor-pointer">
+                  Ready to Advance
+                </Label>
+              </div>
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="next-advance">Next Advance</Label>
+            <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-xl p-4 border border-gray-200 dark:border-gray-700 shadow-md space-y-2">
+              <Label htmlFor="next-advance" className="text-sm font-bold text-gray-700 dark:text-gray-300">Next Advance Date</Label>
               <Input
                 id="next-advance"
                 type="date"
@@ -541,6 +567,7 @@ const TeamHome: React.FC = () => {
                   setNextAdvance(e.target.value);
                   saveDynastyData();
                 }}
+                className="font-semibold"
               />
             </div>
           </div>
@@ -552,11 +579,14 @@ const TeamHome: React.FC = () => {
 
       {/* Team Details Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <Card>
-          <CardHeader className="text-xl font-semibold pb-2 text-center">
-            Team Record
-          </CardHeader>
-          <CardContent className="p-6">
+        <Card className="border-2 border-gray-200 dark:border-gray-700 shadow-xl overflow-hidden hover:shadow-2xl transition-shadow">
+          <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-4">
+            <h3 className="text-xl font-black text-white flex items-center justify-center gap-2">
+              <Trophy className="h-5 w-5" />
+              Team Record
+            </h3>
+          </div>
+          <CardContent className="p-6 bg-gradient-to-br from-gray-50 to-white dark:from-gray-900 dark:to-gray-800">
             <div className="flex flex-col items-center min-h-[250px]">
               <div className="relative w-40 h-40 sm:w-48 sm:h-48 mb-4">
                 <svg
@@ -632,11 +662,14 @@ const TeamHome: React.FC = () => {
             </div>
           </CardContent>
         </Card>
-        <Card>
-          <CardHeader className="text-xl font-semibold pb-2 text-center">
-            Upcoming Games
-          </CardHeader>
-          <CardContent className="p-0">
+        <Card className="border-2 border-gray-200 dark:border-gray-700 shadow-xl overflow-hidden hover:shadow-2xl transition-shadow">
+          <div className="bg-gradient-to-r from-green-600 to-emerald-600 p-4">
+            <h3 className="text-xl font-black text-white flex items-center justify-center gap-2">
+              <Calendar className="h-5 w-5" />
+              Upcoming Games
+            </h3>
+          </div>
+          <CardContent className="p-0 bg-gradient-to-br from-gray-50 to-white dark:from-gray-900 dark:to-gray-800">
             <div className="divide-y divide-border">
               {upcomingGames.length > 0 ? (
                 upcomingGames.map((game) => (
@@ -649,18 +682,21 @@ const TeamHome: React.FC = () => {
                   />
                 ))
               ) : (
-                <p className="p-4 text-center text-muted-foreground">
+                <p className="p-8 text-center text-muted-foreground font-medium">
                   No upcoming games scheduled.
                 </p>
               )}
             </div>
           </CardContent>
         </Card>
-        <Card>
-          <CardHeader className="text-xl font-semibold pb-2 text-center">
-            Recent Results
-          </CardHeader>
-          <CardContent className="p-0">
+        <Card className="border-2 border-gray-200 dark:border-gray-700 shadow-xl overflow-hidden hover:shadow-2xl transition-shadow">
+          <div className="bg-gradient-to-r from-purple-600 to-pink-600 p-4">
+            <h3 className="text-xl font-black text-white flex items-center justify-center gap-2">
+              <Medal className="h-5 w-5" />
+              Recent Results
+            </h3>
+          </div>
+          <CardContent className="p-0 bg-gradient-to-br from-gray-50 to-white dark:from-gray-900 dark:to-gray-800">
             <div className="divide-y divide-border">
               {recentGames.length > 0 ? (
                 recentGames.map((game) => (
@@ -673,18 +709,21 @@ const TeamHome: React.FC = () => {
                   />
                 ))
               ) : (
-                <p className="p-4 text-center text-muted-foreground">
+                <p className="p-8 text-center text-muted-foreground font-medium">
                   No games played yet.
                 </p>
               )}
             </div>
           </CardContent>
         </Card>
-        <Card>
-          <CardHeader className="text-xl font-semibold pb-2 text-center">
-            Current Week
-          </CardHeader>
-          <CardContent className="p-6">
+        <Card className="border-2 border-gray-200 dark:border-gray-700 shadow-xl overflow-hidden hover:shadow-2xl transition-shadow">
+          <div className="bg-gradient-to-r from-orange-600 to-amber-600 p-4">
+            <h3 className="text-xl font-black text-white flex items-center justify-center gap-2">
+              <Calendar className="h-5 w-5" />
+              Current Week
+            </h3>
+          </div>
+          <CardContent className="p-6 bg-gradient-to-br from-gray-50 to-white dark:from-gray-900 dark:to-gray-800">
             <div className="flex flex-col items-center justify-center min-h-[250px]">
               <div className="relative w-40 h-40 sm:w-48 sm:h-48">
                 <svg
@@ -727,11 +766,14 @@ const TeamHome: React.FC = () => {
             </div>
           </CardContent>
         </Card>
-        <Card>
-          <CardHeader className="text-xl font-semibold pb-2 text-center">
-            Team Stats Summary
-          </CardHeader>
-          <CardContent className="p-0">
+        <Card className="border-2 border-gray-200 dark:border-gray-700 shadow-xl overflow-hidden hover:shadow-2xl transition-shadow">
+          <div className="bg-gradient-to-r from-cyan-600 to-blue-600 p-4">
+            <h3 className="text-xl font-black text-white flex items-center justify-center gap-2">
+              <BarChart2 className="h-5 w-5" />
+              Team Stats Summary
+            </h3>
+          </div>
+          <CardContent className="p-0 bg-gradient-to-br from-gray-50 to-white dark:from-gray-900 dark:to-gray-800">
             <div className="divide-y divide-border">
               <div className="flex items-center justify-between p-3 sm:p-4 hover:bg-muted/50">
                 <span className="text-sm sm:text-base text-muted-foreground">
@@ -775,11 +817,14 @@ const TeamHome: React.FC = () => {
             </div>
           </CardContent>
         </Card>
-        <Card>
-          <CardHeader className="text-xl font-semibold pb-2 text-center">
-            Stat Leaders
-          </CardHeader>
-          <CardContent className="p-0">
+        <Card className="border-2 border-gray-200 dark:border-gray-700 shadow-xl overflow-hidden hover:shadow-2xl transition-shadow">
+          <div className="bg-gradient-to-r from-yellow-600 to-amber-600 p-4">
+            <h3 className="text-xl font-black text-white flex items-center justify-center gap-2">
+              <Star className="h-5 w-5" />
+              Stat Leaders
+            </h3>
+          </div>
+          <CardContent className="p-0 bg-gradient-to-br from-gray-50 to-white dark:from-gray-900 dark:to-gray-800">
             <div className="divide-y divide-border">
               <div className="flex items-center p-3 sm:p-4 hover:bg-muted/50">
                 <div className="flex-1 mr-2">

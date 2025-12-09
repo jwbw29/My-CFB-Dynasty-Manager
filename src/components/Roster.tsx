@@ -553,11 +553,27 @@ const Roster: React.FC = () => {
 
   return (
     <div className="space-y-8">
-      <h1 className="text-3xl font-bold text-center">Roster Management</h1>
+      {/* Hero Header */}
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 dark:from-blue-950/30 dark:via-purple-950/30 dark:to-pink-950/30 border border-gray-200 dark:border-gray-700 shadow-lg">
+        <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
+        <div className="relative p-6 md:p-8 text-center">
+          <h1 className="text-4xl md:text-5xl font-black bg-gradient-to-r from-gray-900 via-gray-700 to-gray-900 dark:from-gray-100 dark:via-gray-300 dark:to-gray-100 bg-clip-text text-transparent">
+            Roster Management
+          </h1>
+        </div>
+      </div>
 
       {/* Coaches Section */}
-      <Card className="shadow-lg">
-        <CardHeader>
+      <Card className="border-2 border-gray-200 dark:border-gray-700 shadow-xl overflow-hidden">
+        <div className="bg-gradient-to-r from-indigo-600 to-purple-600 p-6">
+          <CardTitle className="text-2xl font-black text-white">
+            Coaching Staff
+          </CardTitle>
+          <CardDescription className="text-indigo-100 font-medium mt-1">
+            Manage your Head Coach and coordinators
+          </CardDescription>
+        </div>
+        <CardHeader className="hidden">
           <CardTitle className="text-xl font-semibold">
             Coaching Staff
           </CardTitle>
@@ -695,10 +711,10 @@ const Roster: React.FC = () => {
         </CardContent>
       </Card>
 
-      <Card className="shadow-lg">
-        <CardHeader>
+      <Card className="border-2 border-gray-200 dark:border-gray-700 shadow-xl overflow-hidden">
+        <div className="bg-gradient-to-r from-blue-600 to-cyan-600 p-6">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-            <CardTitle className="text-xl font-semibold">Team Roster</CardTitle>
+            <CardTitle className="text-2xl font-black text-white">Team Roster</CardTitle>
             <div className="flex flex-wrap items-center gap-2">
               <Button
                 onClick={handleOpenAddForm}
@@ -715,8 +731,9 @@ const Roster: React.FC = () => {
               </Button>
             </div>
           </div>
-        </CardHeader>
-        <CardContent>
+        </div>
+        <CardHeader className="hidden"></CardHeader>
+        <CardContent className="bg-gradient-to-br from-gray-50 to-white dark:from-gray-900 dark:to-gray-800">
           <div className="w-full sm:w-1/2 md:w-1/3 lg:w-1/4 pb-4">
             <Select
               value={posFilter}

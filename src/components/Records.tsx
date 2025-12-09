@@ -529,153 +529,196 @@ const Records: React.FC = () => {
           {/* Overview */}
           <TabsContent value="overview" className="mt-6">
             {/* All Content Below the tabs */}
-            <div className="space-y-6 max-w-7xl mx-auto">
-              {/* Team logo and Year Season Summary */}
-              <div className="text-center space-y-2">
-                <div className="flex items-center justify-center gap-4">
-                  {(() => {
-                    const p = getCoachProfile();
-                    return p?.schoolName ? (
-                      <TeamLogo teamName={p.schoolName} size="xl" />
-                    ) : null;
-                  })()}
-                  <div>
-                    <h2 className="text-3xl font-bold">
-                      {activeRecord.year} Season Summary
-                    </h2>
-                    <div className="flex items-center justify-center gap-2 mt-1">
+            <div className="space-y-8 max-w-7xl mx-auto">
+              {/* Hero Section - Enhanced Header with Key Stats */}
+              <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 dark:from-blue-950/30 dark:via-purple-950/30 dark:to-pink-950/30 border border-gray-200 dark:border-gray-700 shadow-lg">
+                <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
+                <div className="relative p-8">
+                  {/* Header with Logo and Title */}
+                  <div className="flex flex-col md:flex-row items-center justify-between gap-6 mb-8">
+                    <div className="flex items-center gap-6">
                       {(() => {
-                        const conference = getConferenceForYear(
-                          activeRecord.year
-                        );
-                        return conference !== "N/A" ? (
-                          <>
-                            <ConferenceLogo conference={conference} size="sm" />
-                            <span className="text-md text-gray-600 dark:text-gray-400">
-                              {conference}
-                            </span>
-                          </>
+                        const p = getCoachProfile();
+                        return p?.schoolName ? (
+                          <div className="relative">
+                            <div className="absolute inset-0 bg-gradient-to-br from-blue-400 to-purple-400 rounded-full blur-xl opacity-20"></div>
+                            <TeamLogo teamName={p.schoolName} size="xl" />
+                          </div>
                         ) : null;
                       })()}
+                      <div className="text-center md:text-left">
+                        <h2 className="text-4xl md:text-5xl font-black bg-gradient-to-r from-gray-900 via-gray-700 to-gray-900 dark:from-gray-100 dark:via-gray-300 dark:to-gray-100 bg-clip-text text-transparent">
+                          {activeRecord.year} Season
+                        </h2>
+                        <div className="flex items-center justify-center md:justify-start gap-2 mt-2">
+                          {(() => {
+                            const conference = getConferenceForYear(
+                              activeRecord.year
+                            );
+                            return conference !== "N/A" ? (
+                              <>
+                                <ConferenceLogo conference={conference} size="sm" />
+                                <span className="text-lg font-semibold text-gray-700 dark:text-gray-300">
+                                  {conference}
+                                </span>
+                              </>
+                            ) : null;
+                          })()}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Key Achievement Badges */}
+                    <div className="flex flex-wrap gap-2 justify-center md:justify-end">
+                      {activeRecord.finalRanking && (
+                        <div className="px-4 py-2 bg-gradient-to-r from-yellow-400 to-orange-400 dark:from-yellow-500 dark:to-orange-500 rounded-full shadow-md">
+                          <span className="text-sm font-bold text-white">
+                            #{activeRecord.finalRanking} Final Rank
+                          </span>
+                        </div>
+                      )}
+                      {activeRecord.natChamp && (
+                        <div className="px-4 py-2 bg-gradient-to-r from-yellow-500 to-amber-500 rounded-full shadow-md">
+                          <span className="text-sm font-bold text-white flex items-center gap-1">
+                            <Trophy className="h-4 w-4" />
+                            National Champions
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Main Stats Grid - Reorganized by Logical Grouping */}
+                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    {/* Group 1: Team Records */}
+                    <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-2xl p-6 border-2 border-gray-300 dark:border-gray-600 shadow-lg hover:shadow-xl transition-all">
+                      <div className="flex items-center gap-2 mb-4">
+                        <div className="bg-blue-500 p-2 rounded-lg">
+                          <Calendar className="h-5 w-5 text-white" />
+                        </div>
+                        <h3 className="text-sm font-black text-gray-600 dark:text-gray-300 uppercase tracking-wider">Season Record</h3>
+                      </div>
+                      <div className="space-y-4">
+                        {/* Overall Record - Most Prominent */}
+                        <div className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-950/40 dark:to-indigo-950/40 rounded-xl p-4 border border-blue-200 dark:border-blue-800">
+                          <p className="text-xs font-bold text-blue-700 dark:text-blue-400 uppercase tracking-wider mb-1">Overall Record</p>
+                          <p className="text-5xl font-black text-blue-900 dark:text-blue-100">
+                            {activeRecord.overallRecord || "0-0"}
+                          </p>
+                        </div>
+                        {/* Conference Record */}
+                        <div className="bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-950/40 dark:to-pink-950/40 rounded-xl p-4 border border-purple-200 dark:border-purple-800">
+                          <p className="text-xs font-bold text-purple-700 dark:text-purple-400 uppercase tracking-wider mb-1">Conference Record</p>
+                          <p className="text-4xl font-black text-purple-900 dark:text-purple-100">
+                            {activeRecord.conferenceRecord || "0-0"}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Group 2: Scoring Performance */}
+                    <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-2xl p-6 border-2 border-gray-300 dark:border-gray-600 shadow-lg hover:shadow-xl transition-all">
+                      <div className="flex items-center gap-2 mb-4">
+                        <div className="bg-gradient-to-br from-green-500 to-red-500 p-2 rounded-lg">
+                          <BarChart2 className="h-5 w-5 text-white" />
+                        </div>
+                        <h3 className="text-sm font-black text-gray-600 dark:text-gray-300 uppercase tracking-wider">Scoring</h3>
+                      </div>
+                      <div className="space-y-4">
+                        {/* Points For */}
+                        <div className="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-950/40 dark:to-emerald-950/40 rounded-xl p-4 border border-green-200 dark:border-green-800">
+                          <div className="flex items-center justify-between mb-1">
+                            <p className="text-xs font-bold text-green-700 dark:text-green-400 uppercase tracking-wider">Points For</p>
+                            <TrendingUp className="h-4 w-4 text-green-600 dark:text-green-400" />
+                          </div>
+                          <p className="text-4xl font-black text-green-700 dark:text-green-400">
+                            {activeRecord.pointsFor || "0"}
+                          </p>
+                        </div>
+                        {/* Points Against */}
+                        <div className="bg-gradient-to-br from-red-50 to-rose-50 dark:from-red-950/40 dark:to-rose-950/40 rounded-xl p-4 border border-red-200 dark:border-red-800">
+                          <div className="flex items-center justify-between mb-1">
+                            <p className="text-xs font-bold text-red-700 dark:text-red-400 uppercase tracking-wider">Points Against</p>
+                            <ChevronsDown className="h-4 w-4 text-red-600 dark:text-red-400" />
+                          </div>
+                          <p className="text-4xl font-black text-red-700 dark:text-red-400">
+                            {activeRecord.pointsAgainst || "0"}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Group 3: Final Standings */}
+                    <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-2xl p-6 border-2 border-gray-300 dark:border-gray-600 shadow-lg hover:shadow-xl transition-all">
+                      <div className="flex items-center gap-2 mb-4">
+                        <div className="bg-gradient-to-br from-yellow-500 to-amber-500 p-2 rounded-lg">
+                          <Star className="h-5 w-5 text-white" />
+                        </div>
+                        <h3 className="text-sm font-black text-gray-600 dark:text-gray-300 uppercase tracking-wider">Final Standings</h3>
+                      </div>
+                      <div className="space-y-4">
+                        {/* Final Rank - Most Prominent */}
+                        <div className="bg-gradient-to-br from-yellow-50 to-amber-50 dark:from-yellow-950/40 dark:to-amber-950/40 rounded-xl p-4 border border-yellow-200 dark:border-yellow-800">
+                          <p className="text-xs font-bold text-yellow-700 dark:text-yellow-400 uppercase tracking-wider mb-1">National Rank</p>
+                          <p className="text-5xl font-black text-yellow-700 dark:text-yellow-400">
+                            #{activeRecord.finalRanking || "NR"}
+                          </p>
+                        </div>
+                        {/* Conference Finish */}
+                        <div className="bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-950/40 dark:to-orange-950/40 rounded-xl p-4 border border-amber-200 dark:border-amber-800">
+                          <p className="text-xs font-bold text-amber-700 dark:text-amber-400 uppercase tracking-wider mb-1">Conference Finish</p>
+                          <p className="text-4xl font-black text-amber-900 dark:text-amber-100">
+                            {activeRecord.conferenceFinish || "N/A"}
+                          </p>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
 
-              {/* Top Row */}
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-                {/* Overall Record */}
-                <Card>
-                  <CardContent className="pt-4 text-center">
-                    <p className="text-xs font-medium text-gray-500">Overall</p>
-                    <p className="text-2xl font-bold">
-                      {activeRecord.overallRecord || "0-0"}
-                    </p>
-                  </CardContent>
-                </Card>
-
-                {/* Conference Record */}
-                <Card>
-                  <CardContent className="pt-4 text-center">
-                    <p className="text-xs font-medium text-gray-500">
-                      Conference
-                    </p>
-                    <p className="text-2xl font-bold">
-                      {activeRecord.conferenceRecord || "0-0"}
-                    </p>
-                  </CardContent>
-                </Card>
-
-                {/* Points For */}
-                <Card>
-                  <CardContent className="pt-4 text-center">
-                    <p className="text-xs font-medium text-gray-500">
-                      Points For
-                    </p>
-                    <p className="text-2xl font-bold text-green-600">
-                      {activeRecord.pointsFor || "0"}
-                    </p>
-                  </CardContent>
-                </Card>
-
-                {/* Points Against */}
-                <Card>
-                  <CardContent className="pt-4 text-center">
-                    <p className="text-xs font-medium text-gray-500">
-                      Points Against
-                    </p>
-                    <p className="text-2xl font-bold text-red-600">
-                      {activeRecord.pointsAgainst || "0"}
-                    </p>
-                  </CardContent>
-                </Card>
-
-                {/* Conference Finish */}
-                <Card>
-                  <CardContent className="pt-4 text-center">
-                    <p className="text-xs font-medium text-gray-500">
-                      Conf. Finish
-                    </p>
-                    <p className="text-2xl font-bold">
-                      {activeRecord.conferenceFinish || "N/A"}
-                    </p>
-                  </CardContent>
-                </Card>
-
-                {/* Final Rank */}
-                <Card>
-                  <CardContent className="pt-4 text-center">
-                    <p className="text-xs font-medium text-gray-500">
-                      Final Rank
-                    </p>
-                    <p className="text-2xl font-bold">
-                      #{activeRecord.finalRanking || "NR"}
-                    </p>
-                  </CardContent>
-                </Card>
-              </div>
-
-              {/* Second Row */}
+              {/* Highlights Section - Three Column Grid */}
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {/* Season Achievements */}
-                <Card>
-                  <CardHeader className="p-4">
-                    <CardTitle className="text-lg flex items-center gap-2">
-                      <Trophy /> Season Achievements
+                <Card className="border-2 border-gray-200 dark:border-gray-700 shadow-xl hover:shadow-2xl transition-shadow overflow-hidden">
+                  <div className="bg-gradient-to-r from-amber-500 to-orange-500 p-4">
+                    <CardTitle className="text-xl font-black text-white flex items-center gap-2">
+                      <Trophy className="h-6 w-6" /> Season Achievements
                     </CardTitle>
-                  </CardHeader>
-                  <CardContent className="p-4 space-y-3">
+                  </div>
+                  <CardContent className="p-5 space-y-3 bg-gradient-to-br from-gray-50 to-white dark:from-gray-900 dark:to-gray-800">
                     {activeRecord.natChamp && (
-                      <div className="flex items-center gap-3 p-3 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg">
-                        <Trophy className="h-6 w-6 text-yellow-600" />
-                        <div>
-                          <p className="font-semibold text-yellow-800 dark:text-yellow-200">
+                      <div className="group relative overflow-hidden flex items-center gap-3 p-4 bg-gradient-to-r from-yellow-100 to-amber-100 dark:from-yellow-900/30 dark:to-amber-900/30 rounded-xl border-2 border-yellow-400 dark:border-yellow-600 shadow-md hover:shadow-lg transition-all">
+                        <div className="absolute inset-0 bg-gradient-to-r from-yellow-400/20 to-amber-400/20 group-hover:from-yellow-400/30 group-hover:to-amber-400/30 transition-all"></div>
+                        <Trophy className="h-7 w-7 text-yellow-600 dark:text-yellow-400 relative z-10" />
+                        <div className="relative z-10">
+                          <p className="font-black text-yellow-900 dark:text-yellow-200 text-lg">
                             National Champions!
                           </p>
-                          <p className="text-sm text-yellow-700 dark:text-yellow-300">
+                          <p className="text-sm font-semibold text-yellow-800 dark:text-yellow-300">
                             {activeRecord.natChamp}
                           </p>
                         </div>
                       </div>
                     )}
                     {activeRecord.bowlGame && (
-                      <div className="flex items-center justify-between p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                      <div className="flex items-center justify-between p-4 bg-gradient-to-r from-blue-100 to-indigo-100 dark:from-blue-900/30 dark:to-indigo-900/30 rounded-xl border border-blue-300 dark:border-blue-700 shadow-md hover:shadow-lg transition-all">
                         <div className="flex items-center gap-3">
-                          <Medal className="h-5 w-5 text-blue-600" />
+                          <Medal className="h-6 w-6 text-blue-600 dark:text-blue-400" />
                           <div>
-                            <p className="font-semibold text-blue-800 dark:text-blue-200">
+                            <p className="font-bold text-blue-900 dark:text-blue-200 text-base">
                               {activeRecord.bowlGame}
                             </p>
                           </div>
                         </div>
                         {activeRecord.bowlResult && (
                           <span
-                            className={`px-2 py-1 rounded-full text-xs font-medium ${
+                            className={`px-3 py-1.5 rounded-full text-xs font-bold shadow-md ${
                               activeRecord.bowlResult
                                 .toLowerCase()
                                 .includes("win")
-                                ? "bg-green-100 text-green-800"
-                                : "bg-red-100 text-red-800"
+                                ? "bg-gradient-to-r from-green-500 to-emerald-500 text-white"
+                                : "bg-gradient-to-r from-red-500 to-rose-500 text-white"
                             }`}
                           >
                             {activeRecord.bowlResult}
@@ -684,13 +727,13 @@ const Records: React.FC = () => {
                       </div>
                     )}
                     {activeRecord.heisman && (
-                      <div className="flex items-center gap-3 p-3 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
-                        <Award className="h-5 w-5 text-purple-600" />
+                      <div className="flex items-center gap-3 p-4 bg-gradient-to-r from-purple-100 to-pink-100 dark:from-purple-900/30 dark:to-pink-900/30 rounded-xl border border-purple-300 dark:border-purple-700 shadow-md hover:shadow-lg transition-all">
+                        <Award className="h-6 w-6 text-purple-600 dark:text-purple-400" />
                         <div>
-                          <p className="font-semibold text-purple-800 dark:text-purple-200">
+                          <p className="font-bold text-purple-900 dark:text-purple-200 text-base">
                             Heisman Winner
                           </p>
-                          <p className="text-sm text-purple-600 dark:text-purple-400">
+                          <p className="text-sm font-semibold text-purple-700 dark:text-purple-400">
                             {activeRecord.heisman}
                           </p>
                         </div>
@@ -702,14 +745,14 @@ const Records: React.FC = () => {
                           {activeRecord.rivalTrophies.map((trophy, index) => (
                             <div
                               key={index}
-                              className="flex items-center gap-3 p-3 bg-orange-50 dark:bg-orange-900/20 rounded-lg"
+                              className="flex items-center gap-3 p-3 bg-gradient-to-r from-orange-100 to-red-100 dark:from-orange-900/30 dark:to-red-900/30 rounded-xl border border-orange-300 dark:border-orange-700 shadow-sm hover:shadow-md transition-all"
                             >
-                              <Trophy className="h-5 w-5 text-orange-600" />
+                              <Trophy className="h-5 w-5 text-orange-600 dark:text-orange-400" />
                               <div>
-                                <p className="font-semibold text-orange-800 dark:text-orange-200">
+                                <p className="font-semibold text-orange-900 dark:text-orange-200">
                                   Rival Trophy
                                 </p>
-                                <p className="text-sm text-orange-600 dark:text-orange-400">
+                                <p className="text-sm text-orange-700 dark:text-orange-400">
                                   {trophy}
                                 </p>
                               </div>
@@ -717,76 +760,98 @@ const Records: React.FC = () => {
                           ))}
                         </div>
                       )}
+                    {!activeRecord.natChamp && !activeRecord.bowlGame && !activeRecord.heisman && (!activeRecord.rivalTrophies || activeRecord.rivalTrophies.length === 0) && (
+                      <div className="text-center py-8">
+                        <Trophy className="h-12 w-12 mx-auto mb-3 text-gray-300 dark:text-gray-600" />
+                        <p className="text-sm text-gray-500 dark:text-gray-400 font-medium">No achievements recorded</p>
+                      </div>
+                    )}
                   </CardContent>
                 </Card>
 
                 {/* Schedule Highlights */}
-                <Card>
-                  <CardHeader className="p-4">
-                    <CardTitle className="text-lg flex items-center gap-2">
-                      <Zap /> Schedule Highlights
+                <Card className="border-2 border-gray-200 dark:border-gray-700 shadow-xl hover:shadow-2xl transition-shadow overflow-hidden">
+                  <div className="bg-gradient-to-r from-indigo-500 to-purple-500 p-4">
+                    <CardTitle className="text-xl font-black text-white flex items-center gap-2">
+                      <Zap className="h-6 w-6" /> Schedule Highlights
                     </CardTitle>
-                  </CardHeader>
-                  <CardContent className="p-4 space-y-3">
+                  </div>
+                  <CardContent className="p-5 space-y-3 bg-gradient-to-br from-gray-50 to-white dark:from-gray-900 dark:to-gray-800">
                     {scheduleHighlights.bestWin && (
-                      <div className="flex items-center gap-3 p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
-                        <ChevronsUp className="h-6 w-6 text-green-600" />
+                      <div className="flex items-center gap-3 p-4 bg-gradient-to-r from-green-100 to-emerald-100 dark:from-green-900/30 dark:to-emerald-900/30 rounded-xl border-l-4 border-green-500 shadow-md hover:shadow-lg transition-all">
+                        <div className="bg-green-500 p-2 rounded-lg">
+                          <ChevronsUp className="h-6 w-6 text-white" />
+                        </div>
                         <div>
-                          <p className="font-semibold text-green-800 dark:text-green-200">
+                          <p className="font-bold text-green-900 dark:text-green-200 text-base">
                             Best Win
                           </p>
-                          <p className="text-sm text-green-700 dark:text-green-300">
-                            vs {scheduleHighlights.bestWin.opponent} (
-                            {scheduleHighlights.bestWin.score})
+                          <p className="text-sm font-semibold text-green-700 dark:text-green-400">
+                            vs {scheduleHighlights.bestWin.opponent}
+                          </p>
+                          <p className="text-xs text-green-600 dark:text-green-500">
+                            {scheduleHighlights.bestWin.score}
                           </p>
                         </div>
                       </div>
                     )}
                     {scheduleHighlights.worstLoss && (
-                      <div className="flex items-center gap-3 p-3 bg-red-50 dark:bg-red-900/20 rounded-lg">
-                        <ChevronsDown className="h-6 w-6 text-red-600" />
+                      <div className="flex items-center gap-3 p-4 bg-gradient-to-r from-red-100 to-rose-100 dark:from-red-900/30 dark:to-rose-900/30 rounded-xl border-l-4 border-red-500 shadow-md hover:shadow-lg transition-all">
+                        <div className="bg-red-500 p-2 rounded-lg">
+                          <ChevronsDown className="h-6 w-6 text-white" />
+                        </div>
                         <div>
-                          <p className="font-semibold text-red-800 dark:text-red-200">
+                          <p className="font-bold text-red-900 dark:text-red-200 text-base">
                             Worst Loss
                           </p>
-                          <p className="text-sm text-red-700 dark:text-red-300">
-                            vs {scheduleHighlights.worstLoss.opponent} (
-                            {scheduleHighlights.worstLoss.score})
+                          <p className="text-sm font-semibold text-red-700 dark:text-red-400">
+                            vs {scheduleHighlights.worstLoss.opponent}
+                          </p>
+                          <p className="text-xs text-red-600 dark:text-red-500">
+                            {scheduleHighlights.worstLoss.score}
                           </p>
                         </div>
                       </div>
                     )}
                     {scheduleHighlights.longestStreak > 1 && (
-                      <div className="flex items-center gap-3 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-                        <TrendingUp className="h-5 w-5 text-blue-600" />
+                      <div className="flex items-center gap-3 p-4 bg-gradient-to-r from-blue-100 to-cyan-100 dark:from-blue-900/30 dark:to-cyan-900/30 rounded-xl border-l-4 border-blue-500 shadow-md hover:shadow-lg transition-all">
+                        <div className="bg-blue-500 p-2 rounded-lg">
+                          <TrendingUp className="h-6 w-6 text-white" />
+                        </div>
                         <div>
-                          <p className="font-semibold text-blue-800 dark:text-blue-200">
+                          <p className="font-bold text-blue-900 dark:text-blue-200 text-base">
                             Longest Win Streak
                           </p>
-                          <p className="text-sm text-blue-700 dark:text-blue-300">
+                          <p className="text-sm font-semibold text-blue-700 dark:text-blue-400">
                             {scheduleHighlights.longestStreak} Games
                           </p>
                         </div>
+                      </div>
+                    )}
+                    {!scheduleHighlights.bestWin && !scheduleHighlights.worstLoss && scheduleHighlights.longestStreak <= 1 && (
+                      <div className="text-center py-8">
+                        <Zap className="h-12 w-12 mx-auto mb-3 text-gray-300 dark:text-gray-600" />
+                        <p className="text-sm text-gray-500 dark:text-gray-400 font-medium">No schedule highlights yet</p>
                       </div>
                     )}
                   </CardContent>
                 </Card>
 
                 {/* NFL Draft Class Preview */}
-                <Card>
-                  <CardHeader className="p-4">
-                    <CardTitle className="text-lg flex items-center gap-2">
-                      <ShieldCheck className="text-blue-600" /> NFL Draft Class
+                <Card className="border-2 border-gray-200 dark:border-gray-700 shadow-xl hover:shadow-2xl transition-shadow overflow-hidden">
+                  <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-4">
+                    <CardTitle className="text-xl font-black text-white flex items-center gap-2">
+                      <ShieldCheck className="h-6 w-6" /> NFL Draft Class
                     </CardTitle>
-                  </CardHeader>
-                  <CardContent className="p-4">
+                  </div>
+                  <CardContent className="p-5 bg-gradient-to-br from-gray-50 to-white dark:from-gray-900 dark:to-gray-800">
                     {(activeRecord.playersDrafted || []).length > 0 ? (
-                      <div className="space-y-3">
-                        <div className="text-center p-2 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-                          <p className="text-2xl font-bold text-blue-800 dark:text-blue-200">
+                      <div className="space-y-4">
+                        <div className="text-center p-4 bg-gradient-to-br from-blue-100 to-indigo-100 dark:from-blue-900/40 dark:to-indigo-900/40 rounded-xl border-2 border-blue-300 dark:border-blue-700 shadow-lg">
+                          <p className="text-4xl font-black text-blue-700 dark:text-blue-300">
                             {(activeRecord.playersDrafted || []).length}
                           </p>
-                          <p className="text-sm text-blue-600 dark:text-blue-400">
+                          <p className="text-sm font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wide">
                             Players Drafted
                           </p>
                         </div>
@@ -798,14 +863,17 @@ const Records: React.FC = () => {
                             .map((player) => (
                               <div
                                 key={player.id}
-                                className="flex items-center gap-3 p-2 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800"
+                                className="flex items-center gap-3 p-3 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-xl border border-blue-200 dark:border-blue-800 shadow-sm hover:shadow-md transition-all"
                               >
-                                <div className="w-6 h-6 bg-blue-600 text-white rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0">
+                                <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-indigo-600 text-white rounded-full flex items-center justify-center text-sm font-black shadow-md flex-shrink-0">
                                   R{player.round}
                                 </div>
                                 <div className="min-w-0 flex-1">
-                                  <p className="font-medium text-blue-800 dark:text-blue-200 truncate text-sm">
+                                  <p className="font-bold text-blue-900 dark:text-blue-200 truncate">
                                     {player.playerName}
+                                  </p>
+                                  <p className="text-xs text-blue-600 dark:text-blue-400 font-medium">
+                                    Round {player.round}
                                   </p>
                                 </div>
                               </div>
@@ -813,20 +881,18 @@ const Records: React.FC = () => {
                           {(activeRecord.playersDrafted || []).filter((p) =>
                             p.playerName.trim()
                           ).length > 3 && (
-                            <p className="text-xs text-center text-blue-600 dark:text-blue-400 mt-2">
-                              +
-                              {(activeRecord.playersDrafted || []).filter((p) =>
+                            <p className="text-sm text-center text-blue-600 dark:text-blue-400 font-bold mt-3 bg-blue-50 dark:bg-blue-900/20 p-2 rounded-lg">
+                              +{(activeRecord.playersDrafted || []).filter((p) =>
                                 p.playerName.trim()
-                              ).length - 3}{" "}
-                              more
+                              ).length - 3} more players
                             </p>
                           )}
                         </div>
                       </div>
                     ) : (
-                      <div className="text-center py-4">
-                        <ShieldCheck className="h-8 w-8 mx-auto mb-2 text-gray-400" />
-                        <p className="text-sm text-gray-500 dark:text-gray-400">
+                      <div className="text-center py-8">
+                        <ShieldCheck className="h-12 w-12 mx-auto mb-3 text-gray-300 dark:text-gray-600" />
+                        <p className="text-sm text-gray-500 dark:text-gray-400 font-medium">
                           No players drafted
                         </p>
                       </div>
@@ -835,266 +901,330 @@ const Records: React.FC = () => {
                 </Card>
               </div>
 
-              {/* Third Row - Season Stats */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <BarChart2 className="h-5 w-5" />
+              {/* Season Stats Section - Enhanced */}
+              <Card className="border-2 border-gray-200 dark:border-gray-700 shadow-xl overflow-hidden">
+                <div className="bg-gradient-to-r from-slate-700 via-slate-600 to-slate-700 p-6">
+                  <CardTitle className="flex items-center gap-3 text-2xl font-black text-white">
+                    <BarChart2 className="h-7 w-7" />
                     {activeRecord.year} Season Stats
                   </CardTitle>
-                </CardHeader>
-                <CardContent>
+                </div>
+                <CardContent className="p-6 bg-gradient-to-br from-gray-50 to-white dark:from-gray-900 dark:to-gray-800">
                   {activeRecord.teamStats ? (
-                    <div className="space-y-6">
-                      {/* Team Stats Overview */}
-                      <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
-                        <div className="text-center p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
-                          <p className="text-sm font-medium text-green-600 dark:text-green-400">
-                            Total Offense
-                          </p>
-                          <p className="text-2xl font-bold text-green-800 dark:text-green-200">
-                            {activeRecord.teamStats.totalOffense.toLocaleString()}
-                          </p>
+                    <div className="space-y-8">
+                      {/* Key Stats Summary - Three Large Cards */}
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div className="relative overflow-hidden text-center p-6 bg-gradient-to-br from-green-100 via-emerald-100 to-green-100 dark:from-green-900/40 dark:via-emerald-900/40 dark:to-green-900/40 rounded-2xl border-2 border-green-300 dark:border-green-700 shadow-lg hover:shadow-xl transition-all">
+                          <div className="absolute top-0 right-0 w-32 h-32 bg-green-400/20 rounded-full -mr-16 -mt-16"></div>
+                          <div className="relative z-10">
+                            <div className="flex items-center justify-center gap-2 mb-2">
+                              <TrendingUp className="h-5 w-5 text-green-600 dark:text-green-400" />
+                              <p className="text-sm font-bold text-green-700 dark:text-green-400 uppercase tracking-wider">
+                                Total Offense
+                              </p>
+                            </div>
+                            <p className="text-5xl font-black text-green-800 dark:text-green-200 mb-1">
+                              {activeRecord.teamStats.totalOffense.toLocaleString()}
+                            </p>
+                            <p className="text-xs font-semibold text-green-600 dark:text-green-500">
+                              {(activeRecord.teamStats.totalOffense / getEffectiveGamesPlayed(activeRecord)).toFixed(1)} yards per game
+                            </p>
+                          </div>
                         </div>
-                        <div className="text-center p-3 bg-red-50 dark:bg-red-900/20 rounded-lg">
-                          <p className="text-sm font-medium text-red-600 dark:text-red-400">
-                            Total Defense
-                          </p>
-                          <p className="text-2xl font-bold text-red-800 dark:text-red-200">
-                            {activeRecord.teamStats.totalDefense.toLocaleString()}
-                          </p>
+                        <div className="relative overflow-hidden text-center p-6 bg-gradient-to-br from-red-100 via-rose-100 to-red-100 dark:from-red-900/40 dark:via-rose-900/40 dark:to-red-900/40 rounded-2xl border-2 border-red-300 dark:border-red-700 shadow-lg hover:shadow-xl transition-all">
+                          <div className="absolute top-0 right-0 w-32 h-32 bg-red-400/20 rounded-full -mr-16 -mt-16"></div>
+                          <div className="relative z-10">
+                            <div className="flex items-center justify-center gap-2 mb-2">
+                              <ShieldCheck className="h-5 w-5 text-red-600 dark:text-red-400" />
+                              <p className="text-sm font-bold text-red-700 dark:text-red-400 uppercase tracking-wider">
+                                Total Defense
+                              </p>
+                            </div>
+                            <p className="text-5xl font-black text-red-800 dark:text-red-200 mb-1">
+                              {activeRecord.teamStats.totalDefense.toLocaleString()}
+                            </p>
+                            <p className="text-xs font-semibold text-red-600 dark:text-red-500">
+                              {(activeRecord.teamStats.totalDefense / getEffectiveGamesPlayed(activeRecord)).toFixed(1)} yards allowed per game
+                            </p>
+                          </div>
                         </div>
-                        <div className="text-center p-3 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
-                          <p className="text-sm font-medium text-purple-600 dark:text-purple-400">
-                            Avg Margin
-                          </p>
-                          <p className="text-2xl font-bold text-purple-800 dark:text-purple-200">
-                            {(
-                              (activeRecord.teamStats.points -
-                                activeRecord.teamStats.defPoints) /
-                              getEffectiveGamesPlayed(activeRecord)
-                            ).toFixed(1)}
-                          </p>
+                        <div className="relative overflow-hidden text-center p-6 bg-gradient-to-br from-purple-100 via-violet-100 to-purple-100 dark:from-purple-900/40 dark:via-violet-900/40 dark:to-purple-900/40 rounded-2xl border-2 border-purple-300 dark:border-purple-700 shadow-lg hover:shadow-xl transition-all">
+                          <div className="absolute top-0 right-0 w-32 h-32 bg-purple-400/20 rounded-full -mr-16 -mt-16"></div>
+                          <div className="relative z-10">
+                            <div className="flex items-center justify-center gap-2 mb-2">
+                              <Zap className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+                              <p className="text-sm font-bold text-purple-700 dark:text-purple-400 uppercase tracking-wider">
+                                Avg Margin
+                              </p>
+                            </div>
+                            <p className="text-5xl font-black text-purple-800 dark:text-purple-200 mb-1">
+                              {(
+                                (activeRecord.teamStats.points -
+                                  activeRecord.teamStats.defPoints) /
+                                getEffectiveGamesPlayed(activeRecord)
+                              ).toFixed(1)}
+                            </p>
+                            <p className="text-xs font-semibold text-purple-600 dark:text-purple-500">
+                              points per game
+                            </p>
+                          </div>
                         </div>
                       </div>
 
-                      {/* Offense vs Defense Breakdown */}
+                      {/* Offense vs Defense Breakdown - Side by Side */}
                       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        {/* Offense */}
-                        <div className="space-y-4">
-                          <h4 className="text-lg font-semibold text-blue-800 dark:text-blue-200 flex items-center gap-2">
-                            <TrendingUp className="h-5 w-5" />
+                        {/* Offense Card */}
+                        <div className="bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-950/30 dark:to-cyan-950/30 rounded-2xl border-2 border-blue-200 dark:border-blue-800 p-6 shadow-lg">
+                          <h4 className="text-2xl font-black text-blue-800 dark:text-blue-200 flex items-center gap-3 mb-6">
+                            <div className="bg-blue-500 p-2 rounded-lg">
+                              <TrendingUp className="h-6 w-6 text-white" />
+                            </div>
                             Offense
                           </h4>
-                          <div className="grid grid-cols-2 gap-3">
-                            <div className="bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg">
-                              <p className="text-xs text-blue-600 dark:text-blue-400 uppercase tracking-wide">
-                                Pass Yards
-                              </p>
-                              <p className="text-lg font-bold text-blue-800 dark:text-blue-200">
+                          <div className="space-y-4">
+                            <div className="bg-white dark:bg-gray-800 p-4 rounded-xl border border-blue-200 dark:border-blue-700 shadow-md">
+                              <div className="flex items-center justify-between mb-2">
+                                <p className="text-xs text-blue-700 dark:text-blue-400 font-bold uppercase tracking-wider">
+                                  Pass Yards
+                                </p>
+                                <div className="h-2 w-2 bg-blue-500 rounded-full"></div>
+                              </div>
+                              <p className="text-3xl font-black text-blue-900 dark:text-blue-100">
                                 {activeRecord.teamStats.passYards.toLocaleString()}
                               </p>
-                              <p className="text-xs text-blue-600 dark:text-blue-400">
-                                (
+                              <p className="text-xs text-blue-600 dark:text-blue-500 font-medium mt-1">
                                 {(
                                   activeRecord.teamStats.passYards /
                                   getEffectiveGamesPlayed(activeRecord)
-                                ).toFixed(1)}{" "}
-                                per game)
+                                ).toFixed(1)} per game
                               </p>
                             </div>
-                            <div className="bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg">
-                              <p className="text-xs text-blue-600 dark:text-blue-400 uppercase tracking-wide">
-                                Rush Yards
-                              </p>
-                              <p className="text-lg font-bold text-blue-800 dark:text-blue-200">
+                            <div className="bg-white dark:bg-gray-800 p-4 rounded-xl border border-blue-200 dark:border-blue-700 shadow-md">
+                              <div className="flex items-center justify-between mb-2">
+                                <p className="text-xs text-blue-700 dark:text-blue-400 font-bold uppercase tracking-wider">
+                                  Rush Yards
+                                </p>
+                                <div className="h-2 w-2 bg-blue-500 rounded-full"></div>
+                              </div>
+                              <p className="text-3xl font-black text-blue-900 dark:text-blue-100">
                                 {activeRecord.teamStats.rushYards.toLocaleString()}
                               </p>
-                              <p className="text-xs text-blue-600 dark:text-blue-400">
-                                (
+                              <p className="text-xs text-blue-600 dark:text-blue-500 font-medium mt-1">
                                 {(
                                   activeRecord.teamStats.rushYards /
                                   getEffectiveGamesPlayed(activeRecord)
-                                ).toFixed(1)}{" "}
-                                per game)
+                                ).toFixed(1)} per game
                               </p>
                             </div>
-                            <div className="bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg col-span-2">
-                              <p className="text-xs text-blue-600 dark:text-blue-400 uppercase tracking-wide">
-                                Points Scored
-                              </p>
-                              <p className="text-lg font-bold text-blue-800 dark:text-blue-200">
+                            <div className="bg-gradient-to-r from-blue-500 to-cyan-500 p-4 rounded-xl shadow-lg">
+                              <div className="flex items-center justify-between mb-2">
+                                <p className="text-xs text-white font-bold uppercase tracking-wider">
+                                  Points Scored
+                                </p>
+                                <div className="h-2 w-2 bg-white rounded-full"></div>
+                              </div>
+                              <p className="text-3xl font-black text-white">
                                 {activeRecord.teamStats.points.toLocaleString()}
                               </p>
-                              <p className="text-xs text-blue-600 dark:text-blue-400">
-                                (
+                              <p className="text-xs text-blue-100 font-medium mt-1">
                                 {(
                                   activeRecord.teamStats.points /
                                   getEffectiveGamesPlayed(activeRecord)
-                                ).toFixed(1)}{" "}
-                                per game)
+                                ).toFixed(1)} per game
                               </p>
                             </div>
                           </div>
                         </div>
 
-                        {/* Defense */}
-                        <div className="space-y-4">
-                          <h4 className="text-lg font-semibold text-red-800 dark:text-red-200 flex items-center gap-2">
-                            <ShieldCheck className="h-5 w-5" />
+                        {/* Defense Card */}
+                        <div className="bg-gradient-to-br from-red-50 to-rose-50 dark:from-red-950/30 dark:to-rose-950/30 rounded-2xl border-2 border-red-200 dark:border-red-800 p-6 shadow-lg">
+                          <h4 className="text-2xl font-black text-red-800 dark:text-red-200 flex items-center gap-3 mb-6">
+                            <div className="bg-red-500 p-2 rounded-lg">
+                              <ShieldCheck className="h-6 w-6 text-white" />
+                            </div>
                             Defense
                           </h4>
-                          <div className="grid grid-cols-2 gap-3">
-                            <div className="bg-red-50 dark:bg-red-900/20 p-3 rounded-lg">
-                              <p className="text-xs text-red-600 dark:text-red-400 uppercase tracking-wide">
-                                Pass Yards Allowed
-                              </p>
-                              <p className="text-lg font-bold text-red-800 dark:text-red-200">
+                          <div className="space-y-4">
+                            <div className="bg-white dark:bg-gray-800 p-4 rounded-xl border border-red-200 dark:border-red-700 shadow-md">
+                              <div className="flex items-center justify-between mb-2">
+                                <p className="text-xs text-red-700 dark:text-red-400 font-bold uppercase tracking-wider">
+                                  Pass Yards Allowed
+                                </p>
+                                <div className="h-2 w-2 bg-red-500 rounded-full"></div>
+                              </div>
+                              <p className="text-3xl font-black text-red-900 dark:text-red-100">
                                 {activeRecord.teamStats.defPassYards.toLocaleString()}
                               </p>
-                              <p className="text-xs text-red-600 dark:text-red-400">
-                                (
+                              <p className="text-xs text-red-600 dark:text-red-500 font-medium mt-1">
                                 {(
                                   activeRecord.teamStats.defPassYards /
                                   getEffectiveGamesPlayed(activeRecord)
-                                ).toFixed(1)}{" "}
-                                per game)
+                                ).toFixed(1)} per game
                               </p>
                             </div>
-                            <div className="bg-red-50 dark:bg-red-900/20 p-3 rounded-lg">
-                              <p className="text-xs text-red-600 dark:text-red-400 uppercase tracking-wide">
-                                Rush Yards Allowed
-                              </p>
-                              <p className="text-lg font-bold text-red-800 dark:text-red-200">
+                            <div className="bg-white dark:bg-gray-800 p-4 rounded-xl border border-red-200 dark:border-red-700 shadow-md">
+                              <div className="flex items-center justify-between mb-2">
+                                <p className="text-xs text-red-700 dark:text-red-400 font-bold uppercase tracking-wider">
+                                  Rush Yards Allowed
+                                </p>
+                                <div className="h-2 w-2 bg-red-500 rounded-full"></div>
+                              </div>
+                              <p className="text-3xl font-black text-red-900 dark:text-red-100">
                                 {activeRecord.teamStats.defRushYards.toLocaleString()}
                               </p>
-                              <p className="text-xs text-red-600 dark:text-red-400">
-                                (
+                              <p className="text-xs text-red-600 dark:text-red-500 font-medium mt-1">
                                 {(
                                   activeRecord.teamStats.defRushYards /
                                   getEffectiveGamesPlayed(activeRecord)
-                                ).toFixed(1)}{" "}
-                                per game)
+                                ).toFixed(1)} per game
                               </p>
                             </div>
-                            <div className="bg-red-50 dark:bg-red-900/20 p-3 rounded-lg col-span-2">
-                              <p className="text-xs text-red-600 dark:text-red-400 uppercase tracking-wide">
-                                Points Allowed
-                              </p>
-                              <p className="text-lg font-bold text-red-800 dark:text-red-200">
+                            <div className="bg-gradient-to-r from-red-500 to-rose-500 p-4 rounded-xl shadow-lg">
+                              <div className="flex items-center justify-between mb-2">
+                                <p className="text-xs text-white font-bold uppercase tracking-wider">
+                                  Points Allowed
+                                </p>
+                                <div className="h-2 w-2 bg-white rounded-full"></div>
+                              </div>
+                              <p className="text-3xl font-black text-white">
                                 {activeRecord.teamStats.defPoints.toLocaleString()}
                               </p>
-                              <p className="text-xs text-red-600 dark:text-red-400">
-                                (
+                              <p className="text-xs text-red-100 font-medium mt-1">
                                 {(
                                   activeRecord.teamStats.defPoints /
                                   getEffectiveGamesPlayed(activeRecord)
-                                ).toFixed(1)}{" "}
-                                per game)
+                                ).toFixed(1)} per game
                               </p>
                             </div>
                           </div>
                         </div>
                       </div>
 
-                      {/* Team Leaders - Show only top performers */}
+                      {/* Team Leaders - Enhanced */}
                       {activeRecord.teamLeaders && (
-                        <div className="space-y-4">
-                          <h4 className="text-lg font-semibold flex items-center gap-2">
-                            <Star className="h-5 w-5 text-yellow-500" />
-                            Season Leaders
+                        <div className="bg-gradient-to-br from-amber-50 to-yellow-50 dark:from-amber-950/20 dark:to-yellow-950/20 rounded-2xl border-2 border-amber-200 dark:border-amber-800 p-6 shadow-lg">
+                          <h4 className="text-2xl font-black flex items-center gap-3 mb-6">
+                            <div className="bg-gradient-to-br from-yellow-400 to-amber-500 p-2 rounded-lg shadow-md">
+                              <Star className="h-6 w-6 text-white" />
+                            </div>
+                            <span className="bg-gradient-to-r from-amber-700 to-yellow-600 bg-clip-text text-transparent">
+                              Season Leaders
+                            </span>
                           </h4>
                           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                             {/* Top Passer */}
                             {activeRecord.teamLeaders.passingLeaders.length >
                               0 && (
-                              <div className="bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg">
-                                <p className="text-xs text-blue-600 dark:text-blue-400 uppercase tracking-wide font-medium">
-                                  Passing Leader
-                                </p>
-                                <p className="font-bold text-blue-800 dark:text-blue-200 truncate">
-                                  {
-                                    activeRecord.teamLeaders.passingLeaders[0]
-                                      .name
-                                  }
-                                </p>
-                                <p className="text-sm text-blue-600 dark:text-blue-400">
-                                  {activeRecord.teamLeaders.passingLeaders[0].yards?.toLocaleString() ||
-                                    0}{" "}
-                                  yds,{" "}
-                                  {activeRecord.teamLeaders.passingLeaders[0]
-                                    .touchdowns || 0}{" "}
-                                  TDs
-                                </p>
+                              <div className="group relative overflow-hidden bg-gradient-to-br from-blue-100 to-indigo-100 dark:from-blue-900/30 dark:to-indigo-900/30 p-5 rounded-xl border-2 border-blue-300 dark:border-blue-700 shadow-md hover:shadow-xl transition-all">
+                                <div className="absolute top-0 right-0 w-20 h-20 bg-blue-400/20 rounded-full -mr-10 -mt-10 group-hover:scale-150 transition-transform"></div>
+                                <div className="relative z-10">
+                                  <div className="flex items-center gap-2 mb-3">
+                                    <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                                    <p className="text-xs text-blue-700 dark:text-blue-400 uppercase tracking-wider font-black">
+                                      Passing Leader
+                                    </p>
+                                  </div>
+                                  <p className="font-black text-lg text-blue-900 dark:text-blue-200 truncate mb-2">
+                                    {
+                                      activeRecord.teamLeaders.passingLeaders[0]
+                                        .name
+                                    }
+                                  </p>
+                                  <div className="text-sm font-bold text-blue-700 dark:text-blue-400">
+                                    <span className="text-2xl">{activeRecord.teamLeaders.passingLeaders[0].yards?.toLocaleString() ||
+                                      0}</span> yds
+                                  </div>
+                                  <p className="text-xs text-blue-600 dark:text-blue-500 font-semibold mt-1">
+                                    {activeRecord.teamLeaders.passingLeaders[0]
+                                      .touchdowns || 0} TDs
+                                  </p>
+                                </div>
                               </div>
                             )}
 
                             {/* Top Rusher */}
                             {activeRecord.teamLeaders.rushingLeaders.length >
                               0 && (
-                              <div className="bg-green-50 dark:bg-green-900/20 p-3 rounded-lg">
-                                <p className="text-xs text-green-600 dark:text-green-400 uppercase tracking-wide font-medium">
-                                  Rushing Leader
-                                </p>
-                                <p className="font-bold text-green-800 dark:text-green-200 truncate">
-                                  {
-                                    activeRecord.teamLeaders.rushingLeaders[0]
-                                      .name
-                                  }
-                                </p>
-                                <p className="text-sm text-green-600 dark:text-green-400">
-                                  {activeRecord.teamLeaders.rushingLeaders[0].yards?.toLocaleString() ||
-                                    0}{" "}
-                                  yds,{" "}
-                                  {activeRecord.teamLeaders.rushingLeaders[0]
-                                    .touchdowns || 0}{" "}
-                                  TDs
-                                </p>
+                              <div className="group relative overflow-hidden bg-gradient-to-br from-green-100 to-emerald-100 dark:from-green-900/30 dark:to-emerald-900/30 p-5 rounded-xl border-2 border-green-300 dark:border-green-700 shadow-md hover:shadow-xl transition-all">
+                                <div className="absolute top-0 right-0 w-20 h-20 bg-green-400/20 rounded-full -mr-10 -mt-10 group-hover:scale-150 transition-transform"></div>
+                                <div className="relative z-10">
+                                  <div className="flex items-center gap-2 mb-3">
+                                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                                    <p className="text-xs text-green-700 dark:text-green-400 uppercase tracking-wider font-black">
+                                      Rushing Leader
+                                    </p>
+                                  </div>
+                                  <p className="font-black text-lg text-green-900 dark:text-green-200 truncate mb-2">
+                                    {
+                                      activeRecord.teamLeaders.rushingLeaders[0]
+                                        .name
+                                    }
+                                  </p>
+                                  <div className="text-sm font-bold text-green-700 dark:text-green-400">
+                                    <span className="text-2xl">{activeRecord.teamLeaders.rushingLeaders[0].yards?.toLocaleString() ||
+                                      0}</span> yds
+                                  </div>
+                                  <p className="text-xs text-green-600 dark:text-green-500 font-semibold mt-1">
+                                    {activeRecord.teamLeaders.rushingLeaders[0]
+                                      .touchdowns || 0} TDs
+                                  </p>
+                                </div>
                               </div>
                             )}
 
                             {/* Top Receiver */}
                             {activeRecord.teamLeaders.receivingLeaders.length >
                               0 && (
-                              <div className="bg-purple-50 dark:bg-purple-900/20 p-3 rounded-lg">
-                                <p className="text-xs text-purple-600 dark:text-purple-400 uppercase tracking-wide font-medium">
-                                  Receiving Leader
-                                </p>
-                                <p className="font-bold text-purple-800 dark:text-purple-200 truncate">
-                                  {
-                                    activeRecord.teamLeaders.receivingLeaders[0]
-                                      .name
-                                  }
-                                </p>
-                                <p className="text-sm text-purple-600 dark:text-purple-400">
-                                  {activeRecord.teamLeaders.receivingLeaders[0]
-                                    .receptions || 0}{" "}
-                                  rec,{" "}
-                                  {activeRecord.teamLeaders.receivingLeaders[0].yards?.toLocaleString() ||
-                                    0}{" "}
-                                  yds
-                                </p>
+                              <div className="group relative overflow-hidden bg-gradient-to-br from-purple-100 to-pink-100 dark:from-purple-900/30 dark:to-pink-900/30 p-5 rounded-xl border-2 border-purple-300 dark:border-purple-700 shadow-md hover:shadow-xl transition-all">
+                                <div className="absolute top-0 right-0 w-20 h-20 bg-purple-400/20 rounded-full -mr-10 -mt-10 group-hover:scale-150 transition-transform"></div>
+                                <div className="relative z-10">
+                                  <div className="flex items-center gap-2 mb-3">
+                                    <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
+                                    <p className="text-xs text-purple-700 dark:text-purple-400 uppercase tracking-wider font-black">
+                                      Receiving Leader
+                                    </p>
+                                  </div>
+                                  <p className="font-black text-lg text-purple-900 dark:text-purple-200 truncate mb-2">
+                                    {
+                                      activeRecord.teamLeaders.receivingLeaders[0]
+                                        .name
+                                    }
+                                  </p>
+                                  <div className="text-sm font-bold text-purple-700 dark:text-purple-400">
+                                    <span className="text-2xl">{activeRecord.teamLeaders.receivingLeaders[0]
+                                      .receptions || 0}</span> rec
+                                  </div>
+                                  <p className="text-xs text-purple-600 dark:text-purple-500 font-semibold mt-1">
+                                    {activeRecord.teamLeaders.receivingLeaders[0].yards?.toLocaleString() ||
+                                      0} yds
+                                  </p>
+                                </div>
                               </div>
                             )}
 
                             {/* Top Tackler */}
                             {activeRecord.teamLeaders.tackleLeaders.length >
                               0 && (
-                              <div className="bg-red-50 dark:bg-red-900/20 p-3 rounded-lg">
-                                <p className="text-xs text-red-600 dark:text-red-400 uppercase tracking-wide font-medium">
-                                  Tackle Leader
-                                </p>
-                                <p className="font-bold text-red-800 dark:text-red-200 truncate">
-                                  {
-                                    activeRecord.teamLeaders.tackleLeaders[0]
-                                      .name
-                                  }
-                                </p>
-                                <p className="text-sm text-red-600 dark:text-red-400">
-                                  {activeRecord.teamLeaders.tackleLeaders[0]
-                                    .total || 0}{" "}
-                                  tackles
-                                </p>
+                              <div className="group relative overflow-hidden bg-gradient-to-br from-red-100 to-rose-100 dark:from-red-900/30 dark:to-rose-900/30 p-5 rounded-xl border-2 border-red-300 dark:border-red-700 shadow-md hover:shadow-xl transition-all">
+                                <div className="absolute top-0 right-0 w-20 h-20 bg-red-400/20 rounded-full -mr-10 -mt-10 group-hover:scale-150 transition-transform"></div>
+                                <div className="relative z-10">
+                                  <div className="flex items-center gap-2 mb-3">
+                                    <div className="w-2 h-2 bg-red-500 rounded-full"></div>
+                                    <p className="text-xs text-red-700 dark:text-red-400 uppercase tracking-wider font-black">
+                                      Tackle Leader
+                                    </p>
+                                  </div>
+                                  <p className="font-black text-lg text-red-900 dark:text-red-200 truncate mb-2">
+                                    {
+                                      activeRecord.teamLeaders.tackleLeaders[0]
+                                        .name
+                                    }
+                                  </p>
+                                  <div className="text-sm font-bold text-red-700 dark:text-red-400">
+                                    <span className="text-2xl">{activeRecord.teamLeaders.tackleLeaders[0]
+                                      .total || 0}</span> tackles
+                                  </div>
+                                </div>
                               </div>
                             )}
                           </div>
@@ -1102,12 +1232,13 @@ const Records: React.FC = () => {
                       )}
                     </div>
                   ) : (
-                    <div className="text-center py-8 text-gray-500 dark:text-gray-400">
-                      <BarChart2 className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                      <p>No team stats available for this season.</p>
-                      <p className="text-sm mt-2">
-                        Stats will appear here when they are entered in the Team
-                        Stats page.
+                    <div className="text-center py-16">
+                      <div className="inline-block p-6 bg-gray-100 dark:bg-gray-800 rounded-full mb-4">
+                        <BarChart2 className="h-16 w-16 text-gray-400 dark:text-gray-600" />
+                      </div>
+                      <p className="text-lg font-semibold text-gray-600 dark:text-gray-400">No team stats available for this season</p>
+                      <p className="text-sm text-gray-500 dark:text-gray-500 mt-2">
+                        Stats will appear here when they are entered in the Team Stats page
                       </p>
                     </div>
                   )}

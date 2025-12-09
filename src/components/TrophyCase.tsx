@@ -496,16 +496,22 @@ const TrophyCase: React.FC = () => {
 
   return (
     <div className="space-y-8 max-w-7xl mx-auto">
-      {/* Header */}
-      <div className="text-center space-y-4">
-        <div className="flex items-center justify-center gap-4">
-          <Trophy className="h-12 w-12 text-yellow-600" />
-          <div>
-            <h1 className="text-4xl font-bold">Dynasty Trophy Case</h1>
-            <p className="text-gray-600 dark:text-gray-400">
-              Celebrating excellence and achievements throughout your dynasty
-            </p>
+      {/* Hero Header */}
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-yellow-50 via-amber-50 to-orange-50 dark:from-yellow-950/30 dark:via-amber-950/30 dark:to-orange-950/30 border border-gray-200 dark:border-gray-700 shadow-lg">
+        <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
+        <div className="relative p-6 md:p-8 text-center">
+          <div className="flex items-center justify-center gap-4 mb-2">
+            <div className="relative">
+              <div className="absolute inset-0 bg-gradient-to-br from-yellow-400 to-amber-400 rounded-full blur-xl opacity-30"></div>
+              <Trophy className="h-16 w-16 text-yellow-600 dark:text-yellow-400 relative" />
+            </div>
           </div>
+          <h1 className="text-4xl md:text-5xl font-black bg-gradient-to-r from-yellow-700 via-amber-600 to-yellow-700 dark:from-yellow-400 dark:via-amber-300 dark:to-yellow-400 bg-clip-text text-transparent">
+            Dynasty Trophy Case
+          </h1>
+          <p className="text-base font-semibold text-gray-600 dark:text-gray-400 mt-2">
+            Celebrating excellence and achievements throughout your dynasty
+          </p>
         </div>
       </div>
 

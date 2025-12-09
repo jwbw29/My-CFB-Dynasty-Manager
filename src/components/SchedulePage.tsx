@@ -74,7 +74,13 @@ interface GameRowProps {
 }
 
 const GameRow = React.memo(
-  ({ game, availableTeams, onUpdateGame, getRankForTeam, teamUsernameMap }: GameRowProps) => {
+  ({
+    game,
+    availableTeams,
+    onUpdateGame,
+    getRankForTeam,
+    teamUsernameMap,
+  }: GameRowProps) => {
     const [localTeamScore, setLocalTeamScore] = useState("");
     const [localOppScore, setLocalOppScore] = useState("");
 
@@ -478,7 +484,9 @@ const SchedulePage = () => {
         rankingsMapsCache.current.set(cacheKey, rankMap);
       }
 
-      return rankingsMapsCache.current.get(cacheKey)?.get(teamNameToRank) || null;
+      return (
+        rankingsMapsCache.current.get(cacheKey)?.get(teamNameToRank) || null
+      );
     },
     [currentYear, getRankingsForWeek]
   );
@@ -563,91 +571,125 @@ const SchedulePage = () => {
   );
 
   return (
-    <div className="max-w-7xl mx-auto space-y-6">
-      {/* Header section with team info and year */}
-      <div className="flex justify-center items-center">
-        <div className="flex items-center gap-4">
-          {teamData && <TeamLogo teamName={teamData.name} size="lg" />}
-
-          <div className="text-center">
-            <h1 className="text-3xl font-bold flex items-center gap-2">
-              {currentYear} Schedule
-            </h1>
-
-            {teamData && teamData.conference && (
-              <div className="flex items-center justify-center gap-2 mt-1">
-                <ConferenceLogo conference={teamData.conference} size="sm" />
-                <span className="text-lg text-gray-600 dark:text-gray-400">
-                  {teamData.conference}
-                </span>
+    <div className="max-w-7xl mx-auto space-y-8">
+      {/* Hero Header Section */}
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 dark:from-blue-950/30 dark:via-purple-950/30 dark:to-pink-950/30 border border-gray-200 dark:border-gray-700 shadow-lg">
+        <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
+        <div className="relative p-6 md:p-8">
+          <div className="flex items-center justify-center gap-6">
+            {teamData && (
+              <div className="relative">
+                <div className="absolute inset-0 bg-gradient-to-br from-blue-400 to-purple-400 rounded-full blur-xl opacity-20"></div>
+                <TeamLogo teamName={teamData.name} size="xl" />
               </div>
             )}
+            <div className="text-center">
+              <h1 className="text-4xl md:text-5xl font-black bg-gradient-to-r from-gray-900 via-gray-700 to-gray-900 dark:from-gray-100 dark:via-gray-300 dark:to-gray-100 bg-clip-text text-transparent flex items-center gap-3 justify-center">
+                <Calendar className="h-10 w-10 text-blue-600 dark:text-blue-400" />
+                {currentYear} Schedule
+              </h1>
+              {teamData && teamData.conference && (
+                <div className="flex items-center justify-center gap-2 mt-2">
+                  <ConferenceLogo conference={teamData.conference} size="sm" />
+                  <span className="text-base font-semibold text-gray-700 dark:text-gray-300">
+                    {teamData.conference}
+                  </span>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Record cards grid */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      {/* Record cards grid - Enhanced */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {/* Overall record */}
-        <Card>
-          <CardContent className="p-4 text-center">
-            <div className="text-2xl font-bold">
+        <Card className="border-2 border-gray-200 dark:border-gray-700 shadow-xl overflow-hidden hover:shadow-2xl transition-shadow">
+          <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-4">
+            <h3 className="text-lg font-black text-white flex items-center justify-center gap-2">
+              <Trophy className="h-5 w-5" />
+              Overall
+            </h3>
+          </div>
+          <CardContent className="p-6 text-center bg-gradient-to-br from-gray-50 to-white dark:from-gray-900 dark:to-gray-800">
+            <div className="text-5xl font-black text-blue-600 dark:text-blue-400">
               {record.wins}-{record.losses}
               {record.ties > 0 ? `-${record.ties}` : ""}
             </div>
-            <div className="text-sm text-gray-600 dark:text-gray-400">
-              Overall Record
+            <div className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mt-2">
+              Season Record
             </div>
           </CardContent>
         </Card>
 
         {/* Home record */}
-        <Card>
-          <CardContent className="p-4 text-center">
-            <div className="text-2xl font-bold text-blue-600">
+        <Card className="border-2 border-gray-200 dark:border-gray-700 shadow-xl overflow-hidden hover:shadow-2xl transition-shadow">
+          <div className="bg-gradient-to-r from-green-600 to-emerald-600 p-4">
+            <h3 className="text-lg font-black text-white flex items-center justify-center gap-2">
+              <TrendingUp className="h-5 w-5" />
+              Home
+            </h3>
+          </div>
+          <CardContent className="p-6 text-center bg-gradient-to-br from-gray-50 to-white dark:from-gray-900 dark:to-gray-800">
+            <div className="text-5xl font-black text-green-600 dark:text-green-400">
               {locationRecords.home.wins}-{locationRecords.home.losses}
             </div>
-            <div className="text-sm text-gray-600 dark:text-gray-400">
+            <div className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mt-2">
               Home Record
             </div>
           </CardContent>
         </Card>
 
         {/* Away record */}
-        <Card>
-          <CardContent className="p-4 text-center">
-            <div className="text-2xl font-bold text-red-600">
+        <Card className="border-2 border-gray-200 dark:border-gray-700 shadow-xl overflow-hidden hover:shadow-2xl transition-shadow">
+          <div className="bg-gradient-to-r from-red-600 to-rose-600 p-4">
+            <h3 className="text-lg font-black text-white flex items-center justify-center gap-2">
+              <TrendingDown className="h-5 w-5" />
+              Away
+            </h3>
+          </div>
+          <CardContent className="p-6 text-center bg-gradient-to-br from-gray-50 to-white dark:from-gray-900 dark:to-gray-800">
+            <div className="text-5xl font-black text-red-600 dark:text-red-400">
               {locationRecords.away.wins}-{locationRecords.away.losses}
             </div>
-            <div className="text-sm text-gray-600 dark:text-gray-400">
+            <div className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mt-2">
               Away Record
             </div>
           </CardContent>
         </Card>
 
         {/* Neutral site record */}
-        <Card>
-          <CardContent className="p-4 text-center">
-            <div className="text-2xl font-bold text-purple-600">
+        <Card className="border-2 border-gray-200 dark:border-gray-700 shadow-xl overflow-hidden hover:shadow-2xl transition-shadow">
+          <div className="bg-gradient-to-r from-purple-600 to-pink-600 p-4">
+            <h3 className="text-lg font-black text-white flex items-center justify-center gap-2">
+              <Minus className="h-5 w-5" />
+              Neutral
+            </h3>
+          </div>
+          <CardContent className="p-6 text-center bg-gradient-to-br from-gray-50 to-white dark:from-gray-900 dark:to-gray-800">
+            <div className="text-5xl font-black text-purple-600 dark:text-purple-400">
               {locationRecords.neutral.wins}-{locationRecords.neutral.losses}
             </div>
-            <div className="text-sm text-gray-600 dark:text-gray-400">
+            <div className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mt-2">
               Neutral Record
             </div>
           </CardContent>
         </Card>
       </div>
 
-      {/* Schedule management table */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Schedule Management</CardTitle>
-        </CardHeader>
+      {/* Schedule management table - Enhanced */}
+      <Card className="border-2 border-gray-200 dark:border-gray-700 shadow-xl overflow-hidden">
+        <div className="bg-gradient-to-r from-slate-700 via-slate-600 to-slate-700 p-6">
+          <CardTitle className="text-2xl font-black text-white flex items-center gap-3">
+            <Calendar className="h-7 w-7" />
+            Schedule Management
+          </CardTitle>
+        </div>
 
-        <CardContent>
+        <CardContent className="bg-gradient-to-br from-gray-50 to-white dark:from-gray-900 dark:to-gray-800">
           {/* Header Row */}
           <div
-            className="grid gap-2 pb-2 mb-2 border-b font-semibold text-sm text-gray-600 dark:text-gray-400"
+            className="grid gap-2 py-4 mb-2 border-b font-semibold text-sm text-gray-600 dark:text-gray-400"
             style={{ gridTemplateColumns: "1fr 2fr 3fr 1fr 3fr 2fr" }}
           >
             <div>Week</div>

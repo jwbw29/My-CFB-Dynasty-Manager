@@ -20,12 +20,18 @@ const UserTeamsPage: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6 max-w-7xl mx-auto">
-      <div className="text-center">
-        <h1 className="text-3xl font-bold">User vs User Tracking</h1>
-        <p className="text-muted-foreground mt-2">
-          Track head-to-head records against your friends
-        </p>
+    <div className="space-y-8 max-w-7xl mx-auto">
+      {/* Hero Header */}
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 dark:from-blue-950/30 dark:via-purple-950/30 dark:to-pink-950/30 border border-gray-200 dark:border-gray-700 shadow-lg">
+        <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
+        <div className="relative p-6 md:p-8 text-center">
+          <h1 className="text-4xl md:text-5xl font-black bg-gradient-to-r from-gray-900 via-gray-700 to-gray-900 dark:from-gray-100 dark:via-gray-300 dark:to-gray-100 bg-clip-text text-transparent">
+            User vs User Tracking
+          </h1>
+          <p className="text-base font-semibold text-gray-600 dark:text-gray-400 mt-2">
+            Track head-to-head records against your friends
+          </p>
+        </div>
       </div>
 
       <div className="space-y-6 mt-6">
