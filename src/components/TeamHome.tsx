@@ -537,7 +537,7 @@ const TeamHome: React.FC = () => {
                   <div className="flex items-center justify-center md:justify-start gap-2 mt-2">
                     <ConferenceLogo
                       conference={teamData.conference}
-                      size="sm"
+                      size="lg"
                     />
                     <span className="text-base font-semibold text-gray-700 dark:text-gray-300">
                       {teamData.conference}
