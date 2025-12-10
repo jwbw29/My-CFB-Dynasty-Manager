@@ -209,7 +209,8 @@ const CoachProfile = () => {
     <>
       <Button
         variant="default"
-        className="flex flex-wrap items-center md:justify-center justify-start gap-x-4 gap-y-1 px-2 h-full hover:text-black"
+        size="lg"
+        className="flex flex-wrap items-center md:justify-center justify-start gap-x-4 gap-y-1 !h-14 px-2 hover:text-black"
         onClick={() => setIsEditing(true)}
         style={{
           borderLeft: profile.schoolColors?.primary
