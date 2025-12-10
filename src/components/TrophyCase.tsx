@@ -21,6 +21,8 @@ import {
   notifyError,
   MESSAGES,
 } from "@/utils/notification-utils";
+import { CONFERENCES } from "@/utils/fbsTeams";
+import { ConferenceLogo } from "@/components/ui/TeamLogo";
 import {
   Trophy,
   Medal,
@@ -68,18 +70,7 @@ const TROPHY_CATEGORIES = {
     bgColor: "bg-green-50 dark:bg-green-900/20",
     borderColor: "border-green-200 dark:border-green-800",
     textColor: "text-green-800 dark:text-green-200",
-    types: [
-      "AAC Champions",
-      "ACC Champions",
-      "Big 12 Champions",
-      "Big Ten Champions",
-      "C-USA Champions",
-      "MAC Champions",
-      "MWC Champions",
-      "Pac-12 Champions",
-      "SEC Champions",
-      "SBC Champions",
-    ],
+    types: CONFERENCES,
   },
   bowl: {
     name: "Bowl Games",
@@ -303,7 +294,7 @@ const TrophyCase: React.FC = () => {
 
         "College Football Playoff National Championship": "championship",
 
-        // Conference Championship Trophies
+        // Conference Championship Trophies (old format with "Champions")
         "AAC Champions": "conference",
         "ACC Champions": "conference",
         "Big 12 Champions": "conference",
@@ -314,6 +305,19 @@ const TrophyCase: React.FC = () => {
         "Pac-12 Champions": "conference",
         "SEC Champions": "conference",
         "SBC Champions": "conference",
+        "Sun Belt Champions": "conference",
+        // Conference names without "Champions" (new format)
+        AAC: "conference",
+        ACC: "conference",
+        "Big 12": "conference",
+        "Big Ten": "conference",
+        "C-USA": "conference",
+        Independents: "conference",
+        MAC: "conference",
+        MWC: "conference",
+        "Pac-12": "conference",
+        SEC: "conference",
+        "Sun Belt": "conference",
 
         // Rivalry Trophies
         "The Game Trophy": "rivalry",
@@ -611,12 +615,14 @@ const TrophyCase: React.FC = () => {
 
               <div className="space-y-2">
                 <label className="text-sm font-medium text-blue-800 dark:text-blue-200">
-                  Trophy Name
+                  {newTrophy.category === "conference"
+                    ? "Conference"
+                    : "Trophy Name"}
                 </label>
                 <Select
                   value={newTrophy.type}
                   onValueChange={(value) =>
-                    setNewTrophy({ ...newTrophy, type: value })
+                    setNewTrophy({ ...newTrophy, type: value, name: value })
                   }
                 >
                   <SelectTrigger className="bg-white dark:bg-gray-800">
@@ -627,7 +633,18 @@ const TrophyCase: React.FC = () => {
                       newTrophy.category as keyof typeof TROPHY_CATEGORIES
                     ].types.map((type) => (
                       <SelectItem key={type} value={type}>
-                        {type}
+                        {newTrophy.category === "conference" ? (
+                          <div className="flex items-center gap-2">
+                            <ConferenceLogo
+                              conference={type}
+                              size="xs"
+                              showFallback={false}
+                            />
+                            {type}
+                          </div>
+                        ) : (
+                          type
+                        )}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -771,7 +788,18 @@ const TrophyCase: React.FC = () => {
                       <div className="flex items-start justify-between mb-4">
                         <div className="flex items-center gap-3">
                           <div className="text-3xl">
-                            {getTrophyEmoji(trophy.category, trophy.type)}
+                            {trophy.category === "conference" ? (
+                              <ConferenceLogo
+                                conference={trophy.type.replace(
+                                  " Champions",
+                                  ""
+                                )}
+                                size="lg"
+                                showFallback={false}
+                              />
+                            ) : (
+                              getTrophyEmoji(trophy.category, trophy.type)
+                            )}
                           </div>
                           <div>
                             <Badge
@@ -797,7 +825,7 @@ const TrophyCase: React.FC = () => {
 
                       <div className="space-y-2">
                         <h3
-                          className={`font-bold text-lg ${categoryInfo.textColor}`}
+                          className={`font-bold text-lg ${categoryInfo.textColor} flex items-center gap-2`}
                         >
                           {trophy.name}
                         </h3>
@@ -903,7 +931,18 @@ const TrophyCase: React.FC = () => {
                             <div className="flex items-start justify-between mb-4">
                               <div className="flex items-center gap-3">
                                 <div className="text-4xl">
-                                  {getTrophyEmoji(trophy.category, trophy.type)}
+                                  {trophy.category === "conference" ? (
+                                    <ConferenceLogo
+                                      conference={trophy.type.replace(
+                                        " Champions",
+                                        ""
+                                      )}
+                                      size="xl"
+                                      showFallback={false}
+                                    />
+                                  ) : (
+                                    getTrophyEmoji(trophy.category, trophy.type)
+                                  )}
                                 </div>
                                 <div>
                                   <div className="text-sm text-gray-500">
@@ -927,9 +966,23 @@ const TrophyCase: React.FC = () => {
 
                             <div className="space-y-3">
                               <h3
-                                className={`font-bold text-xl ${categoryInfo.textColor}`}
+                                className={`font-bold text-xl ${categoryInfo.textColor} flex items-center gap-2`}
                               >
-                                {trophy.name}
+                                {trophy.category === "conference" ? (
+                                  <>
+                                    <ConferenceLogo
+                                      conference={trophy.type.replace(
+                                        " Champions",
+                                        ""
+                                      )}
+                                      size="md"
+                                      showFallback={false}
+                                    />
+                                    Champions
+                                  </>
+                                ) : (
+                                  trophy.name
+                                )}
                               </h3>
 
                               {trophy.significance && (

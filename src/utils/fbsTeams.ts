@@ -1259,6 +1259,11 @@ export const fbsTeams: Team[] = [
   },
 ];
 
+// Extract unique conferences from the team data
+export const CONFERENCES = Array.from(
+  new Set(fbsTeams.map((team) => team.conference))
+).sort() as Team["conference"][];
+
 export function getTeamByName(name: string): Team | undefined {
   return fbsTeams.find((team) => team.name === name);
 }

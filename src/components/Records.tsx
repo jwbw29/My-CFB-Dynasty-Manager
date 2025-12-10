@@ -542,7 +542,7 @@ const Records: React.FC = () => {
                         return p?.schoolName ? (
                           <div className="relative">
                             <div className="absolute inset-0 bg-gradient-to-br from-blue-400 to-purple-400 rounded-full blur-xl opacity-20"></div>
-                            <TeamLogo teamName={p.schoolName} size="xl" />
+                            <TeamLogo teamName={p.schoolName} size="3xl" />
                           </div>
                         ) : null;
                       })()}
@@ -557,8 +557,11 @@ const Records: React.FC = () => {
                             );
                             return conference !== "N/A" ? (
                               <>
-                                <ConferenceLogo conference={conference} size="sm" />
-                                <span className="text-lg font-semibold text-gray-700 dark:text-gray-300">
+                                <ConferenceLogo
+                                  conference={conference}
+                                  size="lg"
+                                />
+                                <span className="text-xl font-semibold text-gray-700 dark:text-gray-300">
                                   {conference}
                                 </span>
                               </>
@@ -596,19 +599,25 @@ const Records: React.FC = () => {
                         <div className="bg-blue-500 p-2 rounded-lg">
                           <Calendar className="h-5 w-5 text-white" />
                         </div>
-                        <h3 className="text-sm font-black text-gray-600 dark:text-gray-300 uppercase tracking-wider">Season Record</h3>
+                        <h3 className="text-sm font-black text-gray-600 dark:text-gray-300 uppercase tracking-wider">
+                          Season Record
+                        </h3>
                       </div>
                       <div className="space-y-4">
                         {/* Overall Record - Most Prominent */}
                         <div className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-950/40 dark:to-indigo-950/40 rounded-xl p-4 border border-blue-200 dark:border-blue-800">
-                          <p className="text-xs font-bold text-blue-700 dark:text-blue-400 uppercase tracking-wider mb-1">Overall Record</p>
+                          <p className="text-xs font-bold text-blue-700 dark:text-blue-400 uppercase tracking-wider mb-1">
+                            Overall Record
+                          </p>
                           <p className="text-5xl font-black text-blue-900 dark:text-blue-100">
                             {activeRecord.overallRecord || "0-0"}
                           </p>
                         </div>
                         {/* Conference Record */}
                         <div className="bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-950/40 dark:to-pink-950/40 rounded-xl p-4 border border-purple-200 dark:border-purple-800">
-                          <p className="text-xs font-bold text-purple-700 dark:text-purple-400 uppercase tracking-wider mb-1">Conference Record</p>
+                          <p className="text-xs font-bold text-purple-700 dark:text-purple-400 uppercase tracking-wider mb-1">
+                            Conference Record
+                          </p>
                           <p className="text-4xl font-black text-purple-900 dark:text-purple-100">
                             {activeRecord.conferenceRecord || "0-0"}
                           </p>
@@ -622,13 +631,17 @@ const Records: React.FC = () => {
                         <div className="bg-gradient-to-br from-green-500 to-red-500 p-2 rounded-lg">
                           <BarChart2 className="h-5 w-5 text-white" />
                         </div>
-                        <h3 className="text-sm font-black text-gray-600 dark:text-gray-300 uppercase tracking-wider">Scoring</h3>
+                        <h3 className="text-sm font-black text-gray-600 dark:text-gray-300 uppercase tracking-wider">
+                          Scoring
+                        </h3>
                       </div>
                       <div className="space-y-4">
                         {/* Points For */}
                         <div className="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-950/40 dark:to-emerald-950/40 rounded-xl p-4 border border-green-200 dark:border-green-800">
                           <div className="flex items-center justify-between mb-1">
-                            <p className="text-xs font-bold text-green-700 dark:text-green-400 uppercase tracking-wider">Points For</p>
+                            <p className="text-xs font-bold text-green-700 dark:text-green-400 uppercase tracking-wider">
+                              Points For
+                            </p>
                             <TrendingUp className="h-4 w-4 text-green-600 dark:text-green-400" />
                           </div>
                           <p className="text-4xl font-black text-green-700 dark:text-green-400">
@@ -638,7 +651,9 @@ const Records: React.FC = () => {
                         {/* Points Against */}
                         <div className="bg-gradient-to-br from-red-50 to-rose-50 dark:from-red-950/40 dark:to-rose-950/40 rounded-xl p-4 border border-red-200 dark:border-red-800">
                           <div className="flex items-center justify-between mb-1">
-                            <p className="text-xs font-bold text-red-700 dark:text-red-400 uppercase tracking-wider">Points Against</p>
+                            <p className="text-xs font-bold text-red-700 dark:text-red-400 uppercase tracking-wider">
+                              Points Against
+                            </p>
                             <ChevronsDown className="h-4 w-4 text-red-600 dark:text-red-400" />
                           </div>
                           <p className="text-4xl font-black text-red-700 dark:text-red-400">
@@ -654,19 +669,25 @@ const Records: React.FC = () => {
                         <div className="bg-gradient-to-br from-yellow-500 to-amber-500 p-2 rounded-lg">
                           <Star className="h-5 w-5 text-white" />
                         </div>
-                        <h3 className="text-sm font-black text-gray-600 dark:text-gray-300 uppercase tracking-wider">Final Standings</h3>
+                        <h3 className="text-sm font-black text-gray-600 dark:text-gray-300 uppercase tracking-wider">
+                          Final Standings
+                        </h3>
                       </div>
                       <div className="space-y-4">
                         {/* Final Rank - Most Prominent */}
                         <div className="bg-gradient-to-br from-yellow-50 to-amber-50 dark:from-yellow-950/40 dark:to-amber-950/40 rounded-xl p-4 border border-yellow-200 dark:border-yellow-800">
-                          <p className="text-xs font-bold text-yellow-700 dark:text-yellow-400 uppercase tracking-wider mb-1">National Rank</p>
+                          <p className="text-xs font-bold text-yellow-700 dark:text-yellow-400 uppercase tracking-wider mb-1">
+                            National Rank
+                          </p>
                           <p className="text-5xl font-black text-yellow-700 dark:text-yellow-400">
                             #{activeRecord.finalRanking || "NR"}
                           </p>
                         </div>
                         {/* Conference Finish */}
                         <div className="bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-950/40 dark:to-orange-950/40 rounded-xl p-4 border border-amber-200 dark:border-amber-800">
-                          <p className="text-xs font-bold text-amber-700 dark:text-amber-400 uppercase tracking-wider mb-1">Conference Finish</p>
+                          <p className="text-xs font-bold text-amber-700 dark:text-amber-400 uppercase tracking-wider mb-1">
+                            Conference Finish
+                          </p>
                           <p className="text-4xl font-black text-amber-900 dark:text-amber-100">
                             {activeRecord.conferenceFinish || "N/A"}
                           </p>
@@ -760,12 +781,18 @@ const Records: React.FC = () => {
                           ))}
                         </div>
                       )}
-                    {!activeRecord.natChamp && !activeRecord.bowlGame && !activeRecord.heisman && (!activeRecord.rivalTrophies || activeRecord.rivalTrophies.length === 0) && (
-                      <div className="text-center py-8">
-                        <Trophy className="h-12 w-12 mx-auto mb-3 text-gray-300 dark:text-gray-600" />
-                        <p className="text-sm text-gray-500 dark:text-gray-400 font-medium">No achievements recorded</p>
-                      </div>
-                    )}
+                    {!activeRecord.natChamp &&
+                      !activeRecord.bowlGame &&
+                      !activeRecord.heisman &&
+                      (!activeRecord.rivalTrophies ||
+                        activeRecord.rivalTrophies.length === 0) && (
+                        <div className="text-center py-8">
+                          <Trophy className="h-12 w-12 mx-auto mb-3 text-gray-300 dark:text-gray-600" />
+                          <p className="text-sm text-gray-500 dark:text-gray-400 font-medium">
+                            No achievements recorded
+                          </p>
+                        </div>
+                      )}
                   </CardContent>
                 </Card>
 
@@ -828,12 +855,16 @@ const Records: React.FC = () => {
                         </div>
                       </div>
                     )}
-                    {!scheduleHighlights.bestWin && !scheduleHighlights.worstLoss && scheduleHighlights.longestStreak <= 1 && (
-                      <div className="text-center py-8">
-                        <Zap className="h-12 w-12 mx-auto mb-3 text-gray-300 dark:text-gray-600" />
-                        <p className="text-sm text-gray-500 dark:text-gray-400 font-medium">No schedule highlights yet</p>
-                      </div>
-                    )}
+                    {!scheduleHighlights.bestWin &&
+                      !scheduleHighlights.worstLoss &&
+                      scheduleHighlights.longestStreak <= 1 && (
+                        <div className="text-center py-8">
+                          <Zap className="h-12 w-12 mx-auto mb-3 text-gray-300 dark:text-gray-600" />
+                          <p className="text-sm text-gray-500 dark:text-gray-400 font-medium">
+                            No schedule highlights yet
+                          </p>
+                        </div>
+                      )}
                   </CardContent>
                 </Card>
 
@@ -882,9 +913,11 @@ const Records: React.FC = () => {
                             p.playerName.trim()
                           ).length > 3 && (
                             <p className="text-sm text-center text-blue-600 dark:text-blue-400 font-bold mt-3 bg-blue-50 dark:bg-blue-900/20 p-2 rounded-lg">
-                              +{(activeRecord.playersDrafted || []).filter((p) =>
+                              +
+                              {(activeRecord.playersDrafted || []).filter((p) =>
                                 p.playerName.trim()
-                              ).length - 3} more players
+                              ).length - 3}{" "}
+                              more players
                             </p>
                           )}
                         </div>
@@ -927,7 +960,11 @@ const Records: React.FC = () => {
                               {activeRecord.teamStats.totalOffense.toLocaleString()}
                             </p>
                             <p className="text-xs font-semibold text-green-600 dark:text-green-500">
-                              {(activeRecord.teamStats.totalOffense / getEffectiveGamesPlayed(activeRecord)).toFixed(1)} yards per game
+                              {(
+                                activeRecord.teamStats.totalOffense /
+                                getEffectiveGamesPlayed(activeRecord)
+                              ).toFixed(1)}{" "}
+                              yards per game
                             </p>
                           </div>
                         </div>
@@ -944,7 +981,11 @@ const Records: React.FC = () => {
                               {activeRecord.teamStats.totalDefense.toLocaleString()}
                             </p>
                             <p className="text-xs font-semibold text-red-600 dark:text-red-500">
-                              {(activeRecord.teamStats.totalDefense / getEffectiveGamesPlayed(activeRecord)).toFixed(1)} yards allowed per game
+                              {(
+                                activeRecord.teamStats.totalDefense /
+                                getEffectiveGamesPlayed(activeRecord)
+                              ).toFixed(1)}{" "}
+                              yards allowed per game
                             </p>
                           </div>
                         </div>
@@ -996,7 +1037,8 @@ const Records: React.FC = () => {
                                 {(
                                   activeRecord.teamStats.passYards /
                                   getEffectiveGamesPlayed(activeRecord)
-                                ).toFixed(1)} per game
+                                ).toFixed(1)}{" "}
+                                per game
                               </p>
                             </div>
                             <div className="bg-white dark:bg-gray-800 p-4 rounded-xl border border-blue-200 dark:border-blue-700 shadow-md">
@@ -1013,7 +1055,8 @@ const Records: React.FC = () => {
                                 {(
                                   activeRecord.teamStats.rushYards /
                                   getEffectiveGamesPlayed(activeRecord)
-                                ).toFixed(1)} per game
+                                ).toFixed(1)}{" "}
+                                per game
                               </p>
                             </div>
                             <div className="bg-gradient-to-r from-blue-500 to-cyan-500 p-4 rounded-xl shadow-lg">
@@ -1030,7 +1073,8 @@ const Records: React.FC = () => {
                                 {(
                                   activeRecord.teamStats.points /
                                   getEffectiveGamesPlayed(activeRecord)
-                                ).toFixed(1)} per game
+                                ).toFixed(1)}{" "}
+                                per game
                               </p>
                             </div>
                           </div>
@@ -1059,7 +1103,8 @@ const Records: React.FC = () => {
                                 {(
                                   activeRecord.teamStats.defPassYards /
                                   getEffectiveGamesPlayed(activeRecord)
-                                ).toFixed(1)} per game
+                                ).toFixed(1)}{" "}
+                                per game
                               </p>
                             </div>
                             <div className="bg-white dark:bg-gray-800 p-4 rounded-xl border border-red-200 dark:border-red-700 shadow-md">
@@ -1076,7 +1121,8 @@ const Records: React.FC = () => {
                                 {(
                                   activeRecord.teamStats.defRushYards /
                                   getEffectiveGamesPlayed(activeRecord)
-                                ).toFixed(1)} per game
+                                ).toFixed(1)}{" "}
+                                per game
                               </p>
                             </div>
                             <div className="bg-gradient-to-r from-red-500 to-rose-500 p-4 rounded-xl shadow-lg">
@@ -1093,7 +1139,8 @@ const Records: React.FC = () => {
                                 {(
                                   activeRecord.teamStats.defPoints /
                                   getEffectiveGamesPlayed(activeRecord)
-                                ).toFixed(1)} per game
+                                ).toFixed(1)}{" "}
+                                per game
                               </p>
                             </div>
                           </div>
@@ -1131,12 +1178,16 @@ const Records: React.FC = () => {
                                     }
                                   </p>
                                   <div className="text-sm font-bold text-blue-700 dark:text-blue-400">
-                                    <span className="text-2xl">{activeRecord.teamLeaders.passingLeaders[0].yards?.toLocaleString() ||
-                                      0}</span> yds
+                                    <span className="text-2xl">
+                                      {activeRecord.teamLeaders.passingLeaders[0].yards?.toLocaleString() ||
+                                        0}
+                                    </span>{" "}
+                                    yds
                                   </div>
                                   <p className="text-xs text-blue-600 dark:text-blue-500 font-semibold mt-1">
                                     {activeRecord.teamLeaders.passingLeaders[0]
-                                      .touchdowns || 0} TDs
+                                      .touchdowns || 0}{" "}
+                                    TDs
                                   </p>
                                 </div>
                               </div>
@@ -1161,12 +1212,16 @@ const Records: React.FC = () => {
                                     }
                                   </p>
                                   <div className="text-sm font-bold text-green-700 dark:text-green-400">
-                                    <span className="text-2xl">{activeRecord.teamLeaders.rushingLeaders[0].yards?.toLocaleString() ||
-                                      0}</span> yds
+                                    <span className="text-2xl">
+                                      {activeRecord.teamLeaders.rushingLeaders[0].yards?.toLocaleString() ||
+                                        0}
+                                    </span>{" "}
+                                    yds
                                   </div>
                                   <p className="text-xs text-green-600 dark:text-green-500 font-semibold mt-1">
                                     {activeRecord.teamLeaders.rushingLeaders[0]
-                                      .touchdowns || 0} TDs
+                                      .touchdowns || 0}{" "}
+                                    TDs
                                   </p>
                                 </div>
                               </div>
@@ -1186,17 +1241,21 @@ const Records: React.FC = () => {
                                   </div>
                                   <p className="font-black text-lg text-purple-900 dark:text-purple-200 truncate mb-2">
                                     {
-                                      activeRecord.teamLeaders.receivingLeaders[0]
-                                        .name
+                                      activeRecord.teamLeaders
+                                        .receivingLeaders[0].name
                                     }
                                   </p>
                                   <div className="text-sm font-bold text-purple-700 dark:text-purple-400">
-                                    <span className="text-2xl">{activeRecord.teamLeaders.receivingLeaders[0]
-                                      .receptions || 0}</span> rec
+                                    <span className="text-2xl">
+                                      {activeRecord.teamLeaders
+                                        .receivingLeaders[0].receptions || 0}
+                                    </span>{" "}
+                                    rec
                                   </div>
                                   <p className="text-xs text-purple-600 dark:text-purple-500 font-semibold mt-1">
                                     {activeRecord.teamLeaders.receivingLeaders[0].yards?.toLocaleString() ||
-                                      0} yds
+                                      0}{" "}
+                                    yds
                                   </p>
                                 </div>
                               </div>
@@ -1221,8 +1280,11 @@ const Records: React.FC = () => {
                                     }
                                   </p>
                                   <div className="text-sm font-bold text-red-700 dark:text-red-400">
-                                    <span className="text-2xl">{activeRecord.teamLeaders.tackleLeaders[0]
-                                      .total || 0}</span> tackles
+                                    <span className="text-2xl">
+                                      {activeRecord.teamLeaders.tackleLeaders[0]
+                                        .total || 0}
+                                    </span>{" "}
+                                    tackles
                                   </div>
                                 </div>
                               </div>
@@ -1236,9 +1298,12 @@ const Records: React.FC = () => {
                       <div className="inline-block p-6 bg-gray-100 dark:bg-gray-800 rounded-full mb-4">
                         <BarChart2 className="h-16 w-16 text-gray-400 dark:text-gray-600" />
                       </div>
-                      <p className="text-lg font-semibold text-gray-600 dark:text-gray-400">No team stats available for this season</p>
+                      <p className="text-lg font-semibold text-gray-600 dark:text-gray-400">
+                        No team stats available for this season
+                      </p>
                       <p className="text-sm text-gray-500 dark:text-gray-500 mt-2">
-                        Stats will appear here when they are entered in the Team Stats page
+                        Stats will appear here when they are entered in the Team
+                        Stats page
                       </p>
                     </div>
                   )}
