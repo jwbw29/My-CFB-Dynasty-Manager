@@ -580,7 +580,7 @@ const SchedulePage = () => {
             {teamData && (
               <div className="relative">
                 <div className="absolute inset-0 bg-gradient-to-br from-blue-400 to-purple-400 rounded-full blur-xl opacity-20"></div>
-                <TeamLogo teamName={teamData.name} size="xl" />
+                <TeamLogo teamName={teamData.name} size="3xl" />
               </div>
             )}
             <div className="text-center">
@@ -590,7 +590,7 @@ const SchedulePage = () => {
               </h1>
               {teamData && teamData.conference && (
                 <div className="flex items-center justify-center gap-2 mt-2">
-                  <ConferenceLogo conference={teamData.conference} size="sm" />
+                  <ConferenceLogo conference={teamData.conference} size="xl" />
                   <span className="text-base font-semibold text-gray-700 dark:text-gray-300">
                     {teamData.conference}
                   </span>
