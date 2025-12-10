@@ -12,8 +12,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
 import useLocalStorage from "@/hooks/useLocalStorage";
 import {
@@ -220,7 +218,6 @@ const TrophyCase: React.FC = () => {
     "allTrophies",
     []
   );
-  const [activeCategory, setActiveCategory] = useState<string>("all");
   const [isAddFormExpanded, setIsAddFormExpanded] = useState<boolean>(false); // New state for collapsible form
   const [newTrophy, setNewTrophy] = useState<Omit<Trophy, "id" | "year">>({
     category: "championship",
@@ -436,16 +433,6 @@ const TrophyCase: React.FC = () => {
   };
 
   const stats = getTrophyStats();
-
-  // Filter trophies by category - use currentTrophies
-  const getFilteredTrophies = () => {
-    if (activeCategory === "all") {
-      return [...currentTrophies].sort((a, b) => b.year - a.year);
-    }
-    return currentTrophies
-      .filter((trophy) => trophy.category === activeCategory)
-      .sort((a, b) => b.year - a.year);
-  };
 
   const addTrophy = () => {
     // --- MODIFICATION START: Ensure the name is set from the type ---
@@ -735,330 +722,167 @@ const TrophyCase: React.FC = () => {
         )}
       </Card>
 
-      {/* Trophy Display Section */}
-      <Tabs
-        value={activeCategory}
-        onValueChange={setActiveCategory}
-        className="w-full"
-      >
-        <TabsList className="grid w-full grid-cols-5 bg-gray-100 dark:bg-gray-800">
-          <TabsTrigger
-            value="all"
-            className="data-[state=active]:bg-white dark:data-[state=active]:bg-gray-700"
-          >
-            <div className="flex items-center gap-2">
-              <Trophy className="h-4 w-4" />
-              <span className="hidden sm:inline">All</span>
-            </div>
-          </TabsTrigger>
-          {Object.entries(TROPHY_CATEGORIES).map(([key, category]) => (
-            <TabsTrigger
-              key={key}
-              value={key}
-              className="data-[state=active]:bg-white dark:data-[state=active]:bg-gray-700"
-            >
-              <div className="flex items-center gap-2">
-                {getTrophyIcon(key, "h-4 w-4")}
-                <span className="hidden md:inline">
-                  {category.name.split(" ")[0]}
-                </span>
-              </div>
-            </TabsTrigger>
-          ))}
-        </TabsList>
+      {/* Trophy Display Section - Vertically Stacked Categories */}
+      <div className="space-y-8">
+        {Object.entries(TROPHY_CATEGORIES).map(([categoryKey, categoryInfo]) => {
+          const categoryTrophies = currentTrophies
+            .filter((trophy) => trophy.category === categoryKey)
+            .sort((a, b) => b.year - a.year);
 
-        {/* All Trophies Tab */}
-        <TabsContent value="all" className="space-y-6">
-          <div className="flex items-center justify-between">
-            <h2 className="text-2xl font-bold">All Trophies ({stats.total})</h2>
-          </div>
+          // Skip empty categories
+          if (categoryTrophies.length === 0) return null;
 
-          <ScrollArea className="h-[600px] p-1">
-            {" "}
-            {/* MODIFICATION: Added padding for scrollbar */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {getFilteredTrophies().map((trophy) => {
-                const categoryInfo = getCategoryInfo(trophy.category);
-                return (
-                  <Card
-                    key={trophy.id}
-                    className={`hover:shadow-lg transition-shadow ${categoryInfo.bgColor} ${categoryInfo.borderColor}`}
-                  >
-                    <CardContent className="pt-6">
-                      <div className="flex items-start justify-between mb-4">
-                        <div className="flex items-center gap-3">
-                          <div className="text-3xl">
-                            {trophy.category === "conference" ? (
-                              <ConferenceLogo
-                                conference={trophy.type.replace(
-                                  " Champions",
-                                  ""
-                                )}
-                                size="lg"
-                                showFallback={false}
-                              />
-                            ) : (
-                              getTrophyEmoji(trophy.category, trophy.type)
-                            )}
-                          </div>
-                          <div>
-                            <Badge
-                              variant="secondary"
-                              className={`${categoryInfo.textColor} bg-white dark:bg-gray-800`}
-                            >
-                              {categoryInfo.name}
-                            </Badge>
-                            <div className="text-xs text-gray-500 mt-1">
-                              {trophy.type}
-                            </div>
-                          </div>
-                        </div>
-                        <Button
-                          onClick={() => removeTrophy(trophy.id)}
-                          variant="ghost"
-                          size="sm"
-                          className="text-red-500 hover:text-red-700 hover:bg-red-50"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-
-                      <div className="space-y-2">
-                        <h3
-                          className={`font-bold text-lg ${categoryInfo.textColor} flex items-center gap-2`}
-                        >
-                          {trophy.name}
-                        </h3>
-                        <div className="flex items-center gap-2">
-                          <Calendar className="h-4 w-4 text-gray-500" />
-                          <span className="font-semibold">{trophy.year}</span>
-                          {trophy.significance && (
-                            <Badge
-                              variant={
-                                trophy.significance === "High"
-                                  ? "default"
-                                  : "secondary"
-                              }
-                              className={`ml-auto ${
-                                trophy.significance === "Medium"
-                                  ? "bg-gray-300 text-gray-800 dark:bg-secondary dark:text-secondary-foreground"
-                                  : ""
-                              }`}
-                            >
-                              {trophy.significance}
-                            </Badge>
-                          )}
-                        </div>
-
-                        {trophy.description && (
-                          <p className="text-sm text-gray-600 dark:text-gray-400">
-                            {trophy.description}
-                          </p>
-                        )}
-
-                        {trophy.opponent && (
-                          <div className="text-sm">
-                            <span className="font-medium">vs. </span>
-                            <span className={categoryInfo.textColor}>
-                              {trophy.opponent}
-                            </span>
-                          </div>
-                        )}
-
-                        {trophy.location && (
-                          <div className="text-sm text-gray-600 dark:text-gray-400">
-                            📍 {trophy.location}
-                          </div>
-                        )}
-                      </div>
-                    </CardContent>
-                  </Card>
-                );
-              })}
-            </div>
-            {getFilteredTrophies().length === 0 && (
-              <Card className="border-dashed">
-                <CardContent className="p-8 text-center">
-                  <Trophy className="h-12 w-12 mx-auto mb-3 text-gray-400" />
-                  <p className="text-gray-500 dark:text-gray-400">
-                    No trophies found
+          return (
+            <div key={categoryKey} className="space-y-4">
+              {/* Category Header */}
+              <div className="flex items-center gap-3">
+                {getTrophyIcon(categoryKey, "h-8 w-8")}
+                <div>
+                  <h2 className="text-2xl font-bold">{categoryInfo.name}</h2>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    {categoryTrophies.length}{" "}
+                    {categoryTrophies.length === 1 ? "trophy" : "trophies"} earned
                   </p>
-                  <p className="text-sm text-gray-400 mt-1">
-                    Add your first trophy to get started!
-                  </p>
-                </CardContent>
-              </Card>
-            )}
-          </ScrollArea>
-        </TabsContent>
-
-        {/* Individual Category Tabs */}
-        {Object.entries(TROPHY_CATEGORIES).map(
-          ([categoryKey, categoryInfo]) => (
-            <TabsContent
-              key={categoryKey}
-              value={categoryKey}
-              className="space-y-6"
-            >
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  {getTrophyIcon(categoryKey, "h-8 w-8")}
-                  <div>
-                    <h2 className="text-2xl font-bold">{categoryInfo.name}</h2>
-                    <p className="text-gray-600 dark:text-gray-400">
-                      {stats[categoryKey]}{" "}
-                      {stats[categoryKey] === 1 ? "trophy" : "trophies"} earned
-                    </p>
-                  </div>
                 </div>
               </div>
 
-              <ScrollArea className="h-[600px] p-1">
-                {" "}
-                {/* MODIFICATION: Added padding for scrollbar */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {currentTrophies
-                    .filter((trophy) => trophy.category === categoryKey)
-                    .sort((a, b) => b.year - a.year)
-                    .map((trophy) => {
-                      const categoryInfo = getCategoryInfo(trophy.category);
-                      return (
-                        <Card
-                          key={trophy.id}
-                          className={`hover:shadow-lg transition-shadow ${categoryInfo.bgColor} ${categoryInfo.borderColor}`}
-                        >
-                          <CardContent className="pt-6">
-                            <div className="flex items-start justify-between mb-4">
-                              <div className="flex items-center gap-3">
-                                <div className="text-4xl">
-                                  {trophy.category === "conference" ? (
-                                    <ConferenceLogo
-                                      conference={trophy.type.replace(
-                                        " Champions",
-                                        ""
-                                      )}
-                                      size="xl"
-                                      showFallback={false}
-                                    />
-                                  ) : (
-                                    getTrophyEmoji(trophy.category, trophy.type)
-                                  )}
-                                </div>
-                                <div>
-                                  <div className="text-sm text-gray-500">
-                                    {trophy.type}
-                                  </div>
-                                  <div className="text-xs text-gray-400 flex items-center gap-1 mt-1">
-                                    <Calendar className="h-3 w-3" />
-                                    {trophy.year}
-                                  </div>
-                                </div>
-                              </div>
-                              <Button
-                                onClick={() => removeTrophy(trophy.id)}
-                                variant="ghost"
-                                size="sm"
-                                className="text-red-500 hover:text-red-700 hover:bg-red-50"
-                              >
-                                <Trash2 className="h-4 w-4" />
-                              </Button>
-                            </div>
-
-                            <div className="space-y-3">
-                              <h3
-                                className={`font-bold text-xl ${categoryInfo.textColor} flex items-center gap-2`}
-                              >
+              {/* Horizontal Scrolling Trophy Cards */}
+              <div className="relative">
+                <div className="flex gap-6 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent">
+                  {categoryTrophies.map((trophy) => {
+                    const categoryInfo = getCategoryInfo(trophy.category);
+                    return (
+                      <Card
+                        key={trophy.id}
+                        className={`flex-none w-80 snap-start hover:shadow-lg transition-shadow ${categoryInfo.bgColor} ${categoryInfo.borderColor}`}
+                      >
+                        <CardContent className="pt-6">
+                          <div className="flex items-start justify-between mb-4">
+                            <div className="flex items-center gap-3">
+                              <div className="text-4xl">
                                 {trophy.category === "conference" ? (
-                                  <>
-                                    <ConferenceLogo
-                                      conference={trophy.type.replace(
-                                        " Champions",
-                                        ""
-                                      )}
-                                      size="md"
-                                      showFallback={false}
-                                    />
-                                    Champions
-                                  </>
+                                  <ConferenceLogo
+                                    conference={trophy.type.replace(
+                                      " Champions",
+                                      ""
+                                    )}
+                                    size="xl"
+                                    showFallback={false}
+                                  />
                                 ) : (
-                                  trophy.name
-                                )}
-                              </h3>
-
-                              {trophy.significance && (
-                                <Badge
-                                  variant={
-                                    trophy.significance === "High"
-                                      ? "default"
-                                      : "secondary"
-                                  }
-                                  className={`inline-flex ${
-                                    trophy.significance === "Medium"
-                                      ? "bg-gray-300 text-gray-800 dark:bg-secondary dark:text-secondary-foreground"
-                                      : ""
-                                  }`}
-                                >
-                                  {trophy.significance} Significance
-                                </Badge>
-                              )}
-
-                              {trophy.description && (
-                                <p className="text-sm text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 p-3 rounded-lg">
-                                  {trophy.description}
-                                </p>
-                              )}
-
-                              <div className="space-y-2">
-                                {trophy.opponent && (
-                                  <div className="flex items-center gap-2 text-sm">
-                                    <Target className="h-4 w-4 text-gray-500" />
-                                    <span className="font-medium">
-                                      Defeated:
-                                    </span>
-                                    <span className={categoryInfo.textColor}>
-                                      {trophy.opponent}
-                                    </span>
-                                  </div>
-                                )}
-
-                                {trophy.location && (
-                                  <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-                                    <span>📍</span>
-                                    <span>{trophy.location}</span>
-                                  </div>
+                                  getTrophyEmoji(trophy.category, trophy.type)
                                 )}
                               </div>
+                              <div>
+                                <div className="text-sm text-gray-500">
+                                  {trophy.type}
+                                </div>
+                                <div className="text-xs text-gray-400 flex items-center gap-1 mt-1">
+                                  <Calendar className="h-3 w-3" />
+                                  {trophy.year}
+                                </div>
+                              </div>
                             </div>
-                          </CardContent>
-                        </Card>
-                      );
-                    })}
+                            <Button
+                              onClick={() => removeTrophy(trophy.id)}
+                              variant="ghost"
+                              size="sm"
+                              className="text-red-500 hover:text-red-700 hover:bg-red-50"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
+
+                          <div className="space-y-3">
+                            <h3
+                              className={`font-bold text-xl ${categoryInfo.textColor} flex items-center gap-2`}
+                            >
+                              {trophy.category === "conference" ? (
+                                <>
+                                  <ConferenceLogo
+                                    conference={trophy.type.replace(
+                                      " Champions",
+                                      ""
+                                    )}
+                                    size="md"
+                                    showFallback={false}
+                                  />
+                                  Champions
+                                </>
+                              ) : (
+                                trophy.name
+                              )}
+                            </h3>
+
+                            {trophy.significance && (
+                              <Badge
+                                variant={
+                                  trophy.significance === "High"
+                                    ? "default"
+                                    : "secondary"
+                                }
+                                className={`inline-flex ${
+                                  trophy.significance === "Medium"
+                                    ? "bg-gray-300 text-gray-800 dark:bg-secondary dark:text-secondary-foreground"
+                                    : ""
+                                }`}
+                              >
+                                {trophy.significance} Significance
+                              </Badge>
+                            )}
+
+                            {trophy.description && (
+                              <p className="text-sm text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 p-3 rounded-lg">
+                                {trophy.description}
+                              </p>
+                            )}
+
+                            <div className="space-y-2">
+                              {trophy.opponent && (
+                                <div className="flex items-center gap-2 text-sm">
+                                  <Target className="h-4 w-4 text-gray-500" />
+                                  <span className="font-medium">
+                                    Defeated:
+                                  </span>
+                                  <span className={categoryInfo.textColor}>
+                                    {trophy.opponent}
+                                  </span>
+                                </div>
+                              )}
+
+                              {trophy.location && (
+                                <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                                  <span>📍</span>
+                                  <span>{trophy.location}</span>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    );
+                  })}
                 </div>
-                {currentTrophies.filter(
-                  (trophy) => trophy.category === categoryKey
-                ).length === 0 && (
-                  <Card className="border-dashed">
-                    <CardContent className="p-8 text-center">
-                      {getTrophyIcon(
-                        categoryKey,
-                        "h-12 w-12 mx-auto mb-3 text-gray-400"
-                      )}
-                      <p className="text-gray-500 dark:text-gray-400">
-                        No {categoryInfo.name.toLowerCase()} yet
-                      </p>
-                      <p className="text-sm text-gray-400 mt-1">
-                        Add your first{" "}
-                        {categoryInfo.name.toLowerCase().slice(0, -1)} to get
-                        started!
-                      </p>
-                    </CardContent>
-                  </Card>
-                )}
-              </ScrollArea>
-            </TabsContent>
-          )
+              </div>
+            </div>
+          );
+        })}
+
+        {/* Empty State - Show only if no trophies at all */}
+        {currentTrophies.length === 0 && (
+          <Card className="border-dashed">
+            <CardContent className="p-8 text-center">
+              <Trophy className="h-12 w-12 mx-auto mb-3 text-gray-400" />
+              <p className="text-gray-500 dark:text-gray-400">
+                No trophies yet
+              </p>
+              <p className="text-sm text-gray-400 mt-1">
+                Add your first trophy to get started!
+              </p>
+            </CardContent>
+          </Card>
         )}
-      </Tabs>
+      </div>
     </div>
   );
 };
