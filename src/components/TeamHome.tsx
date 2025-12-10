@@ -319,7 +319,8 @@ const TeamHome: React.FC = () => {
         leaders: PlayerLeaderStat[],
         sortField: keyof PlayerLeaderStat
       ) => {
-        if (!leaders || leaders.length === 0 || gamesPlayed === 0) return undefined;
+        if (!leaders || leaders.length === 0 || gamesPlayed === 0)
+          return undefined;
         return leaders
           .filter((leader) => leader.name && leader[sortField] != null)
           .sort(
@@ -329,27 +330,50 @@ const TeamHome: React.FC = () => {
 
       const passingLeader = getTopLeader(teamLeaders.passingLeaders, "yards");
       const rushingLeader = getTopLeader(teamLeaders.rushingLeaders, "yards");
-      const receivingLeader = getTopLeader(teamLeaders.receivingLeaders, "yards");
+      const receivingLeader = getTopLeader(
+        teamLeaders.receivingLeaders,
+        "yards"
+      );
       const tacklesLeader = getTopLeader(teamLeaders.tackleLeaders, "total");
 
       // Calculate per-game averages
       return {
-        passingLeader: passingLeader ? {
-          ...passingLeader,
-          yards: gamesPlayed > 0 ? Number((passingLeader.yards! / gamesPlayed).toFixed(1)) : 0
-        } : undefined,
-        rushingLeader: rushingLeader ? {
-          ...rushingLeader,
-          yards: gamesPlayed > 0 ? Number((rushingLeader.yards! / gamesPlayed).toFixed(1)) : 0
-        } : undefined,
-        receivingLeader: receivingLeader ? {
-          ...receivingLeader,
-          yards: gamesPlayed > 0 ? Number((receivingLeader.yards! / gamesPlayed).toFixed(1)) : 0
-        } : undefined,
-        tacklesLeader: tacklesLeader ? {
-          ...tacklesLeader,
-          total: gamesPlayed > 0 ? Number((tacklesLeader.total! / gamesPlayed).toFixed(1)) : 0
-        } : undefined,
+        passingLeader: passingLeader
+          ? {
+              ...passingLeader,
+              yards:
+                gamesPlayed > 0
+                  ? Number((passingLeader.yards! / gamesPlayed).toFixed(1))
+                  : 0,
+            }
+          : undefined,
+        rushingLeader: rushingLeader
+          ? {
+              ...rushingLeader,
+              yards:
+                gamesPlayed > 0
+                  ? Number((rushingLeader.yards! / gamesPlayed).toFixed(1))
+                  : 0,
+            }
+          : undefined,
+        receivingLeader: receivingLeader
+          ? {
+              ...receivingLeader,
+              yards:
+                gamesPlayed > 0
+                  ? Number((receivingLeader.yards! / gamesPlayed).toFixed(1))
+                  : 0,
+            }
+          : undefined,
+        tacklesLeader: tacklesLeader
+          ? {
+              ...tacklesLeader,
+              total:
+                gamesPlayed > 0
+                  ? Number((tacklesLeader.total! / gamesPlayed).toFixed(1))
+                  : 0,
+            }
+          : undefined,
       };
     } catch (error) {
       console.error("Error parsing teamLeaders for leaders:", error);
@@ -499,7 +523,7 @@ const TeamHome: React.FC = () => {
               {teamData && (
                 <div className="relative">
                   <div className="absolute inset-0 bg-gradient-to-br from-blue-400 to-purple-400 rounded-full blur-xl opacity-20"></div>
-                  <TeamLogo teamName={teamData.name} size="xl" />
+                  <TeamLogo teamName={teamData.name} size="3xl" />
                 </div>
               )}
               <div className="text-center md:text-left">
@@ -511,7 +535,10 @@ const TeamHome: React.FC = () => {
                 </p>
                 {teamData && teamData.conference && (
                   <div className="flex items-center justify-center md:justify-start gap-2 mt-2">
-                    <ConferenceLogo conference={teamData.conference} size="sm" />
+                    <ConferenceLogo
+                      conference={teamData.conference}
+                      size="sm"
+                    />
                     <span className="text-base font-semibold text-gray-700 dark:text-gray-300">
                       {teamData.conference}
                     </span>
@@ -522,7 +549,7 @@ const TeamHome: React.FC = () => {
 
             {teamRank && (
               <div className="px-6 py-3 bg-gradient-to-r from-yellow-400 to-orange-400 dark:from-yellow-500 dark:to-orange-500 rounded-full shadow-md">
-                <span className="text-2xl font-black text-white">
+                <span className="text-5xl font-black text-white">
                   #{teamRank}
                 </span>
               </div>
@@ -552,13 +579,21 @@ const TeamHome: React.FC = () => {
                   }}
                   className="h-5 w-5"
                 />
-                <Label htmlFor="ready-to-advance" className="text-base font-semibold cursor-pointer">
+                <Label
+                  htmlFor="ready-to-advance"
+                  className="text-base font-semibold cursor-pointer"
+                >
                   Ready to Advance
                 </Label>
               </div>
             </div>
             <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-xl p-4 border border-gray-200 dark:border-gray-700 shadow-md space-y-2">
-              <Label htmlFor="next-advance" className="text-sm font-bold text-gray-700 dark:text-gray-300">Next Advance Date</Label>
+              <Label
+                htmlFor="next-advance"
+                className="text-sm font-bold text-gray-700 dark:text-gray-300"
+              >
+                Next Advance Date
+              </Label>
               <Input
                 id="next-advance"
                 type="date"

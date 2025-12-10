@@ -1,31 +1,32 @@
 // src/components/ui/TeamLogo.tsx
-import React, { useState } from 'react';
-import { getTeamLogoPaths, getConferenceLogoPath } from '@/utils/logoUtils';
-import { cn } from '@/lib/utils';
+import React, { useState } from "react";
+import { getTeamLogoPaths, getConferenceLogoPath } from "@/utils/logoUtils";
+import { cn } from "@/lib/utils";
 
 interface TeamLogoProps {
   teamName: string;
-  size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl';
+  size?: "xs" | "sm" | "md" | "lg" | "xl" | "2xl" | "3xl";
   showFallback?: boolean;
   className?: string;
   onClick?: () => void;
 }
 
 const sizeClasses = {
-  xs: 'w-4 h-4',
-  sm: 'w-6 h-6',
-  md: 'w-8 h-8',
-  lg: 'w-12 h-12',
-  xl: 'w-16 h-16',
-  '2xl': 'w-24 h-24'
+  xs: "w-4 h-4",
+  sm: "w-6 h-6",
+  md: "w-8 h-8",
+  lg: "w-12 h-12",
+  xl: "w-16 h-16",
+  "2xl": "w-24 h-24",
+  "3xl": "w-40 h-40",
 };
 
 export const TeamLogo: React.FC<TeamLogoProps> = ({
   teamName,
-  size = 'md',
+  size = "md",
   showFallback = true,
-  className = '',
-  onClick
+  className = "",
+  onClick,
 }) => {
   const [currentPathIndex, setCurrentPathIndex] = useState(0);
   const [error, setError] = useState(false);
@@ -51,17 +52,17 @@ export const TeamLogo: React.FC<TeamLogoProps> = ({
     }
     // Fallback to team initials
     const initials = teamName
-      .split(' ')
-      .map(word => word.charAt(0))
-      .join('')
+      .split(" ")
+      .map((word) => word.charAt(0))
+      .join("")
       .toUpperCase()
       .slice(0, 3);
     return (
       <div
         className={cn(
           sizeClasses[size],
-          'bg-gray-300 dark:bg-gray-600 rounded-full flex items-center justify-center text-xs font-bold text-gray-700 dark:text-gray-300',
-          onClick && 'cursor-pointer',
+          "bg-gray-300 dark:bg-gray-600 rounded-full flex items-center justify-center text-xs font-bold text-gray-700 dark:text-gray-300",
+          onClick && "cursor-pointer",
           className
         )}
         onClick={onClick}
@@ -78,8 +79,8 @@ export const TeamLogo: React.FC<TeamLogoProps> = ({
       alt={`${teamName} logo`}
       className={cn(
         sizeClasses[size],
-        'object-contain rounded',
-        onClick && 'cursor-pointer',
+        "object-contain rounded",
+        onClick && "cursor-pointer",
         className
       )}
       onError={handleImageError}
@@ -93,16 +94,16 @@ export const TeamLogo: React.FC<TeamLogoProps> = ({
 // --- ConferenceLogo component remains the same ---
 interface ConferenceLogoProps {
   conference: string;
-  size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl';
+  size?: "xs" | "sm" | "md" | "lg" | "xl" | "2xl";
   showFallback?: boolean;
   className?: string;
 }
 
 export const ConferenceLogo: React.FC<ConferenceLogoProps> = ({
   conference,
-  size = 'sm',
+  size = "sm",
   showFallback = true,
-  className = ''
+  className = "",
 }) => {
   const [imageError, setImageError] = useState(false);
   const logoPath = getConferenceLogoPath(conference);
@@ -117,7 +118,12 @@ export const ConferenceLogo: React.FC<ConferenceLogoProps> = ({
 
   if (imageError && showFallback) {
     return (
-      <span className={cn('text-xs font-medium text-gray-600 dark:text-gray-400', className)}>
+      <span
+        className={cn(
+          "text-xs font-medium text-gray-600 dark:text-gray-400",
+          className
+        )}
+      >
         {conference}
       </span>
     );
@@ -127,7 +133,7 @@ export const ConferenceLogo: React.FC<ConferenceLogoProps> = ({
     <img
       src={logoPath}
       alt={`${conference} logo`}
-      className={cn(sizeClasses[size], 'object-contain', className)}
+      className={cn(sizeClasses[size], "object-contain", className)}
       onError={handleImageError}
       title={conference}
       loading="lazy"
