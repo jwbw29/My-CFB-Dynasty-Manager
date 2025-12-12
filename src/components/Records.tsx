@@ -28,6 +28,8 @@ import {
   getTeamStats,
   getTeamLeaders,
   getRivalTrophiesForYear,
+  getBowlTrophiesForYear,
+  getConferenceTrophiesForYear,
 } from "@/utils/localStorage";
 import {
   YearRecord,
@@ -167,6 +169,8 @@ const Records: React.FC = () => {
           finalRanking: "",
           conferenceFinish: "",
           rivalTrophies: getRivalTrophiesForYear(currentYear),
+          bowlTrophies: getBowlTrophiesForYear(currentYear),
+          conferenceTrophies: getConferenceTrophiesForYear(currentYear),
         };
         records.push(newCurrentRecord);
       }
@@ -233,6 +237,8 @@ const Records: React.FC = () => {
         finalRanking: storedEditableData.finalRanking,
         conferenceFinish: storedEditableData.conferenceFinish,
         rivalTrophies: getRivalTrophiesForYear(currentYear),
+        bowlTrophies: getBowlTrophiesForYear(currentYear),
+        conferenceTrophies: getConferenceTrophiesForYear(currentYear),
         // Team Stats (load from localStorage)
         teamStats: currentDynastyId
           ? getTeamStats(currentDynastyId, currentYear)
@@ -246,7 +252,7 @@ const Records: React.FC = () => {
       recordForDisplay =
         allStoredRecords.find((r) => r.year === selectedYear) || null;
 
-      // Load team stats and rival trophies for historical records if dynasty ID is available
+      // Load team stats and trophies for historical records if dynasty ID is available
       if (recordForDisplay && currentDynastyId) {
         recordForDisplay = {
           ...recordForDisplay,
@@ -255,14 +261,26 @@ const Records: React.FC = () => {
           rivalTrophies:
             recordForDisplay.rivalTrophies ||
             getRivalTrophiesForYear(selectedYear),
+          bowlTrophies:
+            recordForDisplay.bowlTrophies ||
+            getBowlTrophiesForYear(selectedYear),
+          conferenceTrophies:
+            recordForDisplay.conferenceTrophies ||
+            getConferenceTrophiesForYear(selectedYear),
         };
       } else if (recordForDisplay) {
-        // Ensure rival trophies are loaded even without dynasty ID
+        // Ensure trophies are loaded even without dynasty ID
         recordForDisplay = {
           ...recordForDisplay,
           rivalTrophies:
             recordForDisplay.rivalTrophies ||
             getRivalTrophiesForYear(selectedYear),
+          bowlTrophies:
+            recordForDisplay.bowlTrophies ||
+            getBowlTrophiesForYear(selectedYear),
+          conferenceTrophies:
+            recordForDisplay.conferenceTrophies ||
+            getConferenceTrophiesForYear(selectedYear),
         };
       }
     }
@@ -709,6 +727,7 @@ const Records: React.FC = () => {
                   </div>
 
                   <CardContent className="p-5 space-y-3 bg-gradient-to-br from-gray-50 to-white dark:from-gray-900 dark:to-gray-800">
+                    {/* National Championship Won */}
                     {activeRecord.natChamp && (
                       <div className="group relative overflow-hidden flex items-center gap-3 p-4 bg-gradient-to-r from-yellow-100 to-amber-100 dark:from-yellow-900/30 dark:to-amber-900/30 rounded-xl border-2 border-yellow-400 dark:border-yellow-600 shadow-md hover:shadow-lg transition-all">
                         <div className="absolute inset-0 bg-gradient-to-r from-yellow-400/20 to-amber-400/20 group-hover:from-yellow-400/30 group-hover:to-amber-400/30 transition-all"></div>
@@ -723,6 +742,23 @@ const Records: React.FC = () => {
                         </div>
                       </div>
                     )}
+
+                    {/* Heisman Trophy Winner */}
+                    {activeRecord.heisman && (
+                      <div className="flex items-center gap-3 p-4 bg-gradient-to-r from-purple-100 to-pink-100 dark:from-purple-900/30 dark:to-pink-900/30 rounded-xl border border-purple-300 dark:border-purple-700 shadow-md hover:shadow-lg transition-all">
+                        <Award className="h-6 w-6 text-purple-600 dark:text-purple-400" />
+                        <div>
+                          <p className="font-bold text-purple-900 dark:text-purple-200 text-base">
+                            Heisman Winner
+                          </p>
+                          <p className="text-sm font-semibold text-purple-700 dark:text-purple-400">
+                            {activeRecord.heisman}
+                          </p>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Most Recent Bowl Game Result */}
                     {activeRecord.bowlGame && (
                       <div className="flex items-center justify-between p-4 bg-gradient-to-r from-blue-100 to-indigo-100 dark:from-blue-900/30 dark:to-indigo-900/30 rounded-xl border border-blue-300 dark:border-blue-700 shadow-md hover:shadow-lg transition-all">
                         <div className="flex items-center gap-3">
@@ -748,19 +784,59 @@ const Records: React.FC = () => {
                         )}
                       </div>
                     )}
-                    {activeRecord.heisman && (
-                      <div className="flex items-center gap-3 p-4 bg-gradient-to-r from-purple-100 to-pink-100 dark:from-purple-900/30 dark:to-pink-900/30 rounded-xl border border-purple-300 dark:border-purple-700 shadow-md hover:shadow-lg transition-all">
-                        <Award className="h-6 w-6 text-purple-600 dark:text-purple-400" />
-                        <div>
-                          <p className="font-bold text-purple-900 dark:text-purple-200 text-base">
-                            Heisman Winner
-                          </p>
-                          <p className="text-sm font-semibold text-purple-700 dark:text-purple-400">
-                            {activeRecord.heisman}
-                          </p>
+
+                    {/* Bowl Game Trophies Won */}
+                    {activeRecord.bowlTrophies &&
+                      activeRecord.bowlTrophies.length > 0 && (
+                        <div className="space-y-2">
+                          {activeRecord.bowlTrophies.map((trophy, index) => (
+                            <div
+                              key={index}
+                              className="flex items-center gap-3 p-3 bg-gradient-to-r from-blue-100 to-cyan-100 dark:from-blue-900/30 dark:to-cyan-900/30 rounded-xl border border-blue-300 dark:border-blue-700 shadow-sm hover:shadow-md transition-all"
+                            >
+                              <Trophy className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                              <div>
+                                <p className="font-semibold text-blue-900 dark:text-blue-200">
+                                  Bowl Trophy
+                                </p>
+                                <p className="text-sm text-blue-700 dark:text-blue-400">
+                                  {trophy}
+                                </p>
+                              </div>
+                            </div>
+                          ))}
                         </div>
-                      </div>
-                    )}
+                      )}
+
+                    {/* Conference Championship Trophies */}
+                    {activeRecord.conferenceTrophies &&
+                      activeRecord.conferenceTrophies.length > 0 && (
+                        <div className="space-y-2">
+                          {activeRecord.conferenceTrophies.map(
+                            (trophy, index) => (
+                              <div
+                                key={index}
+                                className="flex items-center gap-3 p-3 bg-gradient-to-r from-green-100 to-emerald-100 dark:from-green-900/30 dark:to-emerald-900/30 rounded-xl border border-green-300 dark:border-green-700 shadow-sm hover:shadow-md transition-all"
+                              >
+                                <Medal className="h-5 w-5 text-green-600 dark:text-green-400" />
+                                <div className="flex items-center gap-2">
+                                  <ConferenceLogo
+                                    conference={trophy}
+                                    size="lg"
+                                  />
+                                  <div>
+                                    <p className="font-semibold text-green-900 dark:text-green-200">
+                                      Conference Championship
+                                    </p>
+                                  </div>
+                                </div>
+                              </div>
+                            )
+                          )}
+                        </div>
+                      )}
+
+                    {/* Rival Trophies Won */}
                     {activeRecord.rivalTrophies &&
                       activeRecord.rivalTrophies.length > 0 && (
                         <div className="space-y-2">
@@ -786,7 +862,11 @@ const Records: React.FC = () => {
                       !activeRecord.bowlGame &&
                       !activeRecord.heisman &&
                       (!activeRecord.rivalTrophies ||
-                        activeRecord.rivalTrophies.length === 0) && (
+                        activeRecord.rivalTrophies.length === 0) &&
+                      (!activeRecord.bowlTrophies ||
+                        activeRecord.bowlTrophies.length === 0) &&
+                      (!activeRecord.conferenceTrophies ||
+                        activeRecord.conferenceTrophies.length === 0) && (
                         <div className="text-center py-8">
                           <Trophy className="h-12 w-12 mx-auto mb-3 text-gray-300 dark:text-gray-600" />
                           <p className="text-sm text-gray-500 dark:text-gray-400 font-medium">

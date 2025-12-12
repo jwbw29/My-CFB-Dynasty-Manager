@@ -362,6 +362,40 @@ export const getRivalTrophiesForYear = (year: number): string[] => {
   }
 };
 
+export const getBowlTrophiesForYear = (year: number): string[] => {
+  try {
+    const storedTrophies = safeLocalStorage.getItem("allTrophies");
+    if (!storedTrophies) return [];
+
+    const allTrophies = JSON.parse(storedTrophies);
+    return allTrophies
+      .filter(
+        (trophy: any) => trophy.year === year && trophy.category === "bowl"
+      )
+      .map((trophy: any) => trophy.name || trophy.type);
+  } catch (error) {
+    console.error(`Error getting bowl trophies for year ${year}:`, error);
+    return [];
+  }
+};
+
+export const getConferenceTrophiesForYear = (year: number): string[] => {
+  try {
+    const storedTrophies = safeLocalStorage.getItem("allTrophies");
+    if (!storedTrophies) return [];
+
+    const allTrophies = JSON.parse(storedTrophies);
+    return allTrophies
+      .filter(
+        (trophy: any) => trophy.year === year && trophy.category === "conference"
+      )
+      .map((trophy: any) => trophy.name || trophy.type);
+  } catch (error) {
+    console.error(`Error getting conference trophies for year ${year}:`, error);
+    return [];
+  }
+};
+
 // --- Recruits ---
 export const getAllRecruits = (): Recruit[] => {
   const storedRecruits = safeLocalStorage.getItem(ALL_RECRUITS_KEY);
