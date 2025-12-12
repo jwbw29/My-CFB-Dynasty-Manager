@@ -78,7 +78,7 @@ const Navigation: React.FC<NavigationProps> = memo(
           onClick={onClick}
           className={`${
             isActive
-              ? "border-blue-500 text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/30"
+              ? "border-primary text-primary dark:text-primary-dark bg-primary/10 dark:bg-primary-dark/30"
               : "border-transparent text-gray-700 dark:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gray-50 dark:hover:bg-gray-700/50"
           } inline-flex items-center px-3 py-2 border-b-2 text-sm font-medium transition-all duration-200 rounded-t-md`}
         >
@@ -93,89 +93,89 @@ const Navigation: React.FC<NavigationProps> = memo(
           <div className="max-w-full mx-auto px-3 sm:px-4 lg:px-6 flex justify-between items-center min-h-14 py-2">
             {/* Left Side - Home Button & Mobile Menu Toggle */}
             <div className="flex items-center gap-2 shrink-0">
-            {onReturnToLaunch && (
-              <AlertDialog>
-                <AlertDialogTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 px-2 h-9"
-                    title="Return to Dynasty Selection"
-                  >
-                    <Home className="h-4 w-4" />
-                  </Button>
-                </AlertDialogTrigger>
-                <AlertDialogContent>
-                  <AlertDialogHeader>
-                    <AlertDialogTitle>Return to Main Menu?</AlertDialogTitle>
-                    <AlertDialogDescription>
-                      Would you like to save your current progress before
-                      returning to the dynasty selection screen? Any unsaved
-                      changes will be lost.
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <AlertDialogFooter>
-                    <AlertDialogCancel>Cancel</AlertDialogCancel>
-                    <AlertDialogAction onClick={handleSaveAndExit}>
-                      Save & Exit
-                    </AlertDialogAction>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
-            )}
-
-            {/* Mobile Menu Toggle - only show below md */}
-            <Button
-              id="menu-hamburger"
-              variant="ghost"
-              size="sm"
-              className="md:hidden text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 px-2 h-9"
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              aria-label="Toggle menu"
-            >
-              {isMobileMenuOpen ? (
-                <X className="h-5 w-5" />
-              ) : (
-                <Menu className="h-5 w-5" />
+              {onReturnToLaunch && (
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 px-2 h-9"
+                      title="Return to Dynasty Selection"
+                    >
+                      <Home className="h-4 w-4" />
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Return to Main Menu?</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        Would you like to save your current progress before
+                        returning to the dynasty selection screen? Any unsaved
+                        changes will be lost.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogAction onClick={handleSaveAndExit}>
+                        Save & Exit
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
               )}
-            </Button>
-          </div>
 
-          {/* Center - Navigation Items (Horizontal Scroll on md+) */}
-          <div className="hidden md:flex flex-1 overflow-x-auto scrollbar-hide px-2 mx-2">
-            <div className="flex gap-1 items-center">
-              {navItems.map((item) => (
-                <NavLink key={item.name} item={item} />
-              ))}
+              {/* Mobile Menu Toggle - only show below md */}
+              <Button
+                id="menu-hamburger"
+                variant="ghost"
+                size="sm"
+                className="md:hidden text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 px-2 h-9"
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                aria-label="Toggle menu"
+              >
+                {isMobileMenuOpen ? (
+                  <X className="h-5 w-5" />
+                ) : (
+                  <Menu className="h-5 w-5" />
+                )}
+              </Button>
             </div>
-          </div>
 
-          {/* Right Side - Coach Profile, Save Button, Theme Toggle */}
-          <div className="flex items-center gap-2 shrink-0 h-full">
-            <div className="hidden sm:block h-full">
-              <CoachProfile />
+            {/* Center - Navigation Items (Horizontal Scroll on md+) */}
+            <div className="hidden md:flex flex-1 overflow-x-auto scrollbar-hide px-2 mx-2">
+              <div className="flex gap-1 items-center">
+                {navItems.map((item) => (
+                  <NavLink key={item.name} item={item} />
+                ))}
+              </div>
             </div>
 
-            <div className="hidden sm:block h-6 w-px bg-gray-300 dark:bg-gray-600"></div>
+            {/* Right Side - Coach Profile, Save Button, Theme Toggle */}
+            <div className="flex items-center gap-2 shrink-0 h-full">
+              <div className="hidden sm:block h-full">
+                <CoachProfile />
+              </div>
 
-            {onManualSave && (
-              <>
-                <Button
-                  onClick={onManualSave}
-                  variant="ghost"
-                  size="sm"
-                  className="text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 h-9"
-                  title="Save Dynasty"
-                >
-                  <Save className="h-4 w-4 sm:mr-1" />
-                  <span className="hidden sm:inline">Save</span>
-                </Button>
+              <div className="hidden sm:block h-6 w-px bg-gray-300 dark:bg-gray-600"></div>
 
-                <div className="hidden sm:block h-6 w-px bg-gray-300 dark:bg-gray-600"></div>
-              </>
-            )}
+              {onManualSave && (
+                <>
+                  <Button
+                    onClick={onManualSave}
+                    variant="outline"
+                    size="default"
+                    className="border-primary text-primary hover:text-primary hover:bg-primary/10"
+                    title="Save Dynasty"
+                  >
+                    <Save className="h-4 w-4 sm:mr-1" />
+                    <span className="hidden sm:inline">Save</span>
+                  </Button>
 
-            <ThemeToggle />
+                  <div className="hidden sm:block h-6 w-px bg-gray-300 dark:bg-gray-600"></div>
+                </>
+              )}
+
+              <ThemeToggle />
             </div>
           </div>
 

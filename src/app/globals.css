@@ -1,4 +1,3 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -82,7 +81,7 @@
 }
 
 .table-hover-cell::after {
-  content: '';
+  content: "";
   position: absolute;
   z-index: -1;
   top: 0;
@@ -156,6 +155,23 @@
   border-color: var(--school-secondary);
 }
 
+.border-school-accent {
+  border-color: var(--school-accent);
+}
+
+/* Text School Colors */
+.text-school-primary {
+  color: var(--school-primary);
+}
+
+.text-school-secondary {
+  color: var(--school-secondary);
+}
+
+.text-school-accent {
+  color: var(--school-accent);
+}
+
 /* Navigation and header styling with school colors */
 .nav-school-themed {
   border-left: 4px solid var(--school-primary);
@@ -164,7 +180,11 @@
 /* Card headers with school color accents */
 .card-header-school {
   border-bottom: 2px solid var(--school-primary);
-  background: linear-gradient(90deg, var(--school-primary)10, transparent 100%);
+  background: linear-gradient(
+    90deg,
+    var(--school-primary) 10,
+    transparent 100%
+  );
 }
 
 /* Stats cards with school color theming */
@@ -174,7 +194,11 @@
 
 /* Table headers with school colors */
 .table-header-school {
-  background: linear-gradient(135deg, var(--school-primary) 0%, var(--school-secondary) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--school-primary) 0%,
+    var(--school-secondary) 100%
+  );
   color: white;
 }
 
@@ -207,41 +231,49 @@
 /* Form focus states */
 .input-school-focus:focus {
   border-color: var(--school-primary);
-  box-shadow: 0 0 0 2px var(--school-primary)20;
+  box-shadow: 0 0 0 2px var(--school-primary) 20;
 }
 
 /* Active states for navigation */
 .nav-active-school {
-  background-color: var(--school-primary)10;
+  background-color: var(--school-primary) 10;
   border-left: 4px solid var(--school-primary);
 }
 
 /* Specific component styling */
 .roster-row-hover:hover {
-  background-color: var(--school-primary)05;
+  background-color: var(--school-primary) 05;
 }
 
 /* Schedule game result styling */
 .game-win {
   border-left: 4px solid var(--school-primary);
-  background-color: var(--school-primary)08;
+  background-color: var(--school-primary) 08;
 }
 
 .game-loss {
   border-left: 4px solid var(--school-secondary);
-  background-color: var(--school-secondary)08;
+  background-color: var(--school-secondary) 08;
 }
 
 /* Player stats table styling */
 .stats-leader {
-  background: linear-gradient(90deg, var(--school-primary)15 0%, transparent 100%);
+  background: linear-gradient(
+    90deg,
+    var(--school-primary) 15 0%,
+    transparent 100%
+  );
   border-left: 3px solid var(--school-primary);
 }
 
 /* Trophy and awards styling */
 .trophy-school {
   color: var(--school-accent);
-  background: linear-gradient(135deg, var(--school-primary)10 0%, var(--school-secondary)10 100%);
+  background: linear-gradient(
+    135deg,
+    var(--school-primary) 10 0%,
+    var(--school-secondary) 10 100%
+  );
 }
 
 /* Recruiting class styling */
@@ -251,12 +283,20 @@
 
 /* Dashboard stat boxes */
 .dashboard-stat-primary {
-  background: linear-gradient(135deg, var(--school-primary) 0%, var(--school-primary-hover) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--school-primary) 0%,
+    var(--school-primary-hover) 100%
+  );
   color: white;
 }
 
 .dashboard-stat-secondary {
-  background: linear-gradient(135deg, var(--school-secondary) 0%, var(--school-secondary-light) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--school-secondary) 0%,
+    var(--school-secondary-light) 100%
+  );
   color: white;
 }
 
@@ -281,11 +321,11 @@
 /* Scrollbar hide utility */
 @layer utilities {
   .scrollbar-hide {
-    -ms-overflow-style: none;  /* IE and Edge */
-    scrollbar-width: none;  /* Firefox */
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
   }
 
   .scrollbar-hide::-webkit-scrollbar {
-    display: none;  /* Chrome, Safari and Opera */
+    display: none; /* Chrome, Safari and Opera */
   }
 }

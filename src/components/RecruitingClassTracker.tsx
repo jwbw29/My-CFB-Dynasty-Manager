@@ -487,10 +487,10 @@ const RecruitingClassTracker: React.FC = () => {
   return (
     <div className="space-y-8">
       {/* Hero Header */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 dark:from-blue-950/30 dark:via-purple-950/30 dark:to-pink-950/30 border border-gray-200 dark:border-gray-700 shadow-lg">
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary/10 to-accent dark:from-blue-950/30 dark:via-purple-950/30 dark:to-pink-950/30 border border-gray-200 dark:border-gray-700 shadow-lg">
         <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
         <div className="relative p-6 md:p-8 text-center">
-          <h1 className="text-4xl md:text-5xl font-black bg-gradient-to-r from-gray-900 via-gray-700 to-gray-900 dark:from-gray-100 dark:via-gray-300 dark:to-gray-100 bg-clip-text text-transparent">
+          <h1 className="text-4xl md:text-5xl leading-relaxed md:leading-relaxed font-black bg-gradient-to-r from-gray-900 via-gray-700 to-gray-900 dark:from-gray-100 dark:via-gray-300 dark:to-gray-100 bg-clip-text text-transparent">
             Recruiting Class Tracker
           </h1>
         </div>
@@ -499,10 +499,12 @@ const RecruitingClassTracker: React.FC = () => {
       {/* Recruiting Needs Section */}
       <Card className="border-2 border-gray-200 dark:border-gray-700 shadow-xl overflow-hidden">
         <div
-          className="bg-gradient-to-r from-green-600 to-emerald-600 p-6 cursor-pointer flex flex-row items-center justify-between hover:from-green-700 hover:to-emerald-700 transition-all"
+          className="bg-gradient-to-r from-primary to-primary/90 p-6 cursor-pointer flex flex-row items-center justify-between hover:from-primary/80 hover:to-primary/70 transition-all"
           onClick={() => setIsNeedsExpanded(!isNeedsExpanded)}
         >
-          <span className="text-2xl font-black text-white">Recruiting Needs Board</span>
+          <span className="text-2xl font-black text-white">
+            Recruiting Needs Board
+          </span>
           {isNeedsExpanded ? (
             <ChevronUp className="h-6 w-6 text-white" />
           ) : (
@@ -531,9 +533,11 @@ const RecruitingClassTracker: React.FC = () => {
       </Card>
 
       <Card className="border-2 border-gray-200 dark:border-gray-700 shadow-xl overflow-hidden">
-        <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-6">
+        <div className="bg-gradient-to-r from-primary to-primary/90 p-6">
           <div className="flex justify-between items-center">
-            <span className="text-2xl font-black text-white">Add New Recruit for Year: {selectedYear}</span>
+            <span className="text-2xl font-black text-white">
+              Add New Recruit for Year: {selectedYear}
+            </span>
           </div>
         </div>
         <CardHeader className="hidden"></CardHeader>

@@ -589,7 +589,7 @@ const DynastyLaunch: React.FC<DynastyLaunchProps> = ({ onDynastySelected }) => {
     <div className="relative min-h-screen bg-gray-800 flex items-center justify-center p-4 overflow-hidden">
       <div className="w-full max-w-6xl">
         <div className="text-center mb-8">
-          <h1 className="text-5xl font-bold text-white mb-4 flex items-center justify-center gap-3">
+          <h1 className="text-5xl leading-relaxed md:leading-relaxed font-bold text-white mb-4 flex items-center justify-center gap-3">
             <Trophy className="h-12 w-12 text-yellow-400" />
             CFB Dynasty Manager
           </h1>

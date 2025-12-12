@@ -523,7 +523,7 @@ const TrophyCase: React.FC = () => {
               <Trophy className="h-16 w-16 text-yellow-600 dark:text-yellow-400 relative" />
             </div>
           </div>
-          <h1 className="text-4xl md:text-5xl font-black bg-gradient-to-r from-yellow-700 via-amber-600 to-yellow-700 dark:from-yellow-400 dark:via-amber-300 dark:to-yellow-400 bg-clip-text text-transparent">
+          <h1 className="text-4xl md:text-5xl leading-relaxed md:leading-relaxed font-black bg-gradient-to-r from-yellow-700 via-amber-600 to-yellow-700 dark:from-yellow-400 dark:via-amber-300 dark:to-yellow-400 bg-clip-text text-transparent">
             Dynasty Trophy Case
           </h1>
           <p className="text-base font-semibold text-gray-600 dark:text-gray-400 mt-2">
@@ -676,7 +676,7 @@ const TrophyCase: React.FC = () => {
                   onValueChange={(value) =>
                     setNewTrophy({
                       ...newTrophy,
-                      opponent: value === "NONE" ? "" : value
+                      opponent: value === "NONE" ? "" : value,
                     })
                   }
                 >
@@ -688,7 +688,9 @@ const TrophyCase: React.FC = () => {
                           <span>
                             {(() => {
                               const rank = getRankForTeam(newTrophy.opponent);
-                              return rank ? `#${rank} ${newTrophy.opponent}` : newTrophy.opponent;
+                              return rank
+                                ? `#${rank} ${newTrophy.opponent}`
+                                : newTrophy.opponent;
                             })()}
                           </span>
                         </div>
@@ -700,7 +702,9 @@ const TrophyCase: React.FC = () => {
                   <SelectContent className="max-h-60">
                     <SelectItem value="NONE">No Opponent</SelectItem>
                     {availableTeams.map((team) => {
-                      const isCustom = CustomTeamManager.isCustomTeam(team.name);
+                      const isCustom = CustomTeamManager.isCustomTeam(
+                        team.name
+                      );
                       const isFCS = "isFCS" in team && team.isFCS;
                       const rank = getRankForTeam(team.name);
                       return (
@@ -709,7 +713,8 @@ const TrophyCase: React.FC = () => {
                             <div className="flex items-center gap-2">
                               <TeamLogo teamName={team.name} size="xs" />
                               <span>
-                                {rank ? `#${rank} ` : ""}{team.name}
+                                {rank ? `#${rank} ` : ""}
+                                {team.name}
                               </span>
                             </div>
                             <div className="flex items-center gap-1 ml-2">
@@ -885,11 +890,18 @@ const TrophyCase: React.FC = () => {
                                     <span className="font-medium">
                                       Defeated:
                                     </span>
-                                    <TeamLogo teamName={trophy.opponent} size="xs" />
+                                    <TeamLogo
+                                      teamName={trophy.opponent}
+                                      size="xs"
+                                    />
                                     <span className={categoryInfo.textColor}>
                                       {(() => {
-                                        const rank = getRankForTeam(trophy.opponent);
-                                        return rank ? `#${rank} ${trophy.opponent}` : trophy.opponent;
+                                        const rank = getRankForTeam(
+                                          trophy.opponent
+                                        );
+                                        return rank
+                                          ? `#${rank} ${trophy.opponent}`
+                                          : trophy.opponent;
                                       })()}
                                     </span>
                                   </div>

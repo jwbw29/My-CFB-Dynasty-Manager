@@ -1,27 +1,37 @@
 // src/components/InsightsPage.tsx
 "use client";
 
-import React, { useState } from 'react';
-import { Card, CardHeader, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Badge } from '@/components/ui/badge';
-import SmartInsights from '@/components/SmartInsights';
-import { Brain, Filter, RefreshCw } from 'lucide-react';
+import React, { useState } from "react";
+import { Card, CardHeader, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
+import SmartInsights from "@/components/SmartInsights";
+import { Brain, Filter, RefreshCw } from "lucide-react";
 
 const InsightsPage: React.FC = () => {
-  const [filter, setFilter] = useState<'all' | 'critical' | 'high' | 'medium' | 'low'>('all');
-  const [category, setCategory] = useState<'all' | 'roster' | 'performance' | 'recruiting' | 'season'>('all');
+  const [filter, setFilter] = useState<
+    "all" | "critical" | "high" | "medium" | "low"
+  >("all");
+  const [category, setCategory] = useState<
+    "all" | "roster" | "performance" | "recruiting" | "season"
+  >("all");
   const [refreshKey, setRefreshKey] = useState(0);
 
   const handleRefresh = () => {
-    setRefreshKey(prev => prev + 1);
+    setRefreshKey((prev) => prev + 1);
   };
 
   return (
     <div className="space-y-8">
       {/* Hero Header */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 dark:from-blue-950/30 dark:via-purple-950/30 dark:to-pink-950/30 border border-gray-200 dark:border-gray-700 shadow-lg">
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary/10 to-accent dark:from-blue-950/30 dark:via-purple-950/30 dark:to-pink-950/30 border border-gray-200 dark:border-gray-700 shadow-lg">
         <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
         <div className="relative p-6 md:p-8">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -31,14 +41,20 @@ const InsightsPage: React.FC = () => {
                 <Brain className="h-16 w-16 text-blue-600 dark:text-blue-400 relative" />
               </div>
               <div>
-                <h1 className="text-4xl md:text-5xl font-black bg-gradient-to-r from-gray-900 via-gray-700 to-gray-900 dark:from-gray-100 dark:via-gray-300 dark:to-gray-100 bg-clip-text text-transparent">
+                <h1 className="text-4xl md:text-5xl leading-relaxed md:leading-relaxed font-black bg-gradient-to-r from-gray-900 via-gray-700 to-gray-900 dark:from-gray-100 dark:via-gray-300 dark:to-gray-100 bg-clip-text text-transparent">
                   Smart Insights
                 </h1>
-                <p className="text-base font-semibold text-gray-600 dark:text-gray-400 mt-1">AI-powered recommendations for your dynasty</p>
+                <p className="text-base font-semibold text-gray-600 dark:text-gray-400 mt-1">
+                  AI-powered recommendations for your dynasty
+                </p>
               </div>
             </div>
 
-            <Button onClick={handleRefresh} variant="outline" className="flex items-center gap-2 bg-white dark:bg-gray-800">
+            <Button
+              onClick={handleRefresh}
+              variant="outline"
+              className="flex items-center gap-2 bg-white dark:bg-gray-800"
+            >
               <RefreshCw className="h-4 w-4" />
               Refresh Insights
             </Button>
@@ -58,7 +74,10 @@ const InsightsPage: React.FC = () => {
           <div className="flex flex-col sm:flex-row gap-4">
             <div className="space-y-2">
               <label className="text-sm font-medium">Priority Level</label>
-              <Select value={filter} onValueChange={(value: any) => setFilter(value)}>
+              <Select
+                value={filter}
+                onValueChange={(value: any) => setFilter(value)}
+              >
                 <SelectTrigger className="w-40">
                   <SelectValue placeholder="Filter by priority" />
                 </SelectTrigger>
@@ -90,7 +109,10 @@ const InsightsPage: React.FC = () => {
 
             <div className="space-y-2">
               <label className="text-sm font-medium">Category</label>
-              <Select value={category} onValueChange={(value: any) => setCategory(value)}>
+              <Select
+                value={category}
+                onValueChange={(value: any) => setCategory(value)}
+              >
                 <SelectTrigger className="w-40">
                   <SelectValue placeholder="Filter by category" />
                 </SelectTrigger>
@@ -109,8 +131,8 @@ const InsightsPage: React.FC = () => {
 
       {/* Insights Grid */}
       <div key={refreshKey}>
-        <SmartInsights 
-          showHeader={false} 
+        <SmartInsights
+          showHeader={false}
           context="full"
           priorityFilter={filter}
           categoryFilter={category}
@@ -129,17 +151,31 @@ const InsightsPage: React.FC = () => {
               </h3>
               <div className="text-sm text-blue-800 dark:text-blue-200 space-y-2">
                 <p>
-                  Smart Insights analyzes your dynasty data to provide personalized recommendations:
+                  Smart Insights analyzes your dynasty data to provide
+                  personalized recommendations:
                 </p>
                 <ul className="list-disc list-inside space-y-1 ml-4">
-                  <li><strong>Roster Analysis:</strong> Identifies depth chart gaps and graduation impacts</li>
-                  <li><strong>Performance Tracking:</strong> Monitors win/loss trends and bowl eligibility</li>
-                  <li><strong>Recruiting Intelligence:</strong> Suggests position needs and class balance</li>
-                  <li><strong>Season Predictions:</strong> Projects outcomes based on current performance</li>
+                  <li>
+                    <strong>Roster Analysis:</strong> Identifies depth chart
+                    gaps and graduation impacts
+                  </li>
+                  <li>
+                    <strong>Performance Tracking:</strong> Monitors win/loss
+                    trends and bowl eligibility
+                  </li>
+                  <li>
+                    <strong>Recruiting Intelligence:</strong> Suggests position
+                    needs and class balance
+                  </li>
+                  <li>
+                    <strong>Season Predictions:</strong> Projects outcomes based
+                    on current performance
+                  </li>
                 </ul>
                 <p className="mt-3">
-                  Insights are updated in real-time as you add games, players, and recruiting classes.
-                  Dismissed insights won't show again unless the situation changes significantly.
+                  Insights are updated in real-time as you add games, players,
+                  and recruiting classes. Dismissed insights won't show again
+                  unless the situation changes significantly.
                 </p>
               </div>
             </div>

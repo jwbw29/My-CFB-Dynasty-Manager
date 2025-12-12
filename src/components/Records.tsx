@@ -531,7 +531,7 @@ const Records: React.FC = () => {
             {/* All Content Below the tabs */}
             <div className="space-y-8 max-w-7xl mx-auto">
               {/* Hero Section - Enhanced Header with Key Stats */}
-              <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 dark:from-blue-950/30 dark:via-purple-950/30 dark:to-pink-950/30 border border-gray-200 dark:border-gray-700 shadow-lg">
+              <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary/10 to-accent dark:from-blue-950/30 dark:via-purple-950/30 dark:to-pink-950/30 border border-gray-200 dark:border-gray-700 shadow-lg">
                 <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
                 <div className="relative p-8">
                   {/* Header with Logo and Title */}
@@ -547,7 +547,7 @@ const Records: React.FC = () => {
                         ) : null;
                       })()}
                       <div className="text-center md:text-left">
-                        <h2 className="text-4xl md:text-5xl font-black bg-gradient-to-r from-gray-900 via-gray-700 to-gray-900 dark:from-gray-100 dark:via-gray-300 dark:to-gray-100 bg-clip-text text-transparent">
+                        <h2 className="text-4xl md:text-5xl leading-relaxed md:leading-relaxed font-black bg-gradient-to-r from-gray-900 via-gray-700 to-gray-900 dark:from-gray-100 dark:via-gray-300 dark:to-gray-100 bg-clip-text text-transparent">
                           {activeRecord.year} Season
                         </h2>
                         <div className="flex items-center justify-center md:justify-start gap-2 mt-2">
@@ -609,7 +609,7 @@ const Records: React.FC = () => {
                           <p className="text-xs font-bold text-blue-700 dark:text-blue-400 uppercase tracking-wider mb-1">
                             Overall Record
                           </p>
-                          <p className="text-5xl font-black text-blue-900 dark:text-blue-100">
+                          <p className="text-5xl leading-relaxed md:leading-relaxed font-black text-blue-900 dark:text-blue-100">
                             {activeRecord.overallRecord || "0-0"}
                           </p>
                         </div>
@@ -679,7 +679,7 @@ const Records: React.FC = () => {
                           <p className="text-xs font-bold text-yellow-700 dark:text-yellow-400 uppercase tracking-wider mb-1">
                             National Rank
                           </p>
-                          <p className="text-5xl font-black text-yellow-700 dark:text-yellow-400">
+                          <p className="text-5xl leading-relaxed md:leading-relaxed font-black text-yellow-700 dark:text-yellow-400">
                             #{activeRecord.finalRanking || "NR"}
                           </p>
                         </div>
@@ -702,11 +702,12 @@ const Records: React.FC = () => {
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {/* Season Achievements */}
                 <Card className="border-2 border-gray-200 dark:border-gray-700 shadow-xl hover:shadow-2xl transition-shadow overflow-hidden">
-                  <div className="bg-gradient-to-r from-amber-500 to-orange-500 p-4">
+                  <div className="bg-gradient-to-r from-primary to-primary/90 p-4">
                     <CardTitle className="text-xl font-black text-white flex items-center gap-2">
                       <Trophy className="h-6 w-6" /> Season Achievements
                     </CardTitle>
                   </div>
+
                   <CardContent className="p-5 space-y-3 bg-gradient-to-br from-gray-50 to-white dark:from-gray-900 dark:to-gray-800">
                     {activeRecord.natChamp && (
                       <div className="group relative overflow-hidden flex items-center gap-3 p-4 bg-gradient-to-r from-yellow-100 to-amber-100 dark:from-yellow-900/30 dark:to-amber-900/30 rounded-xl border-2 border-yellow-400 dark:border-yellow-600 shadow-md hover:shadow-lg transition-all">
@@ -798,11 +799,12 @@ const Records: React.FC = () => {
 
                 {/* Schedule Highlights */}
                 <Card className="border-2 border-gray-200 dark:border-gray-700 shadow-xl hover:shadow-2xl transition-shadow overflow-hidden">
-                  <div className="bg-gradient-to-r from-indigo-500 to-purple-500 p-4">
+                  <div className="bg-gradient-to-r from-primary to-primary/90 p-4">
                     <CardTitle className="text-xl font-black text-white flex items-center gap-2">
                       <Zap className="h-6 w-6" /> Schedule Highlights
                     </CardTitle>
                   </div>
+
                   <CardContent className="p-5 space-y-3 bg-gradient-to-br from-gray-50 to-white dark:from-gray-900 dark:to-gray-800">
                     {scheduleHighlights.bestWin && (
                       <div className="flex items-center gap-3 p-4 bg-gradient-to-r from-green-100 to-emerald-100 dark:from-green-900/30 dark:to-emerald-900/30 rounded-xl border-l-4 border-green-500 shadow-md hover:shadow-lg transition-all">
@@ -870,11 +872,12 @@ const Records: React.FC = () => {
 
                 {/* NFL Draft Class Preview */}
                 <Card className="border-2 border-gray-200 dark:border-gray-700 shadow-xl hover:shadow-2xl transition-shadow overflow-hidden">
-                  <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-4">
+                  <div className="bg-gradient-to-r from-primary to-primary/90 p-4">
                     <CardTitle className="text-xl font-black text-white flex items-center gap-2">
                       <ShieldCheck className="h-6 w-6" /> NFL Draft Class
                     </CardTitle>
                   </div>
+
                   <CardContent className="p-5 bg-gradient-to-br from-gray-50 to-white dark:from-gray-900 dark:to-gray-800">
                     {(activeRecord.playersDrafted || []).length > 0 ? (
                       <div className="space-y-4">
@@ -956,7 +959,7 @@ const Records: React.FC = () => {
                                 Total Offense
                               </p>
                             </div>
-                            <p className="text-5xl font-black text-green-800 dark:text-green-200 mb-1">
+                            <p className="text-5xl leading-relaxed md:leading-relaxed font-black text-green-800 dark:text-green-200 mb-1">
                               {activeRecord.teamStats.totalOffense.toLocaleString()}
                             </p>
                             <p className="text-xs font-semibold text-green-600 dark:text-green-500">
@@ -977,7 +980,7 @@ const Records: React.FC = () => {
                                 Total Defense
                               </p>
                             </div>
-                            <p className="text-5xl font-black text-red-800 dark:text-red-200 mb-1">
+                            <p className="text-5xl leading-relaxed md:leading-relaxed font-black text-red-800 dark:text-red-200 mb-1">
                               {activeRecord.teamStats.totalDefense.toLocaleString()}
                             </p>
                             <p className="text-xs font-semibold text-red-600 dark:text-red-500">
@@ -998,7 +1001,7 @@ const Records: React.FC = () => {
                                 Avg Margin
                               </p>
                             </div>
-                            <p className="text-5xl font-black text-purple-800 dark:text-purple-200 mb-1">
+                            <p className="text-5xl leading-relaxed md:leading-relaxed font-black text-purple-800 dark:text-purple-200 mb-1">
                               {(
                                 (activeRecord.teamStats.points -
                                   activeRecord.teamStats.defPoints) /

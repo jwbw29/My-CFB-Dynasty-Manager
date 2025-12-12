@@ -554,10 +554,10 @@ const Roster: React.FC = () => {
   return (
     <div className="space-y-8">
       {/* Hero Header */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 dark:from-blue-950/30 dark:via-purple-950/30 dark:to-pink-950/30 border border-gray-200 dark:border-gray-700 shadow-lg">
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary/10 to-accent dark:from-blue-950/30 dark:via-purple-950/30 dark:to-pink-950/30 border border-gray-200 dark:border-gray-700 shadow-lg">
         <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
         <div className="relative p-6 md:p-8 text-center">
-          <h1 className="text-4xl md:text-5xl font-black bg-gradient-to-r from-gray-900 via-gray-700 to-gray-900 dark:from-gray-100 dark:via-gray-300 dark:to-gray-100 bg-clip-text text-transparent">
+          <h1 className="text-4xl md:text-5xl leading-relaxed md:leading-relaxed font-black bg-gradient-to-r from-gray-900 via-gray-700 to-gray-900 dark:from-gray-100 dark:via-gray-300 dark:to-gray-100 bg-clip-text text-transparent">
             Roster Management
           </h1>
         </div>
@@ -565,7 +565,7 @@ const Roster: React.FC = () => {
 
       {/* Coaches Section */}
       <Card className="border-2 border-gray-200 dark:border-gray-700 shadow-xl overflow-hidden">
-        <div className="bg-gradient-to-r from-indigo-600 to-purple-600 p-6">
+        <div className="bg-gradient-to-r from-primary to-primary/90 p-6">
           <CardTitle className="text-2xl font-black text-white">
             Coaching Staff
           </CardTitle>
@@ -712,9 +712,11 @@ const Roster: React.FC = () => {
       </Card>
 
       <Card className="border-2 border-gray-200 dark:border-gray-700 shadow-xl overflow-hidden">
-        <div className="bg-gradient-to-r from-blue-600 to-cyan-600 p-6">
+        <div className="bg-gradient-to-r from-primary to-primary/90 p-6">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-            <CardTitle className="text-2xl font-black text-white">Team Roster</CardTitle>
+            <CardTitle className="text-2xl font-black text-white">
+              Team Roster
+            </CardTitle>
             <div className="flex flex-wrap items-center gap-2">
               <Button
                 onClick={handleOpenAddForm}

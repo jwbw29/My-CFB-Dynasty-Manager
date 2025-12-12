@@ -573,23 +573,25 @@ const SchedulePage = () => {
   return (
     <div className="max-w-7xl mx-auto space-y-8">
       {/* Hero Header Section */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 dark:from-blue-950/30 dark:via-purple-950/30 dark:to-pink-950/30 border border-gray-200 dark:border-gray-700 shadow-lg">
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary/10 to-accent dark:from-blue-950/30 dark:via-purple-950/30 dark:to-pink-950/30 border border-gray-200 dark:border-gray-700 shadow-lg">
         <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
         <div className="relative p-6 md:p-8">
           <div className="flex items-center justify-center gap-6">
             {teamData && (
               <div className="relative">
-                <div className="absolute inset-0 bg-gradient-to-br from-blue-400 to-purple-400 rounded-full blur-xl opacity-20"></div>
+                <div className="absolute inset-0 bg-gradient-to-br from-primary to-secondary rounded-full blur-xl opacity-20"></div>
                 <TeamLogo teamName={teamData.name} size="3xl" />
               </div>
             )}
-            <div className="text-center">
-              <h1 className="text-4xl md:text-5xl font-black bg-gradient-to-r from-gray-900 via-gray-700 to-gray-900 dark:from-gray-100 dark:via-gray-300 dark:to-gray-100 bg-clip-text text-transparent flex items-center gap-3 justify-center">
+
+            {/* Title and Conference */}
+            <div className="flex flex-col justify-center items-center text-center gap-2">
+              <h1 className="text-4xl md:text-5xl leading-relaxed md:leading-relaxed font-black bg-gradient-to-r from-gray-900 via-gray-700 to-gray-900 dark:from-gray-100 dark:via-gray-300 dark:to-gray-100 bg-clip-text text-transparent flex items-center gap-3 justify-center">
                 <Calendar className="h-10 w-10 text-blue-600 dark:text-blue-400" />
                 {currentYear} Schedule
               </h1>
               {teamData && teamData.conference && (
-                <div className="flex items-center justify-center gap-2 mt-2">
+                <div className="flex items-center justify-center gap-2">
                   <ConferenceLogo conference={teamData.conference} size="xl" />
                   <span className="text-base font-semibold text-gray-700 dark:text-gray-300">
                     {teamData.conference}
@@ -605,14 +607,15 @@ const SchedulePage = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {/* Overall record */}
         <Card className="border-2 border-gray-200 dark:border-gray-700 shadow-xl overflow-hidden hover:shadow-2xl transition-shadow">
-          <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-4">
+          <div className="bg-primary p-4">
             <h3 className="text-lg font-black text-white flex items-center justify-center gap-2">
               <Trophy className="h-5 w-5" />
               Overall
             </h3>
           </div>
+
           <CardContent className="p-6 text-center bg-gradient-to-br from-gray-50 to-white dark:from-gray-900 dark:to-gray-800">
-            <div className="text-5xl font-black text-blue-600 dark:text-blue-400">
+            <div className="text-5xl leading-relaxed md:leading-relaxed font-black text-blue-600 dark:text-blue-400">
               {record.wins}-{record.losses}
               {record.ties > 0 ? `-${record.ties}` : ""}
             </div>
@@ -624,14 +627,15 @@ const SchedulePage = () => {
 
         {/* Home record */}
         <Card className="border-2 border-gray-200 dark:border-gray-700 shadow-xl overflow-hidden hover:shadow-2xl transition-shadow">
-          <div className="bg-gradient-to-r from-green-600 to-emerald-600 p-4">
+          <div className="bg-primary p-4">
             <h3 className="text-lg font-black text-white flex items-center justify-center gap-2">
               <TrendingUp className="h-5 w-5" />
               Home
             </h3>
           </div>
+
           <CardContent className="p-6 text-center bg-gradient-to-br from-gray-50 to-white dark:from-gray-900 dark:to-gray-800">
-            <div className="text-5xl font-black text-green-600 dark:text-green-400">
+            <div className="text-5xl leading-relaxed md:leading-relaxed font-black text-green-600 dark:text-green-400">
               {locationRecords.home.wins}-{locationRecords.home.losses}
             </div>
             <div className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mt-2">
@@ -642,14 +646,15 @@ const SchedulePage = () => {
 
         {/* Away record */}
         <Card className="border-2 border-gray-200 dark:border-gray-700 shadow-xl overflow-hidden hover:shadow-2xl transition-shadow">
-          <div className="bg-gradient-to-r from-red-600 to-rose-600 p-4">
+          <div className="bg-primary p-4">
             <h3 className="text-lg font-black text-white flex items-center justify-center gap-2">
               <TrendingDown className="h-5 w-5" />
               Away
             </h3>
           </div>
+
           <CardContent className="p-6 text-center bg-gradient-to-br from-gray-50 to-white dark:from-gray-900 dark:to-gray-800">
-            <div className="text-5xl font-black text-red-600 dark:text-red-400">
+            <div className="text-5xl leading-relaxed md:leading-relaxed font-black text-red-600 dark:text-red-400">
               {locationRecords.away.wins}-{locationRecords.away.losses}
             </div>
             <div className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mt-2">
@@ -660,14 +665,15 @@ const SchedulePage = () => {
 
         {/* Neutral site record */}
         <Card className="border-2 border-gray-200 dark:border-gray-700 shadow-xl overflow-hidden hover:shadow-2xl transition-shadow">
-          <div className="bg-gradient-to-r from-purple-600 to-pink-600 p-4">
+          <div className="bg-primary p-4">
             <h3 className="text-lg font-black text-white flex items-center justify-center gap-2">
               <Minus className="h-5 w-5" />
               Neutral
             </h3>
           </div>
+
           <CardContent className="p-6 text-center bg-gradient-to-br from-gray-50 to-white dark:from-gray-900 dark:to-gray-800">
-            <div className="text-5xl font-black text-purple-600 dark:text-purple-400">
+            <div className="text-5xl leading-relaxed md:leading-relaxed font-black text-purple-600 dark:text-purple-400">
               {locationRecords.neutral.wins}-{locationRecords.neutral.losses}
             </div>
             <div className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mt-2">

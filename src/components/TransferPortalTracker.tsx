@@ -180,7 +180,7 @@ const TransferPortalTracker: React.FC = () => {
   };
 
   const saveEdit = () => {
-    const transferToEdit = allTransfers.find(t => t.id === editingId);
+    const transferToEdit = allTransfers.find((t) => t.id === editingId);
     if (!transferToEdit) return;
 
     if (transferToEdit.transferDirection === "From") {
@@ -274,213 +274,240 @@ const TransferPortalTracker: React.FC = () => {
   return (
     <div className="space-y-8">
       {/* Hero Header */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 dark:from-blue-950/30 dark:via-purple-950/30 dark:to-pink-950/30 border border-gray-200 dark:border-gray-700 shadow-lg">
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary/10 to-accent dark:from-blue-950/30 dark:via-purple-950/30 dark:to-pink-950/30 border border-gray-200 dark:border-gray-700 shadow-lg">
         <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
         <div className="relative p-6 md:p-8 text-center">
-          <h1 className="text-4xl md:text-5xl font-black bg-gradient-to-r from-gray-900 via-gray-700 to-gray-900 dark:from-gray-100 dark:via-gray-300 dark:to-gray-100 bg-clip-text text-transparent">
+          <h1 className="text-4xl md:text-5xl leading-relaxed md:leading-relaxed font-black bg-gradient-to-r from-gray-900 via-gray-700 to-gray-900 dark:from-gray-100 dark:via-gray-300 dark:to-gray-100 bg-clip-text text-transparent">
             Transfer Portal Tracker
           </h1>
         </div>
       </div>
 
       {/* Edit Transfer Form - Conditional based on what's being edited */}
-      {editingId && (() => {
-        const transferBeingEdited = allTransfers.find(t => t.id === editingId);
-        if (!transferBeingEdited) return null;
-
-        if (transferBeingEdited.transferDirection === "To") {
-          return (
-            <Card>
-              <CardHeader className="text-xl font-semibold">
-                <div className="flex justify-between items-center">
-                  <span>Edit Outgoing Transfer</span>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-6 gap-4 mb-4">
-                  <Input
-                    value={editingOutgoingTransfer.playerName}
-                    onChange={(e) =>
-                      setEditingOutgoingTransfer({ ...editingOutgoingTransfer, playerName: e.target.value })
-                    }
-                    placeholder="Player Name"
-                  />
-                  <Select
-                    value={editingOutgoingTransfer.position}
-                    onValueChange={(value) =>
-                      setEditingOutgoingTransfer({ ...editingOutgoingTransfer, position: value })
-                    }
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Position" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {generalPositions.map((pos) => (
-                        <SelectItem key={pos} value={pos}>
-                          {pos}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <Select
-                    value={editingOutgoingTransfer.stars}
-                    onValueChange={(value) =>
-                      setEditingOutgoingTransfer({ ...editingOutgoingTransfer, stars: value })
-                    }
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Stars" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {starOptions.map((stars) => (
-                        <SelectItem key={stars} value={stars}>
-                          {stars} ⭐
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <div className="flex items-center justify-center bg-red-50 dark:bg-red-900/20 rounded border px-3">
-                    <span className="text-red-600 dark:text-red-400 font-medium">To</span>
-                  </div>
-                  <Select
-                    value={editingOutgoingTransfer.school}
-                    onValueChange={(value) =>
-                      setEditingOutgoingTransfer({ ...editingOutgoingTransfer, school: value })
-                    }
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="School" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {fbsTeams.map((team) => (
-                        <SelectItem key={team.name} value={team.name}>
-                          <div className="flex items-center gap-2">
-                            <TeamLogo teamName={team.name} size="sm" />
-                            <span>{team.name}</span>
-                          </div>
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <div className="flex gap-2">
-                    <Button onClick={saveEdit} size="sm">
-                      Save
-                    </Button>
-                    <Button onClick={cancelEdit} variant="outline" size="sm">
-                      Cancel
-                    </Button>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+      {editingId &&
+        (() => {
+          const transferBeingEdited = allTransfers.find(
+            (t) => t.id === editingId
           );
-        }
-        return null;
-      })()}
+          if (!transferBeingEdited) return null;
+
+          if (transferBeingEdited.transferDirection === "To") {
+            return (
+              <Card>
+                <CardHeader className="text-xl font-semibold">
+                  <div className="flex justify-between items-center">
+                    <span>Edit Outgoing Transfer</span>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-1 md:grid-cols-6 gap-4 mb-4">
+                    <Input
+                      value={editingOutgoingTransfer.playerName}
+                      onChange={(e) =>
+                        setEditingOutgoingTransfer({
+                          ...editingOutgoingTransfer,
+                          playerName: e.target.value,
+                        })
+                      }
+                      placeholder="Player Name"
+                    />
+                    <Select
+                      value={editingOutgoingTransfer.position}
+                      onValueChange={(value) =>
+                        setEditingOutgoingTransfer({
+                          ...editingOutgoingTransfer,
+                          position: value,
+                        })
+                      }
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Position" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {generalPositions.map((pos) => (
+                          <SelectItem key={pos} value={pos}>
+                            {pos}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <Select
+                      value={editingOutgoingTransfer.stars}
+                      onValueChange={(value) =>
+                        setEditingOutgoingTransfer({
+                          ...editingOutgoingTransfer,
+                          stars: value,
+                        })
+                      }
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Stars" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {starOptions.map((stars) => (
+                          <SelectItem key={stars} value={stars}>
+                            {stars} ⭐
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <div className="flex items-center justify-center bg-red-50 dark:bg-red-900/20 rounded border px-3">
+                      <span className="text-red-600 dark:text-red-400 font-medium">
+                        To
+                      </span>
+                    </div>
+                    <Select
+                      value={editingOutgoingTransfer.school}
+                      onValueChange={(value) =>
+                        setEditingOutgoingTransfer({
+                          ...editingOutgoingTransfer,
+                          school: value,
+                        })
+                      }
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="School" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {fbsTeams.map((team) => (
+                          <SelectItem key={team.name} value={team.name}>
+                            <div className="flex items-center gap-2">
+                              <TeamLogo teamName={team.name} size="sm" />
+                              <span>{team.name}</span>
+                            </div>
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <div className="flex gap-2">
+                      <Button onClick={saveEdit} size="sm">
+                        Save
+                      </Button>
+                      <Button onClick={cancelEdit} variant="outline" size="sm">
+                        Cancel
+                      </Button>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            );
+          }
+          return null;
+        })()}
 
       {/* Incoming Transfers Form - Only show when not editing outgoing transfer */}
-      {(!editingId || (() => {
-        const transferBeingEdited = allTransfers.find(t => t.id === editingId);
-        return transferBeingEdited?.transferDirection === "From";
-      })()) && (
+      {(!editingId ||
+        (() => {
+          const transferBeingEdited = allTransfers.find(
+            (t) => t.id === editingId
+          );
+          return transferBeingEdited?.transferDirection === "From";
+        })()) && (
         <Card>
           <CardHeader className="text-xl font-semibold">
             <div className="flex justify-between items-center">
-              <span>{editingId ? "Edit Incoming Transfer" : `Add Incoming Transfer for Year: ${selectedYear}`}</span>
-            </div>
-          </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-6 gap-4 mb-4">
-            <Input
-              value={newIncomingTransfer.playerName}
-              onChange={(e) =>
-                setNewIncomingTransfer({
-                  ...newIncomingTransfer,
-                  playerName: e.target.value,
-                })
-              }
-              placeholder="Player Name"
-            />
-            <Select
-              value={newIncomingTransfer.position}
-              onValueChange={(value) =>
-                setNewIncomingTransfer({
-                  ...newIncomingTransfer,
-                  position: value,
-                })
-              }
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Position" />
-              </SelectTrigger>
-              <SelectContent>
-                {generalPositions.map((pos) => (
-                  <SelectItem key={pos} value={pos}>
-                    {pos}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <Select
-              value={newIncomingTransfer.stars}
-              onValueChange={(value) =>
-                setNewIncomingTransfer({ ...newIncomingTransfer, stars: value })
-              }
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Stars" />
-              </SelectTrigger>
-              <SelectContent>
-                {starOptions.map((stars) => (
-                  <SelectItem key={stars} value={stars}>
-                    {stars} ⭐
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <div className="flex items-center justify-center bg-green-50 dark:bg-green-900/20 rounded border px-3">
-              <span className="text-green-600 dark:text-green-400 font-medium">
-                From
+              <span>
+                {editingId
+                  ? "Edit Incoming Transfer"
+                  : `Add Incoming Transfer for Year: ${selectedYear}`}
               </span>
             </div>
-            <Select
-              value={newIncomingTransfer.school}
-              onValueChange={(value) =>
-                setNewIncomingTransfer({
-                  ...newIncomingTransfer,
-                  school: value,
-                })
-              }
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="School" />
-              </SelectTrigger>
-              <SelectContent>
-                {fbsTeams.map((team) => (
-                  <SelectItem key={team.name} value={team.name}>
-                    <div className="flex items-center gap-2">
-                      <TeamLogo teamName={team.name} size="sm" />
-                      <span>{team.name}</span>
-                    </div>
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            {editingId ? (
-              <div className="flex gap-2">
-                <Button onClick={saveEdit} size="sm">
-                  Save
-                </Button>
-                <Button onClick={cancelEdit} variant="outline" size="sm">
-                  Cancel
-                </Button>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-6 gap-4 mb-4">
+              <Input
+                value={newIncomingTransfer.playerName}
+                onChange={(e) =>
+                  setNewIncomingTransfer({
+                    ...newIncomingTransfer,
+                    playerName: e.target.value,
+                  })
+                }
+                placeholder="Player Name"
+              />
+              <Select
+                value={newIncomingTransfer.position}
+                onValueChange={(value) =>
+                  setNewIncomingTransfer({
+                    ...newIncomingTransfer,
+                    position: value,
+                  })
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Position" />
+                </SelectTrigger>
+                <SelectContent>
+                  {generalPositions.map((pos) => (
+                    <SelectItem key={pos} value={pos}>
+                      {pos}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Select
+                value={newIncomingTransfer.stars}
+                onValueChange={(value) =>
+                  setNewIncomingTransfer({
+                    ...newIncomingTransfer,
+                    stars: value,
+                  })
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Stars" />
+                </SelectTrigger>
+                <SelectContent>
+                  {starOptions.map((stars) => (
+                    <SelectItem key={stars} value={stars}>
+                      {stars} ⭐
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <div className="flex items-center justify-center bg-green-50 dark:bg-green-900/20 rounded border px-3">
+                <span className="text-green-600 dark:text-green-400 font-medium">
+                  From
+                </span>
               </div>
-            ) : (
-              <Button onClick={addIncomingTransfer}>Add Transfer</Button>
-            )}
-          </div>
-        </CardContent>
-      </Card>
+              <Select
+                value={newIncomingTransfer.school}
+                onValueChange={(value) =>
+                  setNewIncomingTransfer({
+                    ...newIncomingTransfer,
+                    school: value,
+                  })
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="School" />
+                </SelectTrigger>
+                <SelectContent>
+                  {fbsTeams.map((team) => (
+                    <SelectItem key={team.name} value={team.name}>
+                      <div className="flex items-center gap-2">
+                        <TeamLogo teamName={team.name} size="sm" />
+                        <span>{team.name}</span>
+                      </div>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {editingId ? (
+                <div className="flex gap-2">
+                  <Button onClick={saveEdit} size="sm">
+                    Save
+                  </Button>
+                  <Button onClick={cancelEdit} variant="outline" size="sm">
+                    Cancel
+                  </Button>
+                </div>
+              ) : (
+                <Button onClick={addIncomingTransfer}>Add Transfer</Button>
+              )}
+            </div>
+          </CardContent>
+        </Card>
       )}
 
       {/* Outgoing Transfers Form */}

@@ -31,7 +31,15 @@ import {
   RecordLevel,
 } from "@/types/yearRecord";
 import { useDynasty } from "@/contexts/DynastyContext";
-import { ChevronUp, ChevronDown, Plus, Trash2, Edit2, Save, X } from "lucide-react";
+import {
+  ChevronUp,
+  ChevronDown,
+  Plus,
+  Trash2,
+  Edit2,
+  Save,
+  X,
+} from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 import { ScrollArea } from "./ui/scroll-area";
 
@@ -640,7 +648,10 @@ const TeamStats: React.FC = () => {
                           <Input
                             value={displayRecord.playerName}
                             onChange={(e) =>
-                              handleEditFieldChange("playerName", e.target.value)
+                              handleEditFieldChange(
+                                "playerName",
+                                e.target.value
+                              )
                             }
                             className="font-bold text-lg"
                             placeholder="Player name"
@@ -649,7 +660,10 @@ const TeamStats: React.FC = () => {
                             type="number"
                             value={displayRecord.year}
                             onChange={(e) =>
-                              handleEditFieldChange("year", Number(e.target.value))
+                              handleEditFieldChange(
+                                "year",
+                                Number(e.target.value)
+                              )
                             }
                             className="text-sm w-24"
                             placeholder="Year"
@@ -700,7 +714,9 @@ const TeamStats: React.FC = () => {
                             variant="ghost"
                             size="icon"
                             className="h-6 w-6 text-destructive"
-                            onClick={() => handleDeleteRecord(recordType, record.id)}
+                            onClick={() =>
+                              handleDeleteRecord(recordType, record.id)
+                            }
                           >
                             <Trash2 className="h-4 w-4" />
                           </Button>
@@ -730,10 +746,10 @@ const TeamStats: React.FC = () => {
       className="flex flex-col items-center gap-6 space-y-8"
     >
       {/* Hero Header */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 dark:from-blue-950/30 dark:via-purple-950/30 dark:to-pink-950/30 border border-gray-200 dark:border-gray-700 shadow-lg w-full">
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary/10 to-accent dark:from-blue-950/30 dark:via-purple-950/30 dark:to-pink-950/30 border border-gray-200 dark:border-gray-700 shadow-lg w-full">
         <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
         <div className="relative p-6 md:p-8 text-center">
-          <h1 className="text-4xl md:text-5xl font-black bg-gradient-to-r from-gray-900 via-gray-700 to-gray-900 dark:from-gray-100 dark:via-gray-300 dark:to-gray-100 bg-clip-text text-transparent">
+          <h1 className="text-4xl md:text-5xl leading-relaxed md:leading-relaxed font-black bg-gradient-to-r from-gray-900 via-gray-700 to-gray-900 dark:from-gray-100 dark:via-gray-300 dark:to-gray-100 bg-clip-text text-transparent">
             Stats & Records
           </h1>
         </div>

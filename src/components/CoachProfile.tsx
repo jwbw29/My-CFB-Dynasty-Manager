@@ -210,30 +210,8 @@ const CoachProfile = () => {
       <Button
         variant="default"
         size="lg"
-        className="flex flex-wrap items-center md:justify-center justify-start gap-x-4 gap-y-1 !h-14 px-2 hover:text-black"
+        className="flex flex-wrap items-center md:justify-center justify-start gap-x-4 gap-y-1 !h-14 px-2 text-white  border-2 border-school-secondary "
         onClick={() => setIsEditing(true)}
-        style={{
-          borderLeft: profile.schoolColors?.primary
-            ? `4px solid ${profile.schoolColors.accent}`
-            : undefined,
-          background: profile.schoolColors?.primary
-            ? profile.schoolColors.primary
-            : undefined,
-        }}
-        onMouseEnter={(e) => {
-          if (profile.schoolColors?.primary) {
-            e.currentTarget.style.background = "white";
-            e.currentTarget.style.border = `2px solid ${profile.schoolColors.primary}`;
-            e.currentTarget.style.borderLeft = `4px solid ${profile.schoolColors.accent}`;
-          }
-        }}
-        onMouseLeave={(e) => {
-          if (profile.schoolColors?.primary) {
-            e.currentTarget.style.background = profile.schoolColors.primary;
-            e.currentTarget.style.border = "";
-            e.currentTarget.style.borderLeft = `4px solid ${profile.schoolColors.accent}`;
-          }
-        }}
       >
         <div className="flex items-center space-x-1">
           <User className="h-4 w-4" />

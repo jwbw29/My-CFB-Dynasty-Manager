@@ -65,6 +65,7 @@ const predefinedAwards = [
   "Ray Guy Award",
   "Returner of the Year",
   "Rimington Trophy",
+  "Shaun Alexander Award",
   "Unitas Golden Arm Award",
   "Walter Camp Award",
 ];
@@ -120,12 +121,15 @@ const AwardTracker: React.FC = () => {
       finalPlayerName = coachProfile?.coachName || "Head Coach";
     } else if (selectedAwardName === "Broyles Award") {
       // Get coordinator name from coaches roster
-      const coordinatorName = broylesPosition === "OC"
-        ? coaches?.offensiveCoordinator.name
-        : coaches?.defensiveCoordinator.name;
+      const coordinatorName =
+        broylesPosition === "OC"
+          ? coaches?.offensiveCoordinator.name
+          : coaches?.defensiveCoordinator.name;
 
       if (!coordinatorName || !coordinatorName.trim()) {
-        toast.error(`Please add the ${broylesPosition} name in the Roster Management page first.`);
+        toast.error(
+          `Please add the ${broylesPosition} name in the Roster Management page first.`
+        );
         return;
       }
       finalPlayerName = `${coordinatorName} - ${broylesPosition}`;
@@ -199,24 +203,25 @@ const AwardTracker: React.FC = () => {
   };
 
   const isTeamAwardSelected = teamAwards.includes(selectedAwardName);
-  const isCoachAward = selectedAwardName === "Bear Bryant Coach of the Year Award";
+  const isCoachAward =
+    selectedAwardName === "Bear Bryant Coach of the Year Award";
   const isBroylesAward = selectedAwardName === "Broyles Award";
   const isPlayerAward = !isCoachAward && !isBroylesAward;
 
   return (
     <div className="space-y-8">
       {/* Hero Header */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 dark:from-blue-950/30 dark:via-purple-950/30 dark:to-pink-950/30 border border-gray-200 dark:border-gray-700 shadow-lg">
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary/10 to-accent dark:from-blue-950/30 dark:via-purple-950/30 dark:to-pink-950/30 border border-gray-200 dark:border-gray-700 shadow-lg">
         <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
         <div className="relative p-6 md:p-8 text-center">
-          <h1 className="text-4xl md:text-5xl font-black bg-gradient-to-r from-gray-900 via-gray-700 to-gray-900 dark:from-gray-100 dark:via-gray-300 dark:to-gray-100 bg-clip-text text-transparent">
+          <h1 className="text-4xl leading-relaxed md:leading-relaxed md:text-5xl leading-relaxed md:leading-relaxed font-black bg-gradient-to-r from-gray-900 via-gray-700 to-gray-900 dark:from-gray-100 dark:via-gray-300 dark:to-gray-100 bg-clip-text text-transparent">
             Award Tracker
           </h1>
         </div>
       </div>
 
       <Card className="border-2 border-gray-200 dark:border-gray-700 shadow-xl overflow-hidden">
-        <div className="bg-gradient-to-r from-yellow-600 to-amber-600 p-6">
+        <div className="bg-gradient-to-r from-primary to-primary/90 p-6">
           <div className="flex justify-between items-center">
             <span className="text-2xl font-black text-white">
               {editingId ? "Edit" : "Add New"} Award for Year: {selectedYear}
