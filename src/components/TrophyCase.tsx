@@ -234,7 +234,7 @@ const TrophyCase: React.FC = () => {
   const [selectedYear, setSelectedYear] = useState<number>(currentYear);
 
   // Get context for rankings
-  const { getRankingsForWeek } = useDynasty();
+  const { getRankingsForWeek, activeWeek } = useDynasty();
 
   // Get all available teams (similar to SchedulePage)
   const availableTeams = useMemo(() => {
@@ -249,9 +249,9 @@ const TrophyCase: React.FC = () => {
       .sort((a, b) => (a.name || "").localeCompare(b.name || ""));
   }, []);
 
-  // Get rankings for the selected year
+  // Get rankings for the current year and active week
   const getRankForTeam = (teamName: string) => {
-    const rankings = getRankingsForWeek(selectedYear, 0); // Week 0 for preseason/final rankings
+    const rankings = getRankingsForWeek(currentYear, activeWeek);
     const rankIndex = rankings.findIndex((team) => team.name === teamName);
     return rankIndex !== -1 ? rankIndex + 1 : null;
   };
