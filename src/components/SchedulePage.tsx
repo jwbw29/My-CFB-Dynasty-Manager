@@ -55,11 +55,11 @@ const getWeekDisplayName = (weekNumber: number): string => {
     case 17:
       return "Bowl Week 1";
     case 18:
-      return "Bowl Week 2";
+      return "CFP Quarterfinals";
     case 19:
-      return "Bowl Week 3";
+      return "CFP Semifinals";
     case 20:
-      return "Bowl Week 4";
+      return "CFP National Championship";
     default:
       return `Week ${weekNumber}`;
   }
