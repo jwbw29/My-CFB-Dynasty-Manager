@@ -14,6 +14,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import SmartInsights from "@/components/SmartInsights";
 import { Brain, Filter, RefreshCw } from "lucide-react";
+import { HeroHeader } from "@/components/ui/HeroHeader";
 
 const InsightsPage: React.FC = () => {
   const [filter, setFilter] = useState<
@@ -31,36 +32,11 @@ const InsightsPage: React.FC = () => {
   return (
     <div className="space-y-8">
       {/* Hero Header */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary/10 to-accent dark:from-blue-950/30 dark:via-purple-950/30 dark:to-pink-950/30 border border-gray-200 dark:border-gray-700 shadow-lg">
-        <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
-        <div className="relative p-6 md:p-8">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div className="flex items-center gap-4">
-              <div className="relative">
-                <div className="absolute inset-0 bg-gradient-to-br from-blue-400 to-purple-400 rounded-full blur-xl opacity-20"></div>
-                <Brain className="h-16 w-16 text-blue-600 dark:text-blue-400 relative" />
-              </div>
-              <div>
-                <h1 className="text-4xl md:text-5xl leading-relaxed md:leading-relaxed font-black bg-gradient-to-r from-gray-900 via-gray-700 to-gray-900 dark:from-gray-100 dark:via-gray-300 dark:to-gray-100 bg-clip-text text-transparent">
-                  Smart Insights
-                </h1>
-                <p className="text-base font-semibold text-gray-600 dark:text-gray-400 mt-1">
-                  AI-powered recommendations for your dynasty
-                </p>
-              </div>
-            </div>
-
-            <Button
-              onClick={handleRefresh}
-              variant="outline"
-              className="flex items-center gap-2 bg-white dark:bg-gray-800"
-            >
-              <RefreshCw className="h-4 w-4" />
-              Refresh Insights
-            </Button>
-          </div>
-        </div>
-      </div>
+      <HeroHeader
+        title="Smart Insights"
+        subtitle="AI-powered recommendations for your dynasty"
+        icon={Brain}
+      />
 
       {/* Filters */}
       <Card>

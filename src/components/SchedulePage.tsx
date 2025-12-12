@@ -575,30 +575,28 @@ const SchedulePage = () => {
       {/* Hero Header Section */}
       <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary/10 to-accent dark:from-blue-950/30 dark:via-purple-950/30 dark:to-pink-950/30 border border-gray-200 dark:border-gray-700 shadow-lg">
         <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
-        <div className="relative p-6 md:p-8">
-          <div className="flex items-center justify-center gap-6">
-            {teamData && (
-              <div className="relative">
-                <div className="absolute inset-0 bg-gradient-to-br from-primary to-secondary rounded-full blur-xl opacity-20"></div>
-                <TeamLogo teamName={teamData.name} size="3xl" />
+        <div className="flex items-center justify-start p-6 md:p-8 gap-6">
+          {teamData && (
+            <div className="relative">
+              <div className="absolute inset-0 bg-gradient-to-br from-primary to-secondary rounded-full blur-xl opacity-20"></div>
+              <TeamLogo teamName={teamData.name} size="3xl" />
+            </div>
+          )}
+
+          {/* Title and Conference */}
+          <div className="flex flex-col justify-center items-start text-center gap-2">
+            <h1 className="text-4xl md:text-5xl leading-relaxed md:leading-relaxed font-black bg-gradient-to-r from-gray-900 via-gray-700 to-gray-900 dark:from-gray-100 dark:via-gray-300 dark:to-gray-100 bg-clip-text text-transparent flex items-center gap-3 justify-center">
+              <Calendar className="h-10 w-10 text-blue-600 dark:text-blue-400" />
+              {currentYear} Schedule
+            </h1>
+            {teamData && teamData.conference && (
+              <div className="flex items-center justify-center gap-2">
+                <ConferenceLogo conference={teamData.conference} size="xl" />
+                <span className="text-base font-semibold text-gray-700 dark:text-gray-300">
+                  {teamData.conference}
+                </span>
               </div>
             )}
-
-            {/* Title and Conference */}
-            <div className="flex flex-col justify-center items-center text-center gap-2">
-              <h1 className="text-4xl md:text-5xl leading-relaxed md:leading-relaxed font-black bg-gradient-to-r from-gray-900 via-gray-700 to-gray-900 dark:from-gray-100 dark:via-gray-300 dark:to-gray-100 bg-clip-text text-transparent flex items-center gap-3 justify-center">
-                <Calendar className="h-10 w-10 text-blue-600 dark:text-blue-400" />
-                {currentYear} Schedule
-              </h1>
-              {teamData && teamData.conference && (
-                <div className="flex items-center justify-center gap-2">
-                  <ConferenceLogo conference={teamData.conference} size="xl" />
-                  <span className="text-base font-semibold text-gray-700 dark:text-gray-300">
-                    {teamData.conference}
-                  </span>
-                </div>
-              )}
-            </div>
           </div>
         </div>
       </div>

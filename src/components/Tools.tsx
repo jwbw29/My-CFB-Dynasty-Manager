@@ -10,19 +10,13 @@ import RecruitingCalculator from "./RecruitingCalculator";
 import PlayerNameGenerator from "./PlayerNameGenerator";
 import RecruitPredictor from "./RecruitingPredictor";
 import DataControls from "./DataControls";
+import { HeroHeader } from "@/components/ui/HeroHeader";
 
 const Tools: React.FC = () => {
   return (
     <div className="space-y-8">
       {/* Hero Header */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary/10 to-accent dark:from-blue-950/30 dark:via-purple-950/30 dark:to-pink-950/30 border border-gray-200 dark:border-gray-700 shadow-lg">
-        <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
-        <div className="relative p-6 md:p-8 text-center">
-          <h1 className="text-4xl md:text-5xl leading-relaxed md:leading-relaxed font-black bg-gradient-to-r from-gray-900 via-gray-700 to-gray-900 dark:from-gray-100 dark:via-gray-300 dark:to-gray-100 bg-clip-text text-transparent">
-            Dynasty Tools
-          </h1>
-        </div>
-      </div>
+      <HeroHeader title="Dynasty Tools" />
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
         <Card className="border-2 border-gray-200 dark:border-gray-700 shadow-xl overflow-hidden">

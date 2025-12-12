@@ -42,6 +42,7 @@ import {
 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 import { ScrollArea } from "./ui/scroll-area";
+import { HeroHeader } from "@/components/ui/HeroHeader";
 
 interface TeamStatsData {
   gamesPlayed: number;
@@ -746,14 +747,7 @@ const TeamStats: React.FC = () => {
       className="flex flex-col items-center gap-6 space-y-8"
     >
       {/* Hero Header */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary/10 to-accent dark:from-blue-950/30 dark:via-purple-950/30 dark:to-pink-950/30 border border-gray-200 dark:border-gray-700 shadow-lg w-full">
-        <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
-        <div className="relative p-6 md:p-8 text-center">
-          <h1 className="text-4xl md:text-5xl leading-relaxed md:leading-relaxed font-black bg-gradient-to-r from-gray-900 via-gray-700 to-gray-900 dark:from-gray-100 dark:via-gray-300 dark:to-gray-100 bg-clip-text text-transparent">
-            Stats & Records
-          </h1>
-        </div>
-      </div>
+      <HeroHeader title="Stats & Records" className="w-full" />
 
       <Tabs
         defaultValue="stats"

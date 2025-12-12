@@ -22,6 +22,7 @@ import { getCurrentYear } from "@/utils/localStorage";
 import { useDynasty } from "@/contexts/DynastyContext";
 import { TeamDisplay } from "./TeamHome";
 import { useUsernameLookup } from "@/hooks/useUsernameLookup";
+import { HeroHeader } from "@/components/ui/HeroHeader";
 
 // --- WEEKS array for the dropdown selector ---
 const WEEKS = Array.from({ length: 22 }, (_, i) => i); // Weeks 0-21
@@ -307,19 +308,10 @@ const Top25Rankings: React.FC = () => {
   return (
     <div className="space-y-8 max-w-7xl mx-auto">
       {/* Hero Header */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary/10 to-accent dark:from-blue-950/30 dark:via-purple-950/30 dark:to-pink-950/30 border border-gray-200 dark:border-gray-700 shadow-lg">
-        <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
-
-        {/* Title and Season */}
-        <div className="flex flex-col gap-2 justify-center items-center p-6 md:p-8 text-center">
-          <h1 className="text-4xl md:text-5xl leading-relaxed md:leading-relaxed font-black bg-gradient-to-r from-gray-900 via-gray-700 to-gray-900 dark:from-gray-100 dark:via-gray-300 dark:to-gray-100 bg-clip-text text-transparent">
-            Top 25 Rankings
-          </h1>
-          <p className="text-lg font-semibold text-gray-600 dark:text-gray-400">
-            {currentYear} Season
-          </p>
-        </div>
-      </div>
+      <HeroHeader
+        title="Top 25 Rankings"
+        subtitle={`${currentYear} Season`}
+      />
 
       <Card className="border-2 border-gray-200 dark:border-gray-700 shadow-xl overflow-hidden">
         <div className="bg-primary p-6">
