@@ -18,7 +18,7 @@ import { toast } from "react-hot-toast";
 import { useTop25Rankings, RankedTeam } from "@/hooks/useTop25Rankings";
 import { TeamLogo } from "./ui/TeamLogo";
 import { getWeekDisplayName } from "@/utils/weekUtils";
-import { getCurrentYear } from "@/utils/localStorage";
+import { getCurrentYear, getCoachProfile } from "@/utils/localStorage";
 import { useDynasty } from "@/contexts/DynastyContext";
 import { TeamDisplay } from "./TeamHome";
 import { useUsernameLookup } from "@/hooks/useUsernameLookup";
@@ -38,6 +38,7 @@ interface TeamRankingRowProps {
     currentRank: number
   ) => React.ReactNode;
   getUsernameForTeam: (teamName: string) => string | undefined;
+  dynastyTeamName: string | null;
 }
 
 const TeamRankingRow: React.FC<TeamRankingRowProps> = React.memo(
@@ -48,6 +49,7 @@ const TeamRankingRow: React.FC<TeamRankingRowProps> = React.memo(
     onTeamChange,
     renderRankingChange,
     getUsernameForTeam,
+    dynastyTeamName,
   }) => {
     const dropdownOptions = useMemo(() => {
       const options = [...unrankedTeams];
@@ -75,7 +77,13 @@ const TeamRankingRow: React.FC<TeamRankingRowProps> = React.memo(
         <div className="text-right w-8 font-bold text-lg">{index + 1}</div>
         <div className="flex items-center">
           <Select value={team.name || "unranked"} onValueChange={handleChange}>
-            <SelectTrigger className="h-9">
+            <SelectTrigger
+              className={`h-9 ${
+                team.name && team.name === dynastyTeamName
+                  ? "bg-primary/10 border-primary border-2 font-semibold"
+                  : ""
+              }`}
+            >
               <SelectValue>
                 {team.name ? (
                   <div className="flex items-center gap-2">
@@ -104,7 +112,11 @@ const TeamRankingRow: React.FC<TeamRankingRowProps> = React.memo(
                 <SelectItem
                   key={optionTeam.name}
                   value={optionTeam.name}
-                  className="flex flex-row"
+                  className={`flex flex-row ${
+                    optionTeam.name === dynastyTeamName
+                      ? "bg-primary/10 border-l-4 border-primary font-semibold"
+                      : ""
+                  }`}
                 >
                   <TeamDisplay
                     name={optionTeam.name}
@@ -131,7 +143,8 @@ const TeamRankingRow: React.FC<TeamRankingRowProps> = React.memo(
       prevProps.unrankedTeams === nextProps.unrankedTeams &&
       prevProps.onTeamChange === nextProps.onTeamChange &&
       prevProps.renderRankingChange === nextProps.renderRankingChange &&
-      prevProps.getUsernameForTeam === nextProps.getUsernameForTeam
+      prevProps.getUsernameForTeam === nextProps.getUsernameForTeam &&
+      prevProps.dynastyTeamName === nextProps.dynastyTeamName
     );
   }
 );
@@ -217,6 +230,12 @@ const Top25Rankings: React.FC = () => {
 
   // Use the memoized username lookup hook for performance
   const { getUsernameForTeam } = useUsernameLookup();
+
+  // Get dynasty team name from coach profile for highlighting
+  const dynastyTeamName = useMemo(() => {
+    const coachProfile = getCoachProfile();
+    return coachProfile?.schoolName || null;
+  }, []);
 
   // --- FIX 1: Call useTop25Rankings with NO arguments ---
   const {
@@ -308,10 +327,7 @@ const Top25Rankings: React.FC = () => {
   return (
     <div className="space-y-8 max-w-7xl mx-auto">
       {/* Hero Header */}
-      <HeroHeader
-        title="Top 25 Rankings"
-        subtitle={`${currentYear} Season`}
-      />
+      <HeroHeader title="Top 25 Rankings" subtitle={`${currentYear} Season`} />
 
       <Card className="border-2 border-gray-200 dark:border-gray-700 shadow-xl overflow-hidden">
         <div className="bg-primary p-6">
@@ -359,6 +375,7 @@ const Top25Rankings: React.FC = () => {
                   onTeamChange={handleTeamChange}
                   renderRankingChange={renderRankingChange}
                   getUsernameForTeam={getUsernameForTeam}
+                  dynastyTeamName={dynastyTeamName}
                 />
               ))}
             </div>
@@ -372,6 +389,7 @@ const Top25Rankings: React.FC = () => {
                   onTeamChange={handleTeamChange}
                   renderRankingChange={renderRankingChange}
                   getUsernameForTeam={getUsernameForTeam}
+                  dynastyTeamName={dynastyTeamName}
                 />
               ))}
             </div>
@@ -385,6 +403,7 @@ const Top25Rankings: React.FC = () => {
                   onTeamChange={handleTeamChange}
                   renderRankingChange={renderRankingChange}
                   getUsernameForTeam={getUsernameForTeam}
+                  dynastyTeamName={dynastyTeamName}
                 />
               ))}
             </div>
