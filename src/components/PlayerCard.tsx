@@ -691,50 +691,81 @@ const PlayerCard: React.FC<PlayerCardProps> = ({ player, isOpen, onClose }) => {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           {(() => {
                             // Helper function to determine award priority
-                            const getAwardPriority = (awardName: string): number => {
+                            const getAwardPriority = (
+                              awardName: string
+                            ): number => {
                               const name = awardName.toLowerCase();
-                              if (name.includes('heisman')) return 0;
-                              if (name.includes('all-american') || name.includes('all american')) return 2;
-                              if (name.includes('all-conference') || name.includes('all conference')) return 3;
+                              if (name.includes("heisman")) return 0;
+                              if (
+                                name.includes("all-american") ||
+                                name.includes("all american")
+                              )
+                                return 2;
+                              if (
+                                name.includes("all-conference") ||
+                                name.includes("all conference")
+                              )
+                                return 3;
                               return 1; // Other awards (Maxwell, Doak Walker, etc.)
                             };
 
                             // Helper function to format award display name
-                            const formatAwardName = (awardName: string, team?: string): string => {
+                            const formatAwardName = (
+                              awardName: string,
+                              team?: string
+                            ): string => {
                               const name = awardName.toLowerCase();
-                              if ((name.includes('all-american') || name.includes('all american') ||
-                                   name.includes('all-conference') || name.includes('all conference')) && team) {
+                              if (
+                                (name.includes("all-american") ||
+                                  name.includes("all american") ||
+                                  name.includes("all-conference") ||
+                                  name.includes("all conference")) &&
+                                team
+                              ) {
                                 // Convert "1st Team" to "First Team", "2nd Team" to "Second Team"
-                                const teamText = team === "1st Team" ? "First Team" :
-                                                team === "2nd Team" ? "Second Team" :
-                                                team;
+                                const teamText =
+                                  team === "1st Team"
+                                    ? "First Team"
+                                    : team === "2nd Team"
+                                    ? "Second Team"
+                                    : team;
                                 return `${awardName} ${teamText}`;
                               }
                               return awardName;
                             };
 
                             // Group awards by award name (including team designation)
-                            const awardsByName = playerAwards.reduce((acc, award) => {
-                              const key = award.team
-                                ? `${award.awardName}|${award.team}`
-                                : award.awardName;
+                            const awardsByName = playerAwards.reduce(
+                              (acc, award) => {
+                                const key = award.team
+                                  ? `${award.awardName}|${award.team}`
+                                  : award.awardName;
 
-                              if (!acc[key]) {
-                                acc[key] = {
-                                  awardName: award.awardName,
-                                  team: award.team,
-                                  years: []
-                                };
-                              }
-                              acc[key].years.push(award.year);
-                              return acc;
-                            }, {} as Record<string, { awardName: string; team?: string; years: number[] }>);
+                                if (!acc[key]) {
+                                  acc[key] = {
+                                    awardName: award.awardName,
+                                    team: award.team,
+                                    years: [],
+                                  };
+                                }
+                                acc[key].years.push(award.year);
+                                return acc;
+                              },
+                              {} as Record<
+                                string,
+                                {
+                                  awardName: string;
+                                  team?: string;
+                                  years: number[];
+                                }
+                              >
+                            );
 
                             // Sort awards by priority, then alphabetically, and years in ascending order
                             const sortedAwards = Object.values(awardsByName)
-                              .map(award => ({
+                              .map((award) => ({
                                 ...award,
-                                years: award.years.sort((a, b) => a - b) // Changed to ascending order
+                                years: award.years.sort((a, b) => a - b), // Changed to ascending order
                               }))
                               .sort((a, b) => {
                                 // Sort by priority first
@@ -746,22 +777,34 @@ const PlayerCard: React.FC<PlayerCardProps> = ({ player, isOpen, onClose }) => {
 
                                 // Within same priority, sort by award name
                                 if (a.awardName === b.awardName) {
-                                  const teamOrder = { "1st Team": 1, "2nd Team": 2, "Freshman": 3 };
-                                  const aTeam = a.team ? teamOrder[a.team] || 4 : 4;
-                                  const bTeam = b.team ? teamOrder[b.team] || 4 : 4;
+                                  const teamOrder = {
+                                    "1st Team": 1,
+                                    "2nd Team": 2,
+                                    Freshman: 3,
+                                  };
+                                  const aTeam = a.team
+                                    ? teamOrder[a.team] || 4
+                                    : 4;
+                                  const bTeam = b.team
+                                    ? teamOrder[b.team] || 4
+                                    : 4;
                                   return aTeam - bTeam;
                                 }
                                 return a.awardName.localeCompare(b.awardName);
                               });
 
                             return sortedAwards.map((award, index) => {
-                              const displayName = formatAwardName(award.awardName, award.team);
+                              const displayName = formatAwardName(
+                                award.awardName,
+                                award.team
+                              );
                               const name = award.awardName.toLowerCase();
-                              const showTeamBadge = award.team &&
-                                !name.includes('all-american') &&
-                                !name.includes('all american') &&
-                                !name.includes('all-conference') &&
-                                !name.includes('all conference');
+                              const showTeamBadge =
+                                award.team &&
+                                !name.includes("all-american") &&
+                                !name.includes("all american") &&
+                                !name.includes("all-conference") &&
+                                !name.includes("all conference");
 
                               return (
                                 <div
@@ -792,10 +835,12 @@ const PlayerCard: React.FC<PlayerCardProps> = ({ player, isOpen, onClose }) => {
                                     <div className="mt-3 pt-3 border-t border-gray-200">
                                       <div className="text-center">
                                         <div className="text-xl font-bold text-gray-900">
-                                          {award.years.join(', ')}
+                                          {award.years.join(", ")}
                                         </div>
                                         <div className="text-xs text-gray-500 mt-1 uppercase tracking-wide">
-                                          {award.years.length === 1 ? '1 time' : `${award.years.length} times`}
+                                          {award.years.length === 1
+                                            ? "1 time"
+                                            : `${award.years.length} times`}
                                         </div>
                                       </div>
                                     </div>
