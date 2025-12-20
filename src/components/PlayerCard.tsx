@@ -688,28 +688,122 @@ const PlayerCard: React.FC<PlayerCardProps> = ({ player, isOpen, onClose }) => {
                   <TabsContent value="awards" className="mt-0 h-full p-4">
                     <div className="h-full flex flex-col">
                       {playerAwards.length > 0 ? (
-                        <div className="grid gap-3">
-                          {playerAwards.map((award, index) => (
-                            <div
-                              key={index}
-                              className="flex items-center gap-3 p-3 bg-yellow-50 rounded border-l-4 border-yellow-400"
-                            >
-                              <Trophy className="h-6 w-6 text-yellow-600" />
-                              <div className="flex-1">
-                                <div className="font-semibold">
-                                  {award.awardName}
-                                  {award.team && (
-                                    <span className="text-sm font-normal text-gray-700 ml-2">
-                                      ({award.team})
-                                    </span>
-                                  )}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          {(() => {
+                            // Helper function to determine award priority
+                            const getAwardPriority = (awardName: string): number => {
+                              const name = awardName.toLowerCase();
+                              if (name.includes('heisman')) return 0;
+                              if (name.includes('all-american') || name.includes('all american')) return 2;
+                              if (name.includes('all-conference') || name.includes('all conference')) return 3;
+                              return 1; // Other awards (Maxwell, Doak Walker, etc.)
+                            };
+
+                            // Helper function to format award display name
+                            const formatAwardName = (awardName: string, team?: string): string => {
+                              const name = awardName.toLowerCase();
+                              if ((name.includes('all-american') || name.includes('all american') ||
+                                   name.includes('all-conference') || name.includes('all conference')) && team) {
+                                // Convert "1st Team" to "First Team", "2nd Team" to "Second Team"
+                                const teamText = team === "1st Team" ? "First Team" :
+                                                team === "2nd Team" ? "Second Team" :
+                                                team;
+                                return `${awardName} ${teamText}`;
+                              }
+                              return awardName;
+                            };
+
+                            // Group awards by award name (including team designation)
+                            const awardsByName = playerAwards.reduce((acc, award) => {
+                              const key = award.team
+                                ? `${award.awardName}|${award.team}`
+                                : award.awardName;
+
+                              if (!acc[key]) {
+                                acc[key] = {
+                                  awardName: award.awardName,
+                                  team: award.team,
+                                  years: []
+                                };
+                              }
+                              acc[key].years.push(award.year);
+                              return acc;
+                            }, {} as Record<string, { awardName: string; team?: string; years: number[] }>);
+
+                            // Sort awards by priority, then alphabetically, and years in ascending order
+                            const sortedAwards = Object.values(awardsByName)
+                              .map(award => ({
+                                ...award,
+                                years: award.years.sort((a, b) => a - b) // Changed to ascending order
+                              }))
+                              .sort((a, b) => {
+                                // Sort by priority first
+                                const aPriority = getAwardPriority(a.awardName);
+                                const bPriority = getAwardPriority(b.awardName);
+                                if (aPriority !== bPriority) {
+                                  return aPriority - bPriority;
+                                }
+
+                                // Within same priority, sort by award name
+                                if (a.awardName === b.awardName) {
+                                  const teamOrder = { "1st Team": 1, "2nd Team": 2, "Freshman": 3 };
+                                  const aTeam = a.team ? teamOrder[a.team] || 4 : 4;
+                                  const bTeam = b.team ? teamOrder[b.team] || 4 : 4;
+                                  return aTeam - bTeam;
+                                }
+                                return a.awardName.localeCompare(b.awardName);
+                              });
+
+                            return sortedAwards.map((award, index) => {
+                              const displayName = formatAwardName(award.awardName, award.team);
+                              const name = award.awardName.toLowerCase();
+                              const showTeamBadge = award.team &&
+                                !name.includes('all-american') &&
+                                !name.includes('all american') &&
+                                !name.includes('all-conference') &&
+                                !name.includes('all conference');
+
+                              return (
+                                <div
+                                  key={index}
+                                  className="bg-white rounded-lg border-2 border-yellow-300 shadow-md hover:shadow-lg transition-all hover:border-yellow-400"
+                                >
+                                  <div className="p-5">
+                                    <div className="flex items-start gap-3 mb-3">
+                                      <div className="flex-shrink-0">
+                                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-yellow-400 to-amber-500 flex items-center justify-center shadow">
+                                          <Trophy className="h-5 w-5 text-white" />
+                                        </div>
+                                      </div>
+                                      <div className="flex-1 min-w-0">
+                                        <h3 className="font-bold text-gray-900 text-base leading-tight">
+                                          {displayName}
+                                        </h3>
+                                        {showTeamBadge && (
+                                          <Badge
+                                            variant="secondary"
+                                            className="mt-1.5 text-xs bg-yellow-100 text-yellow-900 border-yellow-300"
+                                          >
+                                            {award.team}
+                                          </Badge>
+                                        )}
+                                      </div>
+                                    </div>
+                                    <div className="mt-3 pt-3 border-t border-gray-200">
+                                      <div className="text-center">
+                                        <div className="text-xl font-bold text-gray-900">
+                                          {award.years.join(', ')}
+                                        </div>
+                                        <div className="text-xs text-gray-500 mt-1 uppercase tracking-wide">
+                                          {award.years.length === 1 ? '1 time' : `${award.years.length} times`}
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
                                 </div>
-                                <div className="text-sm text-gray-600">
-                                  {award.year}
-                                </div>
-                              </div>
-                            </div>
-                          ))}
+                              );
+                            });
+                          })()}
                         </div>
                       ) : (
                         <div className="text-center py-12 text-gray-500 h-full flex flex-col justify-center">
