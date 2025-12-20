@@ -777,7 +777,7 @@ const PlayerCard: React.FC<PlayerCardProps> = ({ player, isOpen, onClose }) => {
 
                                 // Within same priority, sort by award name
                                 if (a.awardName === b.awardName) {
-                                  const teamOrder = {
+                                  const teamOrder: Record<string, number> = {
                                     "1st Team": 1,
                                     "2nd Team": 2,
                                     Freshman: 3,
