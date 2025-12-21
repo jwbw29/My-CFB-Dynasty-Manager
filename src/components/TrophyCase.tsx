@@ -51,6 +51,7 @@ interface Trophy {
   opponent?: string;
   location?: string;
   significance?: "High" | "Medium" | "Low";
+  isPlayoffGame?: boolean;
 }
 
 // Trophy categories with their types and metadata - simplified to 4 core categories
@@ -230,6 +231,7 @@ const TrophyCase: React.FC = () => {
     opponent: "",
     location: "",
     significance: "High",
+    isPlayoffGame: false,
   });
   const [selectedYear, setSelectedYear] = useState<number>(currentYear);
 
@@ -416,6 +418,7 @@ const TrophyCase: React.FC = () => {
         opponent: trophy.opponent || "",
         location: trophy.location || "",
         significance: trophy.significance || "High",
+        isPlayoffGame: trophy.isPlayoffGame || false,
       };
     });
   };
@@ -460,6 +463,19 @@ const TrophyCase: React.FC = () => {
 
   const stats = getTrophyStats();
 
+  // Calculate playoff appearances - count unique years with at least one playoff game
+  // Starting at 6 to account for previous seasons
+  const getPlayoffAppearances = () => {
+    const playoffYears = new Set(
+      currentTrophies
+        .filter((trophy) => trophy.isPlayoffGame === true)
+        .map((trophy) => trophy.year)
+    );
+    return 6 + playoffYears.size;
+  };
+
+  const playoffAppearances = getPlayoffAppearances();
+
   const addTrophy = () => {
     // --- MODIFICATION START: Ensure the name is set from the type ---
     const finalTrophyName = newTrophy.type;
@@ -486,6 +502,7 @@ const TrophyCase: React.FC = () => {
       opponent: "",
       location: "",
       significance: "High",
+      isPlayoffGame: false,
     });
     setIsAddFormExpanded(false);
     notifySuccess(MESSAGES.SAVE_SUCCESS);
@@ -533,7 +550,7 @@ const TrophyCase: React.FC = () => {
       </div>
 
       {/* Overview Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4">
         <Card className="bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800/50 dark:to-gray-700/50">
           <CardContent className="pt-6">
             <div className="text-center">
@@ -541,6 +558,18 @@ const TrophyCase: React.FC = () => {
               <div className="text-2xl font-bold">{stats.total}</div>
               <div className="text-sm text-gray-600 dark:text-gray-400">
                 Total Trophies
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-900/30 dark:to-purple-800/30 border-purple-200 dark:border-purple-800">
+          <CardContent className="pt-6">
+            <div className="text-center">
+              <Star className="h-8 w-8 mx-auto mb-2 text-purple-600 dark:text-purple-400" />
+              <div className="text-2xl font-bold">{playoffAppearances}</div>
+              <div className="text-sm text-purple-800 dark:text-purple-200">
+                Playoff Appearances
               </div>
             </div>
           </CardContent>
@@ -762,6 +791,25 @@ const TrophyCase: React.FC = () => {
                   className="bg-white dark:bg-gray-800"
                 />
               </div>
+            </div>
+
+            {/* Playoff Game Checkbox */}
+            <div className="flex items-center gap-2 mt-4">
+              <input
+                type="checkbox"
+                id="playoff-game"
+                checked={newTrophy.isPlayoffGame || false}
+                onChange={(e) =>
+                  setNewTrophy({ ...newTrophy, isPlayoffGame: e.target.checked })
+                }
+                className="h-4 w-4 text-blue-600 bg-white dark:bg-gray-800 border-gray-300 rounded focus:ring-blue-500"
+              />
+              <label
+                htmlFor="playoff-game"
+                className="text-sm font-medium text-blue-800 dark:text-blue-200 cursor-pointer"
+              >
+                Playoff Game
+              </label>
             </div>
 
             <div className="flex justify-between items-center mt-6">
