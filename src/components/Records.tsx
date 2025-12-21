@@ -969,11 +969,10 @@ const Records: React.FC = () => {
                             Players Drafted
                           </p>
                         </div>
-                        <div className="space-y-2">
+                        <div className="space-y-2 max-h-96 overflow-y-auto pr-2">
                           {(activeRecord.playersDrafted || [])
                             .filter((p) => p.playerName.trim())
                             .sort((a, b) => a.round - b.round)
-                            .slice(0, 3)
                             .map((player) => (
                               <div
                                 key={player.id}
@@ -992,17 +991,6 @@ const Records: React.FC = () => {
                                 </div>
                               </div>
                             ))}
-                          {(activeRecord.playersDrafted || []).filter((p) =>
-                            p.playerName.trim()
-                          ).length > 3 && (
-                            <p className="text-sm text-center text-blue-600 dark:text-blue-400 font-bold mt-3 bg-blue-50 dark:bg-blue-900/20 p-2 rounded-lg">
-                              +
-                              {(activeRecord.playersDrafted || []).filter((p) =>
-                                p.playerName.trim()
-                              ).length - 3}{" "}
-                              more players
-                            </p>
-                          )}
                         </div>
                       </div>
                     ) : (
