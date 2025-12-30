@@ -549,7 +549,7 @@ const Records: React.FC = () => {
             {/* All Content Below the tabs */}
             <div className="space-y-8 max-w-7xl mx-auto">
               {/* Hero Section - Enhanced Header with Key Stats */}
-              <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary/10 to-accent dark:from-blue-950/30 dark:via-purple-950/30 dark:to-pink-950/30 border border-gray-200 dark:border-gray-700 shadow-lg">
+              <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary/30 to-primary dark:from-blue-950/30 dark:via-purple-950/30 dark:to-pink-950/30 border border-gray-200 dark:border-gray-700 shadow-lg">
                 <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
                 <div className="relative p-8">
                   {/* Header with Logo and Title */}
