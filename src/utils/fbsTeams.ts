@@ -1257,6 +1257,15 @@ export const fbsTeams: Team[] = [
     stadium: "",
     abbrev: "JUCO",
   },
+  {
+    name: "FCS",
+    nickName: "FCS",
+    city: "",
+    state: "",
+    conference: "Independents",
+    stadium: "",
+    abbrev: "FCS",
+  },
 ];
 
 // Extract unique conferences from the team data

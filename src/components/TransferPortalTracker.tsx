@@ -146,10 +146,12 @@ const TransferPortalTracker: React.FC = () => {
       school: newOutgoingTransfer.school,
     };
 
-    // Add to transfers and remove from roster
+    // Add to transfers and mark player as transferring (don't remove from roster)
     setAllTransfers([...allTransfers, transferToAdd]);
-    const updatedPlayers = players.filter(
-      (p) => p.id.toString() !== newOutgoingTransfer.playerId
+    const updatedPlayers = players.map((p) =>
+      p.id.toString() === newOutgoingTransfer.playerId
+        ? { ...p, isTransferring: true }
+        : p
     );
     setPlayersState(updatedPlayers);
     setPlayers(updatedPlayers);
@@ -249,21 +251,13 @@ const TransferPortalTracker: React.FC = () => {
   const removeTransfer = (id: number) => {
     const transferToRemove = allTransfers.find((t) => t.id === id);
 
-    // If removing an outgoing transfer, restore player to roster
+    // If removing an outgoing transfer, unmark the player as transferring
     if (transferToRemove && transferToRemove.transferDirection === "To") {
-      const restoredPlayer: Player = {
-        id: Date.now(), // New ID since the original was removed
-        name: transferToRemove.playerName,
-        position: transferToRemove.position,
-        year: "TR", // Mark as transfer
-        rating: transferToRemove.stars,
-        jerseyNumber: "",
-        devTrait: "Normal" as const,
-        notes: `Restored from transfer portal (${transferToRemove.school})`,
-        isRedshirted: false,
-      };
-
-      const updatedPlayers = [...players, restoredPlayer];
+      const updatedPlayers = players.map((p) =>
+        p.name === transferToRemove.playerName && p.isTransferring
+          ? { ...p, isTransferring: false }
+          : p
+      );
       setPlayersState(updatedPlayers);
       setPlayers(updatedPlayers);
     }
@@ -526,11 +520,13 @@ const TransferPortalTracker: React.FC = () => {
                 <SelectValue placeholder="Select Player" />
               </SelectTrigger>
               <SelectContent>
-                {players.map((player) => (
-                  <SelectItem key={player.id} value={player.id.toString()}>
-                    {player.name} - {player.position} ({player.rating}⭐)
-                  </SelectItem>
-                ))}
+                {players
+                  .filter((player) => !player.isTransferring)
+                  .map((player) => (
+                    <SelectItem key={player.id} value={player.id.toString()}>
+                      {player.name} - {player.position} ({player.rating}⭐)
+                    </SelectItem>
+                  ))}
               </SelectContent>
             </Select>
             <div className="flex items-center justify-center bg-red-50 dark:bg-red-900/20 rounded border px-3">

@@ -73,6 +73,7 @@ export interface Player {
   devTrait?: "Normal" | "Impact" | "Star" | "Elite";
   notes?: string;
   isRedshirted: boolean;
+  isTransferring: boolean;
 }
 
 export interface Recruit {

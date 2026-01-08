@@ -13,7 +13,8 @@
       "Bash(chmod:*)",
       "Bash(mkdir:*)",
       "Bash(cp:*)",
-      "Bash(node -e:*)"
+      "Bash(node -e:*)",
+      "Bash(git log:*)"
     ],
     "deny": []
   }

@@ -65,6 +65,7 @@ import { saveAs } from "file-saver";
 import Papa from "papaparse";
 import RosterCSVImport from "./RosterCSVImport";
 import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
 import { usePlayerCard } from "@/hooks/usePlayerCard";
 import PlayerCard from "./PlayerCard";
 import { v4 as uuidv4 } from "uuid";
@@ -90,6 +91,7 @@ interface Player {
   devTrait: "Normal" | "Impact" | "Star" | "Elite";
   notes: string;
   isRedshirted: boolean;
+  isTransferring: boolean;
 }
 
 interface DevTraitBadgeProps {
@@ -175,6 +177,7 @@ const initialNewPlayerState: Omit<Player, "id"> = {
   devTrait: "Normal",
   notes: "",
   isRedshirted: false,
+  isTransferring: false,
 };
 
 const DevTraitBadge: React.FC<DevTraitBadgeProps> = ({ trait }) => {
@@ -331,6 +334,7 @@ const Roster: React.FC = () => {
               devTrait: p.devTrait || "Normal",
               notes: p.notes || "",
               isRedshirted: p.isRedshirted || false,
+              isTransferring: false,
             } as Player)
         ),
       ]);
@@ -468,7 +472,7 @@ const Roster: React.FC = () => {
     (
       processedNewPlayers: Omit<
         Player,
-        "id" | "devTrait" | "notes" | "jerseyNumber" | "isRedshirted"
+        "id" | "devTrait" | "notes" | "jerseyNumber" | "isRedshirted" | "isTransferring"
       >[]
     ) => {
       const playersWithDefaults = processedNewPlayers.map((p) => ({
@@ -478,6 +482,7 @@ const Roster: React.FC = () => {
         devTrait: "Normal" as const,
         notes: "",
         isRedshirted: false,
+        isTransferring: false,
       }));
       setPlayers((prev) => [...prev, ...playersWithDefaults]);
       notifySuccess("Players processed from image!");
@@ -545,6 +550,9 @@ const Roster: React.FC = () => {
   );
 
   const getRowClassName = useCallback((player: Player) => {
+    if (player.isTransferring) {
+      return "border-t transition-colors bg-blue-100 dark:bg-blue-900/30 hover:bg-blue-200/80 dark:hover:bg-blue-800/50";
+    }
     return `border-t transition-colors ${
       player.isRedshirted
         ? "bg-red-100 dark:bg-red-900/30 hover:bg-red-200/80 dark:hover:bg-red-800/50"
@@ -808,6 +816,14 @@ const Roster: React.FC = () => {
                       </TableCell>
                       <TableCell className="text-center">
                         {player.year}
+                        {player.isTransferring && (
+                          <Badge
+                            variant="outline"
+                            className="ml-2 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 border-blue-300 dark:border-blue-700"
+                          >
+                            Transferring
+                          </Badge>
+                        )}
                       </TableCell>
                       <TableCell className="text-center font-bold">
                         {player.rating}
