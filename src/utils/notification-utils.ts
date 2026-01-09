@@ -9,7 +9,7 @@ interface NotificationOptions {
 
 const defaultOptions: NotificationOptions = {
   duration: 2000,
-  position: 'top-right'
+  position: 'bottom-center'
 };
 
 export const notify = (

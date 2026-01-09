@@ -119,6 +119,8 @@ export interface PlayerRecord {
   year: number; // Year the record was set
   recordType: RecordType;
   levels: RecordLevel[]; // Can be multiple: national, conference, school
+  school?: string; // School the player attended
+  position?: string; // Player's position
   stats: {
     passingYards?: number;
     passingTDs?: number;

@@ -43,6 +43,8 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 import { ScrollArea } from "./ui/scroll-area";
 import { HeroHeader } from "@/components/ui/HeroHeader";
+import { fbsTeams } from "@/utils/fbsTeams";
+import { positions } from "@/types/playerTypes";
 
 interface TeamStatsData {
   gamesPlayed: number;
@@ -175,6 +177,8 @@ const TeamStats: React.FC = () => {
     year: number;
     recordType: RecordType;
     levels: RecordLevel[];
+    school: string;
+    position: string;
     stats: {
       passingYards: string;
       passingTDs: string;
@@ -191,6 +195,8 @@ const TeamStats: React.FC = () => {
     year: currentYear,
     recordType: "career",
     levels: [],
+    school: "",
+    position: "",
     stats: {
       passingYards: "",
       passingTDs: "",
@@ -459,6 +465,8 @@ const TeamStats: React.FC = () => {
       year: newRecord.year,
       recordType: newRecord.recordType,
       levels: newRecord.levels,
+      school: newRecord.school || undefined,
+      position: newRecord.position || undefined,
       stats,
     };
 
@@ -473,6 +481,8 @@ const TeamStats: React.FC = () => {
       year: currentYear,
       recordType: "career",
       levels: [],
+      school: "",
+      position: "",
       stats: {
         passingYards: "",
         passingTDs: "",
@@ -657,6 +667,42 @@ const TeamStats: React.FC = () => {
                             className="font-bold text-lg"
                             placeholder="Player name"
                           />
+                          <div className="flex gap-2">
+                            <Select
+                              value={displayRecord.position || ""}
+                              onValueChange={(value) =>
+                                handleEditFieldChange("position", value)
+                              }
+                            >
+                              <SelectTrigger className="text-sm">
+                                <SelectValue placeholder="Position" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {positions.map((pos) => (
+                                  <SelectItem key={pos} value={pos}>
+                                    {pos}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                            <Select
+                              value={displayRecord.school || ""}
+                              onValueChange={(value) =>
+                                handleEditFieldChange("school", value)
+                              }
+                            >
+                              <SelectTrigger className="text-sm flex-1">
+                                <SelectValue placeholder="School" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {fbsTeams.map((team) => (
+                                  <SelectItem key={team.name} value={team.name}>
+                                    {team.name}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
                           <Input
                             type="number"
                             value={displayRecord.year}
@@ -675,9 +721,17 @@ const TeamStats: React.FC = () => {
                           <h4 className="font-bold text-lg">
                             {displayRecord.playerName}
                           </h4>
-                          <p className="text-sm text-muted-foreground">
-                            {displayRecord.year}
-                          </p>
+                          <div className="text-sm text-muted-foreground space-y-0.5">
+                            {displayRecord.position && displayRecord.school ? (
+                              <p>{displayRecord.position} • {displayRecord.school}</p>
+                            ) : (
+                              <>
+                                {displayRecord.position && <p>{displayRecord.position}</p>}
+                                {displayRecord.school && <p>{displayRecord.school}</p>}
+                              </>
+                            )}
+                            <p>{displayRecord.year}</p>
+                          </div>
                         </>
                       )}
                     </div>
@@ -2092,6 +2146,56 @@ const TeamStats: React.FC = () => {
                         }))
                       }
                     />
+                  </div>
+
+                  {/* School Dropdown */}
+                  <div>
+                    <Label htmlFor="recordSchool">School</Label>
+                    <Select
+                      value={newRecord.school}
+                      onValueChange={(value) =>
+                        setNewRecord((prev) => ({
+                          ...prev,
+                          school: value,
+                        }))
+                      }
+                    >
+                      <SelectTrigger id="recordSchool">
+                        <SelectValue placeholder="Select school" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {fbsTeams.map((team) => (
+                          <SelectItem key={team.name} value={team.name}>
+                            {team.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  {/* Position Dropdown */}
+                  <div>
+                    <Label htmlFor="recordPosition">Position</Label>
+                    <Select
+                      value={newRecord.position}
+                      onValueChange={(value) =>
+                        setNewRecord((prev) => ({
+                          ...prev,
+                          position: value,
+                        }))
+                      }
+                    >
+                      <SelectTrigger id="recordPosition">
+                        <SelectValue placeholder="Select position" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {positions.map((pos) => (
+                          <SelectItem key={pos} value={pos}>
+                            {pos}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
 
                   {/* Record Level Checkboxes */}

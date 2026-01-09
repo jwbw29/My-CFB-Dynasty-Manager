@@ -17,7 +17,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${inter.className} bg-gray-200 dark:bg-gray-900 text-gray-900 dark:text-gray-100`}>
-        <Toaster />
+        <Toaster position="bottom-center" />
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <DynastyProvider>
             <DynastyThemeManager />
