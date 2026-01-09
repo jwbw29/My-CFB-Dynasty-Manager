@@ -46,6 +46,21 @@ import { HeroHeader } from "@/components/ui/HeroHeader";
 import { fbsTeams } from "@/utils/fbsTeams";
 import { positions } from "@/types/playerTypes";
 
+// Conference list
+const conferences = [
+  "ACC",
+  "American",
+  "Big 12",
+  "Big Ten",
+  "C-USA",
+  "Independents",
+  "MAC",
+  "Mountain West",
+  "Pac-12",
+  "SEC",
+  "Sun Belt",
+];
+
 interface TeamStatsData {
   gamesPlayed: number;
   // Offense
@@ -179,6 +194,7 @@ const TeamStats: React.FC = () => {
     levels: RecordLevel[];
     school: string;
     position: string;
+    conference: string;
     stats: {
       passingYards: string;
       passingTDs: string;
@@ -197,6 +213,7 @@ const TeamStats: React.FC = () => {
     levels: [],
     school: "",
     position: "",
+    conference: "",
     stats: {
       passingYards: "",
       passingTDs: "",
@@ -467,6 +484,7 @@ const TeamStats: React.FC = () => {
       levels: newRecord.levels,
       school: newRecord.school || undefined,
       position: newRecord.position || undefined,
+      conference: newRecord.conference || undefined,
       stats,
     };
 
@@ -483,6 +501,7 @@ const TeamStats: React.FC = () => {
       levels: [],
       school: "",
       position: "",
+      conference: "",
       stats: {
         passingYards: "",
         passingTDs: "",
@@ -703,6 +722,23 @@ const TeamStats: React.FC = () => {
                               </SelectContent>
                             </Select>
                           </div>
+                          <Select
+                            value={displayRecord.conference || ""}
+                            onValueChange={(value) =>
+                              handleEditFieldChange("conference", value)
+                            }
+                          >
+                            <SelectTrigger className="text-sm">
+                              <SelectValue placeholder="Conference" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {conferences.map((conf) => (
+                                <SelectItem key={conf} value={conf}>
+                                  {conf}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
                           <Input
                             type="number"
                             value={displayRecord.year}
@@ -723,12 +759,22 @@ const TeamStats: React.FC = () => {
                           </h4>
                           <div className="text-sm text-muted-foreground space-y-0.5">
                             {displayRecord.position && displayRecord.school ? (
-                              <p>{displayRecord.position} • {displayRecord.school}</p>
+                              <p>
+                                {displayRecord.position} •{" "}
+                                {displayRecord.school}
+                              </p>
                             ) : (
                               <>
-                                {displayRecord.position && <p>{displayRecord.position}</p>}
-                                {displayRecord.school && <p>{displayRecord.school}</p>}
+                                {displayRecord.position && (
+                                  <p>{displayRecord.position}</p>
+                                )}
+                                {displayRecord.school && (
+                                  <p>{displayRecord.school}</p>
+                                )}
                               </>
+                            )}
+                            {displayRecord.conference && (
+                              <p>{displayRecord.conference}</p>
                             )}
                             <p>{displayRecord.year}</p>
                           </div>
@@ -2192,6 +2238,31 @@ const TeamStats: React.FC = () => {
                         {positions.map((pos) => (
                           <SelectItem key={pos} value={pos}>
                             {pos}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  {/* Conference Dropdown */}
+                  <div>
+                    <Label htmlFor="recordConference">Conference</Label>
+                    <Select
+                      value={newRecord.conference}
+                      onValueChange={(value) =>
+                        setNewRecord((prev) => ({
+                          ...prev,
+                          conference: value,
+                        }))
+                      }
+                    >
+                      <SelectTrigger id="recordConference">
+                        <SelectValue placeholder="Select conference" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {conferences.map((conf) => (
+                          <SelectItem key={conf} value={conf}>
+                            {conf}
                           </SelectItem>
                         ))}
                       </SelectContent>

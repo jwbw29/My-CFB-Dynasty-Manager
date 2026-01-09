@@ -121,6 +121,7 @@ export interface PlayerRecord {
   levels: RecordLevel[]; // Can be multiple: national, conference, school
   school?: string; // School the player attended
   position?: string; // Player's position
+  conference?: string; // Conference the player's school belonged to
   stats: {
     passingYards?: number;
     passingTDs?: number;
