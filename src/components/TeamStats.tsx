@@ -185,6 +185,7 @@ const TeamStats: React.FC = () => {
   // State for editing records
   const [editingRecordId, setEditingRecordId] = useState<string | null>(null);
   const [editingRecord, setEditingRecord] = useState<PlayerRecord | null>(null);
+  const [isFormExpanded, setIsFormExpanded] = useState(false);
 
   // Form state for adding new records
   const [newRecord, setNewRecord] = useState<{
@@ -2074,93 +2075,30 @@ const TeamStats: React.FC = () => {
           </Card>
         </TabsContent>
 
-        <TabsContent value="records" className="flex gap-4 w-full h-full">
-          {/* Left Side - Records Display */}
-          <Card className="w-1/2 flex flex-col">
-            <CardHeader>
-              <CardTitle>Records</CardTitle>
-            </CardHeader>
-            <CardContent className="flex-1">
-              <Tabs defaultValue="career" className="w-full">
-                <TabsList className="grid w-full grid-cols-3">
-                  <TabsTrigger value="career">Career</TabsTrigger>
-                  <TabsTrigger value="season">Season</TabsTrigger>
-                  <TabsTrigger value="game">Game</TabsTrigger>
-                </TabsList>
-
-                <TabsContent value="career">
-                  <ScrollArea className="h-[600px] pr-4">
-                    <div className="space-y-6 mt-4">
-                      {renderRecordsSection(
-                        "career",
-                        "national",
-                        "National Records"
-                      )}
-                      {renderRecordsSection(
-                        "career",
-                        "conference",
-                        "Conference Records"
-                      )}
-                      {renderRecordsSection(
-                        "career",
-                        "school",
-                        "School Records"
-                      )}
-                    </div>
-                  </ScrollArea>
-                </TabsContent>
-
-                <TabsContent value="season">
-                  <ScrollArea className="h-[600px] pr-4">
-                    <div className="space-y-6 mt-4">
-                      {renderRecordsSection(
-                        "season",
-                        "national",
-                        "National Records"
-                      )}
-                      {renderRecordsSection(
-                        "season",
-                        "conference",
-                        "Conference Records"
-                      )}
-                      {renderRecordsSection(
-                        "season",
-                        "school",
-                        "School Records"
-                      )}
-                    </div>
-                  </ScrollArea>
-                </TabsContent>
-
-                <TabsContent value="game">
-                  <ScrollArea className="h-[600px] pr-4">
-                    <div className="space-y-6 mt-4">
-                      {renderRecordsSection(
-                        "game",
-                        "national",
-                        "National Records"
-                      )}
-                      {renderRecordsSection(
-                        "game",
-                        "conference",
-                        "Conference Records"
-                      )}
-                      {renderRecordsSection("game", "school", "School Records")}
-                    </div>
-                  </ScrollArea>
-                </TabsContent>
-              </Tabs>
-            </CardContent>
-          </Card>
-
-          {/* Right Side - Record Entry Form */}
-          <Card className="w-1/2 flex flex-col">
-            <CardHeader>
-              <CardTitle>Add Record</CardTitle>
-            </CardHeader>
-            <CardContent className="flex-1">
-              <ScrollArea className="h-[600px] pr-4">
-                <div className="space-y-4">
+        <TabsContent
+          value="records"
+          className="flex flex-col gap-4 w-full h-full"
+        >
+          {/* Top - Record Entry Form */}
+          <Card className="border-2 border-gray-200 dark:border-gray-700 shadow-xl overflow-hidden">
+            <div
+              className="bg-gradient-to-r from-primary to-primary/90 p-6 cursor-pointer flex flex-row items-center justify-between hover:from-primary/80 hover:to-primary/70 transition-all"
+              onClick={() => setIsFormExpanded(!isFormExpanded)}
+            >
+              <span className="text-2xl font-black text-white">
+                Add Record
+              </span>
+              {isFormExpanded ? (
+                <ChevronUp className="h-6 w-6 text-white" />
+              ) : (
+                <ChevronDown className="h-6 w-6 text-white" />
+              )}
+            </div>
+            <CardHeader className="hidden"></CardHeader>
+            {isFormExpanded && (
+              <CardContent className="flex-1 bg-gradient-to-br from-gray-50 to-white dark:from-gray-900 dark:to-gray-800">
+                <ScrollArea className="h-[600px] pr-4">
+                  <div className="space-y-4">
                   {/* Name Input */}
                   <div>
                     <Label htmlFor="playerName">Name</Label>
@@ -2508,6 +2446,85 @@ const TeamStats: React.FC = () => {
                   </Button>
                 </div>
               </ScrollArea>
+            </CardContent>
+            )}
+          </Card>
+
+          {/* Bottom - Records Display */}
+          <Card className="w-full flex flex-col">
+            <CardHeader>
+              <CardTitle>Records</CardTitle>
+            </CardHeader>
+            <CardContent className="flex-1">
+              <Tabs defaultValue="career" className="w-full">
+                <TabsList className="grid w-full grid-cols-3">
+                  <TabsTrigger value="career">Career</TabsTrigger>
+                  <TabsTrigger value="season">Season</TabsTrigger>
+                  <TabsTrigger value="game">Game</TabsTrigger>
+                </TabsList>
+
+                <TabsContent value="career">
+                  <ScrollArea className="h-[600px] pr-4">
+                    <div className="space-y-6 mt-4">
+                      {renderRecordsSection(
+                        "career",
+                        "national",
+                        "National Records"
+                      )}
+                      {renderRecordsSection(
+                        "career",
+                        "conference",
+                        "Conference Records"
+                      )}
+                      {renderRecordsSection(
+                        "career",
+                        "school",
+                        "School Records"
+                      )}
+                    </div>
+                  </ScrollArea>
+                </TabsContent>
+
+                <TabsContent value="season">
+                  <ScrollArea className="h-[600px] pr-4">
+                    <div className="space-y-6 mt-4">
+                      {renderRecordsSection(
+                        "season",
+                        "national",
+                        "National Records"
+                      )}
+                      {renderRecordsSection(
+                        "season",
+                        "conference",
+                        "Conference Records"
+                      )}
+                      {renderRecordsSection(
+                        "season",
+                        "school",
+                        "School Records"
+                      )}
+                    </div>
+                  </ScrollArea>
+                </TabsContent>
+
+                <TabsContent value="game">
+                  <ScrollArea className="h-[600px] pr-4">
+                    <div className="space-y-6 mt-4">
+                      {renderRecordsSection(
+                        "game",
+                        "national",
+                        "National Records"
+                      )}
+                      {renderRecordsSection(
+                        "game",
+                        "conference",
+                        "Conference Records"
+                      )}
+                      {renderRecordsSection("game", "school", "School Records")}
+                    </div>
+                  </ScrollArea>
+                </TabsContent>
+              </Tabs>
             </CardContent>
           </Card>
         </TabsContent>
