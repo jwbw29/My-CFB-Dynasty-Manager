@@ -463,18 +463,17 @@ const TrophyCase: React.FC = () => {
 
   const stats = getTrophyStats();
 
-  // Calculate playoff appearances - count unique years with at least one playoff game
-  // Starting at 6 to account for previous seasons
-  const getPlayoffAppearances = () => {
+  // Calculate playoff wins - count unique years with at least one playoff game
+  const getPlayoffWins = () => {
     const playoffYears = new Set(
       currentTrophies
         .filter((trophy) => trophy.isPlayoffGame === true)
         .map((trophy) => trophy.year)
     );
-    return 6 + playoffYears.size;
+    return playoffYears.size;
   };
 
-  const playoffAppearances = getPlayoffAppearances();
+  const playoffWins = getPlayoffWins();
 
   const addTrophy = () => {
     // --- MODIFICATION START: Ensure the name is set from the type ---
@@ -567,9 +566,9 @@ const TrophyCase: React.FC = () => {
           <CardContent className="pt-6">
             <div className="text-center">
               <Star className="h-8 w-8 mx-auto mb-2 text-purple-600 dark:text-purple-400" />
-              <div className="text-2xl font-bold">{playoffAppearances}</div>
+              <div className="text-2xl font-bold">{playoffWins}</div>
               <div className="text-sm text-purple-800 dark:text-purple-200">
-                Playoff Appearances
+                Playoff Wins
               </div>
             </div>
           </CardContent>
@@ -800,7 +799,10 @@ const TrophyCase: React.FC = () => {
                 id="playoff-game"
                 checked={newTrophy.isPlayoffGame || false}
                 onChange={(e) =>
-                  setNewTrophy({ ...newTrophy, isPlayoffGame: e.target.checked })
+                  setNewTrophy({
+                    ...newTrophy,
+                    isPlayoffGame: e.target.checked,
+                  })
                 }
                 className="h-4 w-4 text-blue-600 bg-white dark:bg-gray-800 border-gray-300 rounded focus:ring-blue-500"
               />
