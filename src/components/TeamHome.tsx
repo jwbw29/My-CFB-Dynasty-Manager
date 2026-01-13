@@ -515,24 +515,23 @@ const TeamHome: React.FC = () => {
   return (
     <div className="space-y-8">
       {/* Hero Header Section */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary/30 to-primary dark:from-blue-950/30 dark:via-purple-950/30 dark:to-pink-950/30 border border-gray-200 dark:border-gray-700 shadow-lg">
+      <div className="relative overflow-hidden rounded-2xl bg-primary">
         <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
         <div className="relative p-6 md:p-8">
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="flex items-center gap-6">
               {teamData && (
-                <div className="relative">
-                  <div className="absolute inset-0 bg-gradient-to-br from-primary to-secondary rounded-full blur-xl opacity-20"></div>
+                <div className="relative bg-white rounded-full p-4">
                   <TeamLogo teamName={teamData.name} size="3xl" />
                 </div>
               )}
 
               {/* Name, Season, & Conference */}
               <div className="flex flex-col gap-2 text-center md:text-left">
-                <h1 className="text-4xl md:text-5xl leading-relaxed md:leading-relaxed font-black bg-gradient-to-r from-gray-900 via-gray-700 to-gray-900 dark:from-gray-100 dark:via-gray-300 dark:to-gray-100 bg-clip-text text-transparent">
+                <h1 className="text-4xl md:text-5xl leading-relaxed md:leading-relaxed font-black text-school-secondary dark:text-gray-100">
                   {teamName}
                 </h1>
-                <p className="text-lg font-bold text-gray-600 dark:text-gray-400">
+                <p className="text-lg font-bold text-school-accent">
                   {currentYear} Season
                 </p>
                 {teamData && teamData.conference && (
@@ -541,7 +540,7 @@ const TeamHome: React.FC = () => {
                       conference={teamData.conference}
                       size="lg"
                     />
-                    <span className="text-base font-semibold text-gray-700 dark:text-gray-300">
+                    <span className="text-base font-semibold text-school-accent">
                       {teamData.conference}
                     </span>
                   </div>

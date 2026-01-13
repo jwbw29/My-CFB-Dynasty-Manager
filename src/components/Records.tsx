@@ -549,7 +549,7 @@ const Records: React.FC = () => {
             {/* All Content Below the tabs */}
             <div className="space-y-8 max-w-7xl mx-auto">
               {/* Hero Section - Enhanced Header with Key Stats */}
-              <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary/30 to-primary dark:from-blue-950/30 dark:via-purple-950/30 dark:to-pink-950/30 border border-gray-200 dark:border-gray-700 shadow-lg">
+              <div className="relative overflow-hidden rounded-2xl bg-primary">
                 <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
                 <div className="relative p-8">
                   {/* Header with Logo and Title */}
@@ -558,14 +558,13 @@ const Records: React.FC = () => {
                       {(() => {
                         const p = getCoachProfile();
                         return p?.schoolName ? (
-                          <div className="relative">
-                            <div className="absolute inset-0 bg-gradient-to-br from-blue-400 to-purple-400 rounded-full blur-xl opacity-20"></div>
+                          <div className="relative bg-white rounded-full p-4">
                             <TeamLogo teamName={p.schoolName} size="3xl" />
                           </div>
                         ) : null;
                       })()}
                       <div className="text-center md:text-left">
-                        <h2 className="text-4xl md:text-5xl leading-relaxed md:leading-relaxed font-black bg-gradient-to-r from-gray-900 via-gray-700 to-gray-900 dark:from-gray-100 dark:via-gray-300 dark:to-gray-100 bg-clip-text text-transparent">
+                        <h2 className="text-4xl md:text-5xl leading-relaxed md:leading-relaxed  bg-clip-text text-transparent text-school-secondary font-bold">
                           {activeRecord.year} Season
                         </h2>
                         <div className="flex items-center justify-center md:justify-start gap-2 mt-2">
@@ -579,7 +578,7 @@ const Records: React.FC = () => {
                                   conference={conference}
                                   size="lg"
                                 />
-                                <span className="text-xl font-semibold text-gray-700 dark:text-gray-300">
+                                <span className="text-xl font-semibold text-school-accent">
                                   {conference}
                                 </span>
                               </>
@@ -1007,7 +1006,7 @@ const Records: React.FC = () => {
 
               {/* Season Stats Section - Enhanced */}
               <Card className="border-2 border-gray-200 dark:border-gray-700 shadow-xl overflow-hidden">
-                <div className="bg-gradient-to-r from-slate-700 via-slate-600 to-slate-700 p-6">
+                <div className="bg-primary p-6">
                   <CardTitle className="flex items-center gap-3 text-2xl font-black text-white">
                     <BarChart2 className="h-7 w-7" />
                     {activeRecord.year} Season Stats

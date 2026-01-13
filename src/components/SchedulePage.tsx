@@ -573,26 +573,25 @@ const SchedulePage = () => {
   return (
     <div className="max-w-7xl mx-auto space-y-8">
       {/* Hero Header Section */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary/30 to-primary dark:from-blue-950/30 dark:via-purple-950/30 dark:to-pink-950/30 border border-gray-200 dark:border-gray-700 shadow-lg">
+      <div className="relative overflow-hidden rounded-2xl bg-primary">
         <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
         <div className="flex items-center justify-start p-6 md:p-8 gap-6">
           {teamData && (
-            <div className="relative">
-              <div className="absolute inset-0 bg-gradient-to-br from-primary to-secondary rounded-full blur-xl opacity-20"></div>
+            <div className="relative bg-white rounded-full p-4">
               <TeamLogo teamName={teamData.name} size="3xl" />
             </div>
           )}
 
           {/* Title and Conference */}
           <div className="flex flex-col justify-center items-start text-center gap-2">
-            <h1 className="text-4xl md:text-5xl leading-relaxed md:leading-relaxed font-black bg-gradient-to-r from-gray-900 via-gray-700 to-gray-900 dark:from-gray-100 dark:via-gray-300 dark:to-gray-100 bg-clip-text text-transparent flex items-center gap-3 justify-center">
-              <Calendar className="h-10 w-10 text-blue-600 dark:text-blue-400" />
+            <h1 className="text-4xl md:text-5xl leading-relaxed md:leading-relaxed font-black text-school-secondary flex items-center gap-3 justify-center">
+              <Calendar className="h-10 w-10 text-school-secondary " />
               {currentYear} Schedule
             </h1>
             {teamData && teamData.conference && (
               <div className="flex items-center justify-center gap-2">
                 <ConferenceLogo conference={teamData.conference} size="xl" />
-                <span className="text-base font-semibold text-gray-700 dark:text-gray-300">
+                <span className="text-base font-semibold text-school-secondary">
                   {teamData.conference}
                 </span>
               </div>
@@ -617,7 +616,7 @@ const SchedulePage = () => {
               {record.wins}-{record.losses}
               {record.ties > 0 ? `-${record.ties}` : ""}
             </div>
-            <div className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mt-2">
+            <div className="text-xs font-bold text-school-accent uppercase tracking-wider mt-2">
               Season Record
             </div>
           </CardContent>
@@ -682,8 +681,8 @@ const SchedulePage = () => {
       </div>
 
       {/* Schedule management table - Enhanced */}
-      <Card className="border-2 border-gray-200 dark:border-gray-700 shadow-xl overflow-hidden">
-        <div className="bg-gradient-to-r from-slate-700 via-slate-600 to-slate-700 p-6">
+      <Card className="border-2 overflow-hidden">
+        <div className="bg-primary p-6">
           <CardTitle className="text-2xl font-black text-white flex items-center gap-3">
             <Calendar className="h-7 w-7" />
             Schedule Management

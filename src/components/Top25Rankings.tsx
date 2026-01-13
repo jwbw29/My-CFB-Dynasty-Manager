@@ -355,8 +355,8 @@ const Top25Rankings: React.FC = () => {
 
             <Button
               onClick={handleSave}
-              variant="secondary"
-              className="bg-secondary"
+              variant="outline"
+              className="hover:bg-gray-300"
             >
               <Save className="mr-2 h-4 w-4" />
               Save Rankings
