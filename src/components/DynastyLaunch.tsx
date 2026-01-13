@@ -633,7 +633,9 @@ const DynastyLaunch: React.FC<DynastyLaunchProps> = ({ onDynastySelected }) => {
                   <Card key={dynasty.id} className="bg-white/10 ...">
                     <CardHeader className="pb-3">
                       <CardTitle className="text-white flex items-center gap-3">
-                        <TeamLogo teamName={dynasty.schoolName} size="lg" />
+                        <div className="bg-white rounded-full p-1">
+                          <TeamLogo teamName={dynasty.schoolName} size="lg" />
+                        </div>
                         <div className="flex-1">
                           <span className="truncate font-bold text-lg">
                             {teamRank && (
