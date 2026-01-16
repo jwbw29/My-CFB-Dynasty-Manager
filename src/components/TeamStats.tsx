@@ -655,13 +655,16 @@ const TeamStats: React.FC = () => {
   const renderRecordsSection = (
     recordType: RecordType,
     level: RecordLevel,
-    title: string
+    title: string,
+    headerClassName?: string
   ) => {
     const levelRecords = getRecordsByLevel(recordType, level);
 
     return (
-      <div>
-        <h3 className="font-semibold text-lg mb-3">{title}</h3>
+      <div id="renderRecordsSection" className="flex flex-col w-full p-4">
+        <h3 className={`font-semibold text-lg mb-3 ${headerClassName || ""}`}>
+          {title}
+        </h3>
         {levelRecords.length > 0 ? (
           <div className="space-y-3">
             {levelRecords.map((record) => {
@@ -671,7 +674,7 @@ const TeamStats: React.FC = () => {
               if (!displayRecord) return null;
 
               return (
-                <Card key={record.id} className="p-3">
+                <Card key={record.id} className="p-3 mx-3">
                   <div className="flex justify-between items-start mb-2">
                     <div className="flex-1">
                       {isEditing ? (
@@ -2264,6 +2267,7 @@ const TeamStats: React.FC = () => {
                               </Label>
                             </div>
                           </div>
+
                           {/* Record Type Radio Buttons */}
                           <div className="space-y-2">
                             <Label>Record Type</Label>
@@ -2481,7 +2485,7 @@ const TeamStats: React.FC = () => {
               <CardTitle>Records</CardTitle>
             </CardHeader>
 
-            <CardContent className="flex-1 w-[500px]">
+            <CardContent className="flex-1 w-full">
               <Tabs defaultValue="career" className="w-full">
                 <TabsList className="grid w-full grid-cols-3">
                   <TabsTrigger value="career">Career</TabsTrigger>
@@ -2489,66 +2493,76 @@ const TeamStats: React.FC = () => {
                   <TabsTrigger value="game">Game</TabsTrigger>
                 </TabsList>
 
+                {/* Career Records */}
                 <TabsContent value="career">
-                  <ScrollArea className="h-[600px] pr-4">
-                    <div className="space-y-6 mt-4">
-                      {renderRecordsSection(
-                        "career",
-                        "national",
-                        "National Records"
-                      )}
-                      {renderRecordsSection(
-                        "career",
-                        "conference",
-                        "Conference Records"
-                      )}
-                      {renderRecordsSection(
-                        "career",
-                        "school",
-                        "School Records"
-                      )}
-                    </div>
-                  </ScrollArea>
+                  <div className="flex w-full justify-center mt-12">
+                    {renderRecordsSection(
+                      "career",
+                      "national",
+                      "National Records",
+                      "bg-yellow-600 text-white p-2 rounded-md"
+                    )}
+                    {renderRecordsSection(
+                      "career",
+                      "conference",
+                      "Conference Records",
+                      "bg-gray-600 text-white p-2 rounded-md"
+                    )}
+                    {renderRecordsSection(
+                      "career",
+                      "school",
+                      "School Records",
+                      "bg-primary text-white p-2 rounded-md"
+                    )}
+                  </div>
                 </TabsContent>
 
+                {/* Season Records */}
                 <TabsContent value="season">
-                  <ScrollArea className="h-[600px] pr-4">
-                    <div className="space-y-6 mt-4">
-                      {renderRecordsSection(
-                        "season",
-                        "national",
-                        "National Records"
-                      )}
-                      {renderRecordsSection(
-                        "season",
-                        "conference",
-                        "Conference Records"
-                      )}
-                      {renderRecordsSection(
-                        "season",
-                        "school",
-                        "School Records"
-                      )}
-                    </div>
-                  </ScrollArea>
+                  <div className="flex w-full justify-center mt-12">
+                    {renderRecordsSection(
+                      "season",
+                      "national",
+                      "National Records",
+                      "bg-yellow-600 text-white p-2 rounded-md"
+                    )}
+                    {renderRecordsSection(
+                      "season",
+                      "conference",
+                      "Conference Records",
+                      "bg-gray-600 text-white p-2 rounded-md"
+                    )}
+                    {renderRecordsSection(
+                      "season",
+                      "school",
+                      "School Records",
+                      "bg-primary text-white p-2 rounded-md"
+                    )}
+                  </div>
                 </TabsContent>
 
+                {/* Single Game Records */}
                 <TabsContent value="game">
-                  <ScrollArea className="h-[600px] pr-4">
-                    <div className="space-y-6 mt-4">
-                      {renderRecordsSection(
-                        "game",
-                        "national",
-                        "National Records"
-                      )}
-                      {renderRecordsSection(
-                        "game",
-                        "conference",
-                        "Conference Records"
-                      )}
-                      {renderRecordsSection("game", "school", "School Records")}
-                    </div>
-                  </ScrollArea>
+                  <div className="flex w-full justify-center mt-12">
+                    {renderRecordsSection(
+                      "game",
+                      "national",
+                      "National Records",
+                      "bg-yellow-600 text-white p-2 rounded-md"
+                    )}
+                    {renderRecordsSection(
+                      "game",
+                      "conference",
+                      "Conference Records",
+                      "bg-gray-600 text-white p-2 rounded-md"
+                    )}
+                    {renderRecordsSection(
+                      "game",
+                      "school",
+                      "School Records",
+                      "bg-primary text-white p-2 rounded-md"
+                    )}
+                  </div>
                 </TabsContent>
               </Tabs>
             </CardContent>
