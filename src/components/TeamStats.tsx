@@ -2500,19 +2500,19 @@ const TeamStats: React.FC = () => {
                       "career",
                       "national",
                       "National Records",
-                      "bg-yellow-600 text-white p-2 rounded-md"
+                      "bg-yellow-600 text-white p-2 rounded-md text-center"
                     )}
                     {renderRecordsSection(
                       "career",
                       "conference",
                       "Conference Records",
-                      "bg-gray-600 text-white p-2 rounded-md"
+                      "bg-gray-600 text-white p-2 rounded-md text-center"
                     )}
                     {renderRecordsSection(
                       "career",
                       "school",
                       "School Records",
-                      "bg-primary text-white p-2 rounded-md"
+                      "bg-primary text-white p-2 rounded-md text-center"
                     )}
                   </div>
                 </TabsContent>
@@ -2524,19 +2524,19 @@ const TeamStats: React.FC = () => {
                       "season",
                       "national",
                       "National Records",
-                      "bg-yellow-600 text-white p-2 rounded-md"
+                      "bg-yellow-600 text-white p-2 rounded-md text-center"
                     )}
                     {renderRecordsSection(
                       "season",
                       "conference",
                       "Conference Records",
-                      "bg-gray-600 text-white p-2 rounded-md"
+                      "bg-gray-600 text-white p-2 rounded-md text-center"
                     )}
                     {renderRecordsSection(
                       "season",
                       "school",
                       "School Records",
-                      "bg-primary text-white p-2 rounded-md"
+                      "bg-primary text-white p-2 rounded-md text-center"
                     )}
                   </div>
                 </TabsContent>
@@ -2548,19 +2548,19 @@ const TeamStats: React.FC = () => {
                       "game",
                       "national",
                       "National Records",
-                      "bg-yellow-600 text-white p-2 rounded-md"
+                      "bg-yellow-600 text-white p-2 rounded-md text-center"
                     )}
                     {renderRecordsSection(
                       "game",
                       "conference",
                       "Conference Records",
-                      "bg-gray-600 text-white p-2 rounded-md"
+                      "bg-gray-600 text-white p-2 rounded-md text-center"
                     )}
                     {renderRecordsSection(
                       "game",
                       "school",
                       "School Records",
-                      "bg-primary text-white p-2 rounded-md"
+                      "bg-primary text-white p-2 rounded-md text-center"
                     )}
                   </div>
                 </TabsContent>
