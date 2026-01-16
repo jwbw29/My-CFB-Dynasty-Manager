@@ -860,6 +860,7 @@ const TeamStats: React.FC = () => {
           <TabsTrigger value="records">Records</TabsTrigger>
         </TabsList>
 
+        {/* Stats Page */}
         <TabsContent
           value="stats"
           className="flex flex-col items-center gap-6 w-full"
@@ -2076,14 +2077,16 @@ const TeamStats: React.FC = () => {
           </Card>
         </TabsContent>
 
+        {/* Records Page */}
         <TabsContent
           value="records"
           className="flex flex-col gap-4 w-full h-full"
         >
           {/* Top - Record Entry Form */}
-          <Card className="border-2 border-gray-200 dark:border-gray-700 shadow-xl overflow-hidden">
+          <Card className="flex flex-col border-2 border-gray-200 dark:border-gray-700 shadow-xl overflow-hidden items-center justify-center w-full">
+            {/* Add Record Accordion */}
             <div
-              className="bg-gradient-to-r from-primary to-primary/90 p-6 cursor-pointer flex flex-row items-center justify-between hover:from-primary/80 hover:to-primary/70 transition-all"
+              className="bg-gradient-to-r from-primary to-primary/90 p-6 cursor-pointer flex flex-row items-center justify-between hover:from-primary/80 hover:to-primary/70 transition-all w-full"
               onClick={() => setIsFormExpanded(!isFormExpanded)}
             >
               <span className="text-2xl font-black text-white">Add Record</span>
@@ -2093,210 +2096,229 @@ const TeamStats: React.FC = () => {
                 <ChevronDown className="h-6 w-6 text-white" />
               )}
             </div>
+
             <CardHeader className="hidden"></CardHeader>
             {isFormExpanded && (
-              <CardContent className="flex-1 bg-gradient-to-br from-gray-50 to-white dark:from-gray-900 dark:to-gray-800">
-                <ScrollArea className="h-[600px] pr-4">
-                  <div className="space-y-4">
-                    {/* Name Input */}
-                    <div>
-                      <Label htmlFor="playerName">Name</Label>
-                      <Input
-                        id="playerName"
-                        placeholder="Player name"
-                        value={newRecord.playerName}
-                        onChange={(e) =>
-                          setNewRecord((prev) => ({
-                            ...prev,
-                            playerName: e.target.value,
-                          }))
-                        }
-                      />
-                    </div>
+              <CardContent className="flex w-full items-center justify-center bg-gradient-to-br from-gray-50 to-white dark:from-gray-900 dark:to-gray-800">
+                <div className="space-y-4 flex flex-col gap-6">
+                  {/* Inputs */}
+                  <div className="flex gap-24 w-full">
+                    {/* Left Side */}
 
-                    {/* Year Input */}
-                    <div>
-                      <Label htmlFor="recordYear">Year</Label>
-                      <Input
-                        id="recordYear"
-                        type="number"
-                        placeholder="Year"
-                        value={newRecord.year}
-                        onChange={(e) =>
-                          setNewRecord((prev) => ({
-                            ...prev,
-                            year: parseInt(e.target.value) || currentYear,
-                          }))
-                        }
-                      />
-                    </div>
-
-                    {/* School Dropdown */}
-                    <div>
-                      <Label htmlFor="recordSchool">School</Label>
-                      <Select
-                        value={newRecord.school}
-                        onValueChange={(value) =>
-                          setNewRecord((prev) => ({
-                            ...prev,
-                            school: value,
-                          }))
-                        }
-                      >
-                        <SelectTrigger id="recordSchool">
-                          <SelectValue placeholder="Select school" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {fbsTeams.map((team) => (
-                            <SelectItem key={team.name} value={team.name}>
-                              {team.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-
-                    {/* Position Dropdown */}
-                    <div>
-                      <Label htmlFor="recordPosition">Position</Label>
-                      <Select
-                        value={newRecord.position}
-                        onValueChange={(value) =>
-                          setNewRecord((prev) => ({
-                            ...prev,
-                            position: value,
-                          }))
-                        }
-                      >
-                        <SelectTrigger id="recordPosition">
-                          <SelectValue placeholder="Select position" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {positions.map((pos) => (
-                            <SelectItem key={pos} value={pos}>
-                              {pos}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-
-                    {/* Conference Dropdown */}
-                    <div>
-                      <Label htmlFor="recordConference">Conference</Label>
-                      <Select
-                        value={newRecord.conference}
-                        onValueChange={(value) =>
-                          setNewRecord((prev) => ({
-                            ...prev,
-                            conference: value,
-                          }))
-                        }
-                      >
-                        <SelectTrigger id="recordConference">
-                          <SelectValue placeholder="Select conference" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {conferences.map((conf) => (
-                            <SelectItem key={conf} value={conf}>
-                              {conf}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-
-                    {/* Record Level Checkboxes */}
-                    <div className="space-y-2">
-                      <Label>Record Level</Label>
-                      <div className="flex items-center space-x-2">
-                        <Checkbox
-                          id="national"
-                          checked={newRecord.levels.includes("national")}
-                          onCheckedChange={() => handleLevelToggle("national")}
-                        />
-                        <Label
-                          htmlFor="national"
-                          className="font-normal cursor-pointer"
-                        >
-                          National
-                        </Label>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <Checkbox
-                          id="conference"
-                          checked={newRecord.levels.includes("conference")}
-                          onCheckedChange={() =>
-                            handleLevelToggle("conference")
-                          }
-                        />
-                        <Label
-                          htmlFor="conference"
-                          className="font-normal cursor-pointer"
-                        >
-                          Conference
-                        </Label>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <Checkbox
-                          id="school"
-                          checked={newRecord.levels.includes("school")}
-                          onCheckedChange={() => handleLevelToggle("school")}
-                        />
-                        <Label
-                          htmlFor="school"
-                          className="font-normal cursor-pointer"
-                        >
-                          School
-                        </Label>
-                      </div>
-                    </div>
-
-                    {/* Record Type Radio Buttons */}
-                    <div className="space-y-2">
-                      <Label>Record Type</Label>
-                      <RadioGroup
-                        value={newRecord.recordType}
-                        onValueChange={(value: RecordType) =>
-                          setNewRecord((prev) => ({
-                            ...prev,
-                            recordType: value,
-                          }))
-                        }
-                      >
-                        <div className="flex items-center space-x-2">
-                          <RadioGroupItem value="career" id="career-radio" />
-                          <Label
-                            htmlFor="career-radio"
-                            className="font-normal cursor-pointer"
-                          >
-                            Career
-                          </Label>
+                    <div className="flex flex-col w-1/2">
+                      <h3 className="font-semibold text-lg mb-3">Details</h3>
+                      <div className="flex flex-col gap-3">
+                        {/* Name Input */}
+                        <div>
+                          <Label htmlFor="playerName">Name</Label>
+                          <Input
+                            id="playerName"
+                            placeholder="Player name"
+                            value={newRecord.playerName}
+                            onChange={(e) =>
+                              setNewRecord((prev) => ({
+                                ...prev,
+                                playerName: e.target.value,
+                              }))
+                            }
+                          />
                         </div>
-                        <div className="flex items-center space-x-2">
-                          <RadioGroupItem value="season" id="season-radio" />
-                          <Label
-                            htmlFor="season-radio"
-                            className="font-normal cursor-pointer"
-                          >
-                            Season
-                          </Label>
+                        {/* Year Input */}
+                        <div>
+                          <Label htmlFor="recordYear">Year</Label>
+                          <Input
+                            id="recordYear"
+                            type="number"
+                            placeholder="Year"
+                            value={newRecord.year}
+                            onChange={(e) =>
+                              setNewRecord((prev) => ({
+                                ...prev,
+                                year: parseInt(e.target.value) || currentYear,
+                              }))
+                            }
+                          />
                         </div>
-                        <div className="flex items-center space-x-2">
-                          <RadioGroupItem value="game" id="game-radio" />
-                          <Label
-                            htmlFor="game-radio"
-                            className="font-normal cursor-pointer"
+                        {/* School Dropdown */}
+                        <div>
+                          <Label htmlFor="recordSchool">School</Label>
+                          <Select
+                            value={newRecord.school}
+                            onValueChange={(value) =>
+                              setNewRecord((prev) => ({
+                                ...prev,
+                                school: value,
+                              }))
+                            }
                           >
-                            Game
-                          </Label>
+                            <SelectTrigger id="recordSchool">
+                              <SelectValue placeholder="Select school" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {fbsTeams.map((team) => (
+                                <SelectItem key={team.name} value={team.name}>
+                                  {team.name}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
                         </div>
-                      </RadioGroup>
+                        {/* Position Dropdown */}
+                        <div>
+                          <Label htmlFor="recordPosition">Position</Label>
+                          <Select
+                            value={newRecord.position}
+                            onValueChange={(value) =>
+                              setNewRecord((prev) => ({
+                                ...prev,
+                                position: value,
+                              }))
+                            }
+                          >
+                            <SelectTrigger id="recordPosition">
+                              <SelectValue placeholder="Select position" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {positions.map((pos) => (
+                                <SelectItem key={pos} value={pos}>
+                                  {pos}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        {/* Conference Dropdown */}
+                        <div>
+                          <Label htmlFor="recordConference">Conference</Label>
+                          <Select
+                            value={newRecord.conference}
+                            onValueChange={(value) =>
+                              setNewRecord((prev) => ({
+                                ...prev,
+                                conference: value,
+                              }))
+                            }
+                          >
+                            <SelectTrigger id="recordConference">
+                              <SelectValue placeholder="Select conference" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {conferences.map((conf) => (
+                                <SelectItem key={conf} value={conf}>
+                                  {conf}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        {/* Record Level and Type Selection */}
+                        <div className="flex w-full gap-6">
+                          {/* Record Level Checkboxes */}
+                          <div className="space-y-2">
+                            <Label>Record Level</Label>
+                            <div className="flex items-center space-x-2">
+                              <Checkbox
+                                id="national"
+                                checked={newRecord.levels.includes("national")}
+                                onCheckedChange={() =>
+                                  handleLevelToggle("national")
+                                }
+                              />
+                              <Label
+                                htmlFor="national"
+                                className="font-normal cursor-pointer"
+                              >
+                                National
+                              </Label>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                              <Checkbox
+                                id="conference"
+                                checked={newRecord.levels.includes(
+                                  "conference"
+                                )}
+                                onCheckedChange={() =>
+                                  handleLevelToggle("conference")
+                                }
+                              />
+                              <Label
+                                htmlFor="conference"
+                                className="font-normal cursor-pointer"
+                              >
+                                Conference
+                              </Label>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                              <Checkbox
+                                id="school"
+                                checked={newRecord.levels.includes("school")}
+                                onCheckedChange={() =>
+                                  handleLevelToggle("school")
+                                }
+                              />
+                              <Label
+                                htmlFor="school"
+                                className="font-normal cursor-pointer"
+                              >
+                                School
+                              </Label>
+                            </div>
+                          </div>
+                          {/* Record Type Radio Buttons */}
+                          <div className="space-y-2">
+                            <Label>Record Type</Label>
+                            <RadioGroup
+                              value={newRecord.recordType}
+                              onValueChange={(value: RecordType) =>
+                                setNewRecord((prev) => ({
+                                  ...prev,
+                                  recordType: value,
+                                }))
+                              }
+                            >
+                              <div className="flex items-center space-x-2">
+                                <RadioGroupItem
+                                  value="career"
+                                  id="career-radio"
+                                />
+                                <Label
+                                  htmlFor="career-radio"
+                                  className="font-normal cursor-pointer"
+                                >
+                                  Career
+                                </Label>
+                              </div>
+                              <div className="flex items-center space-x-2">
+                                <RadioGroupItem
+                                  value="season"
+                                  id="season-radio"
+                                />
+                                <Label
+                                  htmlFor="season-radio"
+                                  className="font-normal cursor-pointer"
+                                >
+                                  Season
+                                </Label>
+                              </div>
+                              <div className="flex items-center space-x-2">
+                                <RadioGroupItem value="game" id="game-radio" />
+                                <Label
+                                  htmlFor="game-radio"
+                                  className="font-normal cursor-pointer"
+                                >
+                                  Game
+                                </Label>
+                              </div>
+                            </RadioGroup>
+                          </div>
+                        </div>
+                      </div>
                     </div>
 
+                    {/* Right Side */}
                     {/* Stat Inputs */}
-                    <div className="space-y-3">
-                      <Label>Statistics</Label>
+                    <div className="flex flex-col w-1/2 space-y-3">
+                      <h3 className="font-semibold text-lg mb-3">Statistics</h3>
                       <div className="grid grid-cols-2 gap-3">
                         <div>
                           <Label htmlFor="passYds" className="text-sm">
@@ -2435,31 +2457,31 @@ const TeamStats: React.FC = () => {
                         </div>
                       </div>
                     </div>
-
-                    {/* Add Button */}
-                    <Button
-                      onClick={handleAddRecord}
-                      className="w-full"
-                      disabled={
-                        !newRecord.playerName.trim() ||
-                        newRecord.levels.length === 0
-                      }
-                    >
-                      <Plus className="h-4 w-4 mr-2" />
-                      Add Record
-                    </Button>
                   </div>
-                </ScrollArea>
+                  {/* Add Button */}
+                  <Button
+                    onClick={handleAddRecord}
+                    className="w-full"
+                    disabled={
+                      !newRecord.playerName.trim() ||
+                      newRecord.levels.length === 0
+                    }
+                  >
+                    <Plus className="h-4 w-4 mr-2" />
+                    Add Record
+                  </Button>
+                </div>
               </CardContent>
             )}
           </Card>
 
           {/* Bottom - Records Display */}
-          <Card className="w-full flex flex-col">
+          <Card className="flex flex-col items-center justify-center ">
             <CardHeader>
               <CardTitle>Records</CardTitle>
             </CardHeader>
-            <CardContent className="flex-1">
+
+            <CardContent className="flex-1 w-[500px]">
               <Tabs defaultValue="career" className="w-full">
                 <TabsList className="grid w-full grid-cols-3">
                   <TabsTrigger value="career">Career</TabsTrigger>
