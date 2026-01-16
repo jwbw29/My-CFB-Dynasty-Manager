@@ -1102,7 +1102,8 @@ const TeamStats: React.FC = () => {
             <CardHeader>
               <CardTitle>Offensive Team Leaders</CardTitle>
             </CardHeader>
-            <CardContent>
+
+            <CardContent className="w-full px-24">
               <div className="space-y-6">
                 {/* Passing Leaders */}
                 <div>
@@ -1635,7 +1636,7 @@ const TeamStats: React.FC = () => {
             <CardHeader className="flex flex-col items-center w-full">
               <CardTitle>Defensive Team Leaders</CardTitle>
             </CardHeader>
-            <CardContent className="w-full">
+            <CardContent className="w-full px-24">
               <div className="space-y-6">
                 {/* DEFENSIVE LEADERS */}
                 {/* Tackles */}
@@ -2085,9 +2086,7 @@ const TeamStats: React.FC = () => {
               className="bg-gradient-to-r from-primary to-primary/90 p-6 cursor-pointer flex flex-row items-center justify-between hover:from-primary/80 hover:to-primary/70 transition-all"
               onClick={() => setIsFormExpanded(!isFormExpanded)}
             >
-              <span className="text-2xl font-black text-white">
-                Add Record
-              </span>
+              <span className="text-2xl font-black text-white">Add Record</span>
               {isFormExpanded ? (
                 <ChevronUp className="h-6 w-6 text-white" />
               ) : (
@@ -2099,354 +2098,359 @@ const TeamStats: React.FC = () => {
               <CardContent className="flex-1 bg-gradient-to-br from-gray-50 to-white dark:from-gray-900 dark:to-gray-800">
                 <ScrollArea className="h-[600px] pr-4">
                   <div className="space-y-4">
-                  {/* Name Input */}
-                  <div>
-                    <Label htmlFor="playerName">Name</Label>
-                    <Input
-                      id="playerName"
-                      placeholder="Player name"
-                      value={newRecord.playerName}
-                      onChange={(e) =>
-                        setNewRecord((prev) => ({
-                          ...prev,
-                          playerName: e.target.value,
-                        }))
-                      }
-                    />
-                  </div>
-
-                  {/* Year Input */}
-                  <div>
-                    <Label htmlFor="recordYear">Year</Label>
-                    <Input
-                      id="recordYear"
-                      type="number"
-                      placeholder="Year"
-                      value={newRecord.year}
-                      onChange={(e) =>
-                        setNewRecord((prev) => ({
-                          ...prev,
-                          year: parseInt(e.target.value) || currentYear,
-                        }))
-                      }
-                    />
-                  </div>
-
-                  {/* School Dropdown */}
-                  <div>
-                    <Label htmlFor="recordSchool">School</Label>
-                    <Select
-                      value={newRecord.school}
-                      onValueChange={(value) =>
-                        setNewRecord((prev) => ({
-                          ...prev,
-                          school: value,
-                        }))
-                      }
-                    >
-                      <SelectTrigger id="recordSchool">
-                        <SelectValue placeholder="Select school" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {fbsTeams.map((team) => (
-                          <SelectItem key={team.name} value={team.name}>
-                            {team.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  {/* Position Dropdown */}
-                  <div>
-                    <Label htmlFor="recordPosition">Position</Label>
-                    <Select
-                      value={newRecord.position}
-                      onValueChange={(value) =>
-                        setNewRecord((prev) => ({
-                          ...prev,
-                          position: value,
-                        }))
-                      }
-                    >
-                      <SelectTrigger id="recordPosition">
-                        <SelectValue placeholder="Select position" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {positions.map((pos) => (
-                          <SelectItem key={pos} value={pos}>
-                            {pos}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  {/* Conference Dropdown */}
-                  <div>
-                    <Label htmlFor="recordConference">Conference</Label>
-                    <Select
-                      value={newRecord.conference}
-                      onValueChange={(value) =>
-                        setNewRecord((prev) => ({
-                          ...prev,
-                          conference: value,
-                        }))
-                      }
-                    >
-                      <SelectTrigger id="recordConference">
-                        <SelectValue placeholder="Select conference" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {conferences.map((conf) => (
-                          <SelectItem key={conf} value={conf}>
-                            {conf}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  {/* Record Level Checkboxes */}
-                  <div className="space-y-2">
-                    <Label>Record Level</Label>
-                    <div className="flex items-center space-x-2">
-                      <Checkbox
-                        id="national"
-                        checked={newRecord.levels.includes("national")}
-                        onCheckedChange={() => handleLevelToggle("national")}
+                    {/* Name Input */}
+                    <div>
+                      <Label htmlFor="playerName">Name</Label>
+                      <Input
+                        id="playerName"
+                        placeholder="Player name"
+                        value={newRecord.playerName}
+                        onChange={(e) =>
+                          setNewRecord((prev) => ({
+                            ...prev,
+                            playerName: e.target.value,
+                          }))
+                        }
                       />
-                      <Label
-                        htmlFor="national"
-                        className="font-normal cursor-pointer"
-                      >
-                        National
-                      </Label>
                     </div>
-                    <div className="flex items-center space-x-2">
-                      <Checkbox
-                        id="conference"
-                        checked={newRecord.levels.includes("conference")}
-                        onCheckedChange={() => handleLevelToggle("conference")}
-                      />
-                      <Label
-                        htmlFor="conference"
-                        className="font-normal cursor-pointer"
-                      >
-                        Conference
-                      </Label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <Checkbox
-                        id="school"
-                        checked={newRecord.levels.includes("school")}
-                        onCheckedChange={() => handleLevelToggle("school")}
-                      />
-                      <Label
-                        htmlFor="school"
-                        className="font-normal cursor-pointer"
-                      >
-                        School
-                      </Label>
-                    </div>
-                  </div>
 
-                  {/* Record Type Radio Buttons */}
-                  <div className="space-y-2">
-                    <Label>Record Type</Label>
-                    <RadioGroup
-                      value={newRecord.recordType}
-                      onValueChange={(value: RecordType) =>
-                        setNewRecord((prev) => ({ ...prev, recordType: value }))
-                      }
-                    >
+                    {/* Year Input */}
+                    <div>
+                      <Label htmlFor="recordYear">Year</Label>
+                      <Input
+                        id="recordYear"
+                        type="number"
+                        placeholder="Year"
+                        value={newRecord.year}
+                        onChange={(e) =>
+                          setNewRecord((prev) => ({
+                            ...prev,
+                            year: parseInt(e.target.value) || currentYear,
+                          }))
+                        }
+                      />
+                    </div>
+
+                    {/* School Dropdown */}
+                    <div>
+                      <Label htmlFor="recordSchool">School</Label>
+                      <Select
+                        value={newRecord.school}
+                        onValueChange={(value) =>
+                          setNewRecord((prev) => ({
+                            ...prev,
+                            school: value,
+                          }))
+                        }
+                      >
+                        <SelectTrigger id="recordSchool">
+                          <SelectValue placeholder="Select school" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {fbsTeams.map((team) => (
+                            <SelectItem key={team.name} value={team.name}>
+                              {team.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    {/* Position Dropdown */}
+                    <div>
+                      <Label htmlFor="recordPosition">Position</Label>
+                      <Select
+                        value={newRecord.position}
+                        onValueChange={(value) =>
+                          setNewRecord((prev) => ({
+                            ...prev,
+                            position: value,
+                          }))
+                        }
+                      >
+                        <SelectTrigger id="recordPosition">
+                          <SelectValue placeholder="Select position" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {positions.map((pos) => (
+                            <SelectItem key={pos} value={pos}>
+                              {pos}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    {/* Conference Dropdown */}
+                    <div>
+                      <Label htmlFor="recordConference">Conference</Label>
+                      <Select
+                        value={newRecord.conference}
+                        onValueChange={(value) =>
+                          setNewRecord((prev) => ({
+                            ...prev,
+                            conference: value,
+                          }))
+                        }
+                      >
+                        <SelectTrigger id="recordConference">
+                          <SelectValue placeholder="Select conference" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {conferences.map((conf) => (
+                            <SelectItem key={conf} value={conf}>
+                              {conf}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    {/* Record Level Checkboxes */}
+                    <div className="space-y-2">
+                      <Label>Record Level</Label>
                       <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="career" id="career-radio" />
+                        <Checkbox
+                          id="national"
+                          checked={newRecord.levels.includes("national")}
+                          onCheckedChange={() => handleLevelToggle("national")}
+                        />
                         <Label
-                          htmlFor="career-radio"
+                          htmlFor="national"
                           className="font-normal cursor-pointer"
                         >
-                          Career
+                          National
                         </Label>
                       </div>
                       <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="season" id="season-radio" />
+                        <Checkbox
+                          id="conference"
+                          checked={newRecord.levels.includes("conference")}
+                          onCheckedChange={() =>
+                            handleLevelToggle("conference")
+                          }
+                        />
                         <Label
-                          htmlFor="season-radio"
+                          htmlFor="conference"
                           className="font-normal cursor-pointer"
                         >
-                          Season
+                          Conference
                         </Label>
                       </div>
                       <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="game" id="game-radio" />
+                        <Checkbox
+                          id="school"
+                          checked={newRecord.levels.includes("school")}
+                          onCheckedChange={() => handleLevelToggle("school")}
+                        />
                         <Label
-                          htmlFor="game-radio"
+                          htmlFor="school"
                           className="font-normal cursor-pointer"
                         >
-                          Game
+                          School
                         </Label>
-                      </div>
-                    </RadioGroup>
-                  </div>
-
-                  {/* Stat Inputs */}
-                  <div className="space-y-3">
-                    <Label>Statistics</Label>
-                    <div className="grid grid-cols-2 gap-3">
-                      <div>
-                        <Label htmlFor="passYds" className="text-sm">
-                          Passing Yards
-                        </Label>
-                        <Input
-                          id="passYds"
-                          type="number"
-                          placeholder="0"
-                          className="mt-1"
-                          value={newRecord.stats.passingYards}
-                          onChange={(e) =>
-                            handleStatChange("passingYards", e.target.value)
-                          }
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="passTDs" className="text-sm">
-                          Passing TDs
-                        </Label>
-                        <Input
-                          id="passTDs"
-                          type="number"
-                          placeholder="0"
-                          className="mt-1"
-                          value={newRecord.stats.passingTDs}
-                          onChange={(e) =>
-                            handleStatChange("passingTDs", e.target.value)
-                          }
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="rushYds" className="text-sm">
-                          Rushing Yards
-                        </Label>
-                        <Input
-                          id="rushYds"
-                          type="number"
-                          placeholder="0"
-                          className="mt-1"
-                          value={newRecord.stats.rushingYards}
-                          onChange={(e) =>
-                            handleStatChange("rushingYards", e.target.value)
-                          }
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="rushTDs" className="text-sm">
-                          Rushing TDs
-                        </Label>
-                        <Input
-                          id="rushTDs"
-                          type="number"
-                          placeholder="0"
-                          className="mt-1"
-                          value={newRecord.stats.rushingTDs}
-                          onChange={(e) =>
-                            handleStatChange("rushingTDs", e.target.value)
-                          }
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="receptions" className="text-sm">
-                          Receptions
-                        </Label>
-                        <Input
-                          id="receptions"
-                          type="number"
-                          placeholder="0"
-                          className="mt-1"
-                          value={newRecord.stats.receptions}
-                          onChange={(e) =>
-                            handleStatChange("receptions", e.target.value)
-                          }
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="recYds" className="text-sm">
-                          Receiving Yards
-                        </Label>
-                        <Input
-                          id="recYds"
-                          type="number"
-                          placeholder="0"
-                          className="mt-1"
-                          value={newRecord.stats.receivingYards}
-                          onChange={(e) =>
-                            handleStatChange("receivingYards", e.target.value)
-                          }
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="recTDs" className="text-sm">
-                          Receiving TDs
-                        </Label>
-                        <Input
-                          id="recTDs"
-                          type="number"
-                          placeholder="0"
-                          className="mt-1"
-                          value={newRecord.stats.receivingTDs}
-                          onChange={(e) =>
-                            handleStatChange("receivingTDs", e.target.value)
-                          }
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="sacks" className="text-sm">
-                          Sacks
-                        </Label>
-                        <Input
-                          id="sacks"
-                          type="number"
-                          placeholder="0"
-                          className="mt-1"
-                          value={newRecord.stats.sacks}
-                          onChange={(e) =>
-                            handleStatChange("sacks", e.target.value)
-                          }
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="ints" className="text-sm">
-                          Interceptions
-                        </Label>
-                        <Input
-                          id="ints"
-                          type="number"
-                          placeholder="0"
-                          className="mt-1"
-                          value={newRecord.stats.interceptions}
-                          onChange={(e) =>
-                            handleStatChange("interceptions", e.target.value)
-                          }
-                        />
                       </div>
                     </div>
-                  </div>
 
-                  {/* Add Button */}
-                  <Button
-                    onClick={handleAddRecord}
-                    className="w-full"
-                    disabled={
-                      !newRecord.playerName.trim() ||
-                      newRecord.levels.length === 0
-                    }
-                  >
-                    <Plus className="h-4 w-4 mr-2" />
-                    Add Record
-                  </Button>
-                </div>
-              </ScrollArea>
-            </CardContent>
+                    {/* Record Type Radio Buttons */}
+                    <div className="space-y-2">
+                      <Label>Record Type</Label>
+                      <RadioGroup
+                        value={newRecord.recordType}
+                        onValueChange={(value: RecordType) =>
+                          setNewRecord((prev) => ({
+                            ...prev,
+                            recordType: value,
+                          }))
+                        }
+                      >
+                        <div className="flex items-center space-x-2">
+                          <RadioGroupItem value="career" id="career-radio" />
+                          <Label
+                            htmlFor="career-radio"
+                            className="font-normal cursor-pointer"
+                          >
+                            Career
+                          </Label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <RadioGroupItem value="season" id="season-radio" />
+                          <Label
+                            htmlFor="season-radio"
+                            className="font-normal cursor-pointer"
+                          >
+                            Season
+                          </Label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <RadioGroupItem value="game" id="game-radio" />
+                          <Label
+                            htmlFor="game-radio"
+                            className="font-normal cursor-pointer"
+                          >
+                            Game
+                          </Label>
+                        </div>
+                      </RadioGroup>
+                    </div>
+
+                    {/* Stat Inputs */}
+                    <div className="space-y-3">
+                      <Label>Statistics</Label>
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <Label htmlFor="passYds" className="text-sm">
+                            Passing Yards
+                          </Label>
+                          <Input
+                            id="passYds"
+                            type="number"
+                            placeholder="0"
+                            className="mt-1"
+                            value={newRecord.stats.passingYards}
+                            onChange={(e) =>
+                              handleStatChange("passingYards", e.target.value)
+                            }
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="passTDs" className="text-sm">
+                            Passing TDs
+                          </Label>
+                          <Input
+                            id="passTDs"
+                            type="number"
+                            placeholder="0"
+                            className="mt-1"
+                            value={newRecord.stats.passingTDs}
+                            onChange={(e) =>
+                              handleStatChange("passingTDs", e.target.value)
+                            }
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="rushYds" className="text-sm">
+                            Rushing Yards
+                          </Label>
+                          <Input
+                            id="rushYds"
+                            type="number"
+                            placeholder="0"
+                            className="mt-1"
+                            value={newRecord.stats.rushingYards}
+                            onChange={(e) =>
+                              handleStatChange("rushingYards", e.target.value)
+                            }
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="rushTDs" className="text-sm">
+                            Rushing TDs
+                          </Label>
+                          <Input
+                            id="rushTDs"
+                            type="number"
+                            placeholder="0"
+                            className="mt-1"
+                            value={newRecord.stats.rushingTDs}
+                            onChange={(e) =>
+                              handleStatChange("rushingTDs", e.target.value)
+                            }
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="receptions" className="text-sm">
+                            Receptions
+                          </Label>
+                          <Input
+                            id="receptions"
+                            type="number"
+                            placeholder="0"
+                            className="mt-1"
+                            value={newRecord.stats.receptions}
+                            onChange={(e) =>
+                              handleStatChange("receptions", e.target.value)
+                            }
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="recYds" className="text-sm">
+                            Receiving Yards
+                          </Label>
+                          <Input
+                            id="recYds"
+                            type="number"
+                            placeholder="0"
+                            className="mt-1"
+                            value={newRecord.stats.receivingYards}
+                            onChange={(e) =>
+                              handleStatChange("receivingYards", e.target.value)
+                            }
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="recTDs" className="text-sm">
+                            Receiving TDs
+                          </Label>
+                          <Input
+                            id="recTDs"
+                            type="number"
+                            placeholder="0"
+                            className="mt-1"
+                            value={newRecord.stats.receivingTDs}
+                            onChange={(e) =>
+                              handleStatChange("receivingTDs", e.target.value)
+                            }
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="sacks" className="text-sm">
+                            Sacks
+                          </Label>
+                          <Input
+                            id="sacks"
+                            type="number"
+                            placeholder="0"
+                            className="mt-1"
+                            value={newRecord.stats.sacks}
+                            onChange={(e) =>
+                              handleStatChange("sacks", e.target.value)
+                            }
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="ints" className="text-sm">
+                            Interceptions
+                          </Label>
+                          <Input
+                            id="ints"
+                            type="number"
+                            placeholder="0"
+                            className="mt-1"
+                            value={newRecord.stats.interceptions}
+                            onChange={(e) =>
+                              handleStatChange("interceptions", e.target.value)
+                            }
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Add Button */}
+                    <Button
+                      onClick={handleAddRecord}
+                      className="w-full"
+                      disabled={
+                        !newRecord.playerName.trim() ||
+                        newRecord.levels.length === 0
+                      }
+                    >
+                      <Plus className="h-4 w-4 mr-2" />
+                      Add Record
+                    </Button>
+                  </div>
+                </ScrollArea>
+              </CardContent>
             )}
           </Card>
 
