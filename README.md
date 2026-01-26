@@ -35,7 +35,7 @@ _If you encounter any bugs or issues, please report them so they can be fixed!_
 
 <ins>**SCREENSHOTS:**</ins>
 
-![2](https://github.com/user-attachments/assets/bb267b5a-e959-477a-a361-cff78f0b5123)
+![2](/public/screenshots/dynastyHome.png)
 
 ![3](https://github.com/user-attachments/assets/7699d911-7a6c-4055-a9f4-867a384758f8)
 
