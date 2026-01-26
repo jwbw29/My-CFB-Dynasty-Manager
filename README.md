@@ -1,8 +1,3 @@
-** Walkthrough **
-[Walkthrough Video](walkthrough.mp4)
-
-![1](https://github.com/user-attachments/assets/34e95f17-6543-48d2-aa4f-fb4d23a8590c)
-
 **CAUTION: IF USING THIS VERSION WITH A PREVIOUS SAVE, IT MAY BREAK! THIS WAS REDESIGNED TO BE USED WITH A FRESH DYNASTY**
 _If you encounter any bugs or issues, please report them so they can be fixed!_
 
