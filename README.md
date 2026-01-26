@@ -37,30 +37,24 @@ _If you encounter any bugs or issues, please report them so they can be fixed!_
 
 ![2](/public/screenshots/dynastyHome.png)
 
-![3](https://github.com/user-attachments/assets/7699d911-7a6c-4055-a9f4-867a384758f8)
+![3](/public/screenshots/teamHome.png)
 
-![4](https://github.com/user-attachments/assets/7058e47e-656d-45d9-ab84-78a3f4a30134)
+![4](/public/screenshots/schedule.png)
 
-![5](https://github.com/user-attachments/assets/ac7f5fab-0ea4-42f3-bee7-dacb09d16895)
+![5](/public/screenshots/roster.png)
 
-![6](https://github.com/user-attachments/assets/263112cc-a8e7-4192-803b-6ecb7ea007d9)
+![6](/public/screenshots/top25.png)
 
-![7](https://github.com/user-attachments/assets/87dbaf9b-ab2e-4591-b41e-897b4d9a8903)
+![7](/public/screenshots/stats.png)
 
-![8](https://github.com/user-attachments/assets/75abbf05-cd12-4273-905d-f3870e0f4e9b)
+![8](/public/screenshots/records.png)
 
-![9](https://github.com/user-attachments/assets/05d865af-40c2-49a4-a313-ad075bc65d61)
+![9](/public/screenshots/seasonHistory.png)
 
-![10](https://github.com/user-attachments/assets/41d1ab80-4bc8-4528-9e86-0640fa7079a3)
+![10](/public/screenshots/awards.png)
 
-![11](https://github.com/user-attachments/assets/d65796e0-fb94-4e40-85db-b0d783e71acb)
+![11](/public/screenshots/trohpyCase.png)
 
-![12](https://github.com/user-attachments/assets/63812ee0-c15c-48d0-8682-cb471d13c4bb)
+![12](/public/screenshots/recruiting.png)
 
-![13](https://github.com/user-attachments/assets/55dd78ae-f396-465a-8145-ef18558cad38)
-
-![14](https://github.com/user-attachments/assets/31606d9d-0b6d-420d-9027-84ac213d9ce1)
-
-![15](https://github.com/user-attachments/assets/e9f37d1e-12a7-44af-99ce-185423bc9b4a)
-
-![16](https://github.com/user-attachments/assets/21205595-209f-4fdd-ae1b-69f7f77c4815)
+![13](/public/screenshots/editCoach.png)
