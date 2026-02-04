@@ -2,10 +2,23 @@
 "use client";
 
 import React, { useState, useCallback } from "react";
-import { Card, CardHeader, CardContent } from "@/components/ui/card";
+import {
+  Card,
+  CardHeader,
+  CardContent,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Table } from "@/components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import {
   Select,
   SelectContent,
@@ -141,7 +154,7 @@ const getRowStatus = (need: number, signed: number, targeted: number) => {
 const getTabIndex = (
   tableType: "offensive" | "defensive",
   positionIndex: number,
-  fieldIndex: number
+  fieldIndex: number,
 ) => {
   const baseIndex = tableType === "offensive" ? 100 : 200;
   return baseIndex + positionIndex * 10 + fieldIndex;
@@ -153,7 +166,7 @@ const RecruitingNeedsTable = React.memo<{
   updateNeed: (
     position: string,
     field: "rating" | "need" | "signed" | "targeted",
-    value: string | number
+    value: string | number,
   ) => void;
   tableType: "offensive" | "defensive";
 }>(({ title, needs, updateNeed, tableType }) => (
@@ -166,7 +179,7 @@ const RecruitingNeedsTable = React.memo<{
         Position
       </div>
       <div className="bg-gray-100 dark:bg-gray-800 p-2 text-center font-medium border-r border-gray-300">
-        Rating
+        Priority
       </div>
       <div className="bg-gray-100 dark:bg-gray-800 p-2 text-center font-medium border-r border-gray-300">
         Need
@@ -203,7 +216,7 @@ const RecruitingNeedsTable = React.memo<{
                   updateNeed(need.position, "rating", e.target.value)
                 }
                 className="w-full text-center border-0 bg-transparent p-1"
-                placeholder="A, B+, etc."
+                placeholder="P1, P2, etc"
                 tabIndex={getTabIndex(tableType, positionIndex, 1)}
               />
             </div>
@@ -220,7 +233,7 @@ const RecruitingNeedsTable = React.memo<{
                   updateNeed(
                     need.position,
                     "need",
-                    parseInt(e.target.value) || 0
+                    parseInt(e.target.value) || 0,
                   )
                 }
                 className="w-full text-center border-0 bg-transparent p-1"
@@ -241,7 +254,7 @@ const RecruitingNeedsTable = React.memo<{
                   updateNeed(
                     need.position,
                     "signed",
-                    parseInt(e.target.value) || 0
+                    parseInt(e.target.value) || 0,
                   )
                 }
                 className="w-full text-center border-0 bg-transparent p-1"
@@ -262,7 +275,7 @@ const RecruitingNeedsTable = React.memo<{
                   updateNeed(
                     need.position,
                     "targeted",
-                    parseInt(e.target.value) || 0
+                    parseInt(e.target.value) || 0,
                   )
                 }
                 className="w-full text-center border-0 bg-transparent p-1"
@@ -313,19 +326,19 @@ const RecruitingClassTracker: React.FC = () => {
   const { currentDynastyId } = useDynasty();
   const [currentYear] = useLocalStorage<number>(
     "currentYear",
-    new Date().getFullYear()
+    new Date().getFullYear(),
   );
   const [allRecruits, setAllRecruits] = useLocalStorage<Recruit[]>(
     "allRecruits",
-    []
+    [],
   );
   const [offensiveNeeds, setOffensiveNeeds] = useLocalStorage<RecruitingNeed[]>(
     currentDynastyId ? `offensiveNeeds_${currentDynastyId}` : "offensiveNeeds",
-    offensivePositions
+    offensivePositions,
   );
   const [defensiveNeeds, setDefensiveNeeds] = useLocalStorage<RecruitingNeed[]>(
     currentDynastyId ? `defensiveNeeds_${currentDynastyId}` : "defensiveNeeds",
-    defensivePositions
+    defensivePositions,
   );
   const initialFormState: NewRecruitFormState = {
     name: "",
@@ -346,7 +359,7 @@ const RecruitingClassTracker: React.FC = () => {
 
   // Apply sorting to displayed recruits
   const recruitsForSelectedYear = sortRecruitsByStars(
-    allRecruits.filter((recruit) => recruit.recruitedYear === selectedYear)
+    allRecruits.filter((recruit) => recruit.recruitedYear === selectedYear),
   );
 
   // Debounced save notification for recruiting needs
@@ -362,16 +375,16 @@ const RecruitingClassTracker: React.FC = () => {
     (
       position: string,
       field: "rating" | "need" | "signed" | "targeted",
-      value: string | number
+      value: string | number,
     ) => {
       setOffensiveNeeds((prev) =>
         prev.map((need) =>
-          need.position === position ? { ...need, [field]: value } : need
-        )
+          need.position === position ? { ...need, [field]: value } : need,
+        ),
       );
       debouncedSaveNotification();
     },
-    [setOffensiveNeeds, debouncedSaveNotification]
+    [setOffensiveNeeds, debouncedSaveNotification],
   );
 
   // Update Defensive Needs
@@ -379,16 +392,16 @@ const RecruitingClassTracker: React.FC = () => {
     (
       position: string,
       field: "rating" | "need" | "signed" | "targeted",
-      value: string | number
+      value: string | number,
     ) => {
       setDefensiveNeeds((prev) =>
         prev.map((need) =>
-          need.position === position ? { ...need, [field]: value } : need
-        )
+          need.position === position ? { ...need, [field]: value } : need,
+        ),
       );
       debouncedSaveNotification();
     },
-    [setDefensiveNeeds, debouncedSaveNotification]
+    [setDefensiveNeeds, debouncedSaveNotification],
   );
 
   const DevTraitBadge: React.FC<DevTraitBadgeProps> = ({ trait }) => {
@@ -468,7 +481,7 @@ const RecruitingClassTracker: React.FC = () => {
             ? parseInt(newRecruit.stateRank, 10)
             : null,
         };
-      })
+      }),
     );
     setEditingId(null);
     resetForm();
@@ -485,10 +498,99 @@ const RecruitingClassTracker: React.FC = () => {
     notifySuccess(MESSAGES.SAVE_SUCCESS);
   };
 
+  const offensiveArchetypes = [
+    { position: "QB", archetype: "Improviser / Dual Threat" },
+    {
+      position: "HB",
+      archetype: "Backfield Threat -> Elusive Bruiser -> East/West Playmaker",
+    },
+    {
+      position: "WR",
+      archetype: "Speedster + Route Artist + Elusive Route Runner",
+    },
+    { position: "TE", archetype: "Possession -> Vertical Threat -> Gritty" },
+    { position: "OT", archetype: "Pass Pro -> Agile" },
+    { position: "OG", archetype: "Pass Pro -> Agile" },
+    { position: "C", archetype: "Pass Pro -> Agile" },
+  ];
+
+  const defensiveArchetypes = [
+    { position: "EDGE", archetype: "Speed Rusher + Power Rusher" },
+    { position: "DT", archetype: "Interior Disruptor + Gap Specialist" },
+    { position: "SAM", archetype: "Run Stopper / Hybrid" },
+    { position: "MIKE", archetype: "Field General" },
+    { position: "WILL", archetype: "Coverage / Hybrid" },
+    { position: "CB1", archetype: "Bump & Run" },
+    { position: "Slot CB", archetype: "Field/Zone" },
+    { position: "SS", archetype: "Box Specialist" },
+    { position: "FS", archetype: "Coverage Specialist" },
+  ];
+
   return (
     <div className="space-y-8">
       {/* Hero Header */}
       <HeroHeader title="Recruiting Class Tracker" />
+
+      {/* Recruiting Key */}
+      <Card className="flex gap-4 p-4">
+        {/* Offensive Positions */}
+        <Card className="flex flex-col w-full p-4">
+          {/* Card Title & Description */}
+          <CardHeader>
+            <CardTitle>Offense</CardTitle>
+
+            <CardDescription>Air Raid Recruiting Blueprint</CardDescription>
+          </CardHeader>
+
+          {/* Card Content */}
+          <CardContent className="">
+            <Table>
+              {/* Table Header Labels */}
+              <TableRow>
+                <TableHead>Position</TableHead>
+                <TableHead className="text-left">Archetype</TableHead>
+              </TableRow>
+
+              {/* Map the Offensive archetypes here */}
+              {offensiveArchetypes.map((item) => (
+                <TableRow key={item.position}>
+                  <TableCell className="font-bold">{item.position}</TableCell>
+                  <TableCell className="text-left">{item.archetype}</TableCell>
+                </TableRow>
+              ))}
+            </Table>
+          </CardContent>
+        </Card>
+
+        {/* Defensive Positions */}
+        <Card className="flex flex-col w-full p-4">
+          {/* Card Title & Description */}
+          <CardHeader>
+            <CardTitle>Defense</CardTitle>
+
+            <CardDescription>4-3 Multiple Recruiting Blueprint</CardDescription>
+          </CardHeader>
+
+          {/* Card Content */}
+          <CardContent className="">
+            <Table>
+              {/* Table Header Labels */}
+              <TableRow>
+                <TableHead>Position</TableHead>
+                <TableHead className="text-left">Archetype</TableHead>
+              </TableRow>
+
+              {/* Map the Defensive archetypes here */}
+              {defensiveArchetypes.map((item) => (
+                <TableRow key={item.position}>
+                  <TableCell className="font-bold">{item.position}</TableCell>
+                  <TableCell className="text-left">{item.archetype}</TableCell>
+                </TableRow>
+              ))}
+            </Table>
+          </CardContent>
+        </Card>
+      </Card>
 
       {/* Recruiting Needs Section */}
       <Card className="border-2 border-gray-200 dark:border-gray-700 shadow-xl overflow-hidden">

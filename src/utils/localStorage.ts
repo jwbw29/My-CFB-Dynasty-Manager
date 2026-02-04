@@ -9,7 +9,13 @@ import { getTeamByName, Team, getTeamData } from "./fbsTeams";
 import { PlayerStat } from "@/types/playerStats";
 import { CustomTeamManager } from "./customTeamManager";
 import { RankedTeam, Top25History } from "@/hooks/useTop25Rankings";
-import { CoachStaff, Coach, CoachPosition, CoachType, CoachPrestige } from "@/types/coaches";
+import {
+  CoachStaff,
+  Coach,
+  CoachPosition,
+  CoachType,
+  CoachPrestige,
+} from "@/types/coaches";
 
 const COACH_PROFILE_KEY = "coachProfile";
 const COACHES_KEY = "coaches";
@@ -193,7 +199,7 @@ const defaultYearStats: YearStats = {
 
 export const calculateStats = (
   schedule: Game[],
-  schoolName: string
+  schoolName: string,
 ): YearStats => {
   let wins = 0,
     losses = 0,
@@ -353,7 +359,7 @@ export const getRivalTrophiesForYear = (year: number): string[] => {
     const allTrophies = JSON.parse(storedTrophies);
     return allTrophies
       .filter(
-        (trophy: any) => trophy.year === year && trophy.category === "rivalry"
+        (trophy: any) => trophy.year === year && trophy.category === "rivalry",
       )
       .map((trophy: any) => trophy.name || trophy.type);
   } catch (error) {
@@ -370,7 +376,7 @@ export const getBowlTrophiesForYear = (year: number): string[] => {
     const allTrophies = JSON.parse(storedTrophies);
     return allTrophies
       .filter(
-        (trophy: any) => trophy.year === year && trophy.category === "bowl"
+        (trophy: any) => trophy.year === year && trophy.category === "bowl",
       )
       .map((trophy: any) => trophy.name || trophy.type);
   } catch (error) {
@@ -387,7 +393,8 @@ export const getConferenceTrophiesForYear = (year: number): string[] => {
     const allTrophies = JSON.parse(storedTrophies);
     return allTrophies
       .filter(
-        (trophy: any) => trophy.year === year && trophy.category === "conference"
+        (trophy: any) =>
+          trophy.year === year && trophy.category === "conference",
       )
       .map((trophy: any) => trophy.name || trophy.type);
   } catch (error) {
@@ -504,7 +511,7 @@ export const generateYearRecord = (
   year: number,
   stats: YearStats,
   schedule: Game[],
-  coachProfile: CoachProfile | null
+  coachProfile: CoachProfile | null,
 ): YearRecord => {
   const ovrRecord = `${stats.wins}-${stats.losses}`;
   const confRecord = `${stats.conferenceWins}-${stats.conferenceLosses}`;
@@ -559,7 +566,7 @@ export const setTop25History = (history: Top25History): void => {
 export const getTeamRankForWeek = (
   teamName: string,
   year: number,
-  week: number
+  week: number,
 ): number | null => {
   const history = getTop25History();
   const yearData = history[year];
@@ -593,7 +600,7 @@ export const progressRosterForNewSeason = (endedYear: number): void => {
 
     // Remove players marked as transferring before processing the roster
     const playersAfterTransfers = currentPlayers.filter(
-      (player) => !player.isTransferring
+      (player) => !player.isTransferring,
     );
 
     // 1. Progress the roster: Graduate, Age Up, and Handle Redshirts
@@ -683,7 +690,8 @@ export const progressRosterForNewSeason = (endedYear: number): void => {
           devTrait: recruit.potential as Player["devTrait"],
           notes: `Recruited in the class of ${endedYear}.`,
           isRedshirted: false,
-        })
+          isTransferring: false,
+        }),
       );
 
     // 3. Add Incoming Transfers (This logic remains the same)
@@ -691,7 +699,7 @@ export const progressRosterForNewSeason = (endedYear: number): void => {
       .filter(
         (transfer) =>
           transfer.transferYear === endedYear &&
-          transfer.transferDirection === "From"
+          transfer.transferDirection === "From",
       )
       .map(
         (transfer, index): Player => ({
@@ -704,7 +712,8 @@ export const progressRosterForNewSeason = (endedYear: number): void => {
           devTrait: "Normal",
           notes: `Transferred from ${transfer.school} in ${endedYear}.`,
           isRedshirted: false,
-        })
+          isTransferring: false,
+        }),
       );
 
     // 4. Combine and Save the New Roster (This logic remains the same)
@@ -813,7 +822,7 @@ export const restoreDynastyFromSnapshot = (data: Record<string, any>): void => {
     // Only restore if the key is not in the snapshot data
     if (!data[key]) {
       console.warn(
-        `Records key "${key}" was missing from dynasty snapshot. Restoring from backup.`
+        `Records key "${key}" was missing from dynasty snapshot. Restoring from backup.`,
       );
       safeLocalStorage.setItem(key, recordsBackup[key]);
     }
@@ -870,7 +879,7 @@ export const removeUserControlledTeam = (teamName: string): void => {
  */
 export const getTeamStats = (
   dynastyId: string,
-  year: number
+  year: number,
 ): import("@/types/yearRecord").TeamStatsData => {
   const key = `teamStats_${dynastyId}_${year}`;
   const stored = safeLocalStorage.getItem(key);
@@ -900,7 +909,7 @@ export const getTeamStats = (
  */
 export const getTeamLeaders = (
   dynastyId: string,
-  year: number
+  year: number,
 ): import("@/types/yearRecord").TeamLeaderStats => {
   const key = `teamLeaders_${dynastyId}_${year}`;
   const stored = safeLocalStorage.getItem(key);
@@ -920,7 +929,7 @@ export const getTeamLeaders = (
   } catch (error) {
     console.error(
       `Error parsing team leaders for ${dynastyId}_${year}:`,
-      error
+      error,
     );
     return defaultLeaders;
   }
@@ -956,7 +965,7 @@ export const setUsers = (users: import("@/types/user").User[]): void => {
  */
 export const addUser = (
   name: string,
-  teamId: string
+  teamId: string,
 ): import("@/types/user").User => {
   const currentYear = getCurrentYear();
   const newUser: import("@/types/user").User = {
@@ -1021,7 +1030,7 @@ export const deleteUser = (userId: string): void => {
  * Get a user by ID
  */
 export const getUserById = (
-  userId: string
+  userId: string,
 ): import("@/types/user").User | undefined => {
   const users = getUsers();
   return users.find((u) => u.id === userId);
@@ -1032,13 +1041,13 @@ export const getUserById = (
  */
 export const getUserTeamForYear = (
   userId: string,
-  year: number
+  year: number,
 ): string | undefined => {
   const user = getUserById(userId);
   if (!user) return undefined;
 
   const assignment = user.teamHistory.find(
-    (th) => th.startYear <= year && (!th.endYear || th.endYear >= year)
+    (th) => th.startYear <= year && (!th.endYear || th.endYear >= year),
   );
 
   return assignment?.teamId;
@@ -1049,11 +1058,11 @@ export const getUserTeamForYear = (
  */
 export const isTeamAssignedToUser = (
   teamId: string,
-  excludeUserId?: string
+  excludeUserId?: string,
 ): boolean => {
   const users = getUsers();
   return users.some(
-    (u) => u.currentTeamId === teamId && u.id !== excludeUserId
+    (u) => u.currentTeamId === teamId && u.id !== excludeUserId,
   );
 };
 
@@ -1061,7 +1070,7 @@ export const isTeamAssignedToUser = (
  * Get the user who currently controls a specific team
  */
 export const getUserForTeam = (
-  teamName: string
+  teamName: string,
 ): import("@/types/user").User | undefined => {
   if (!teamName) return undefined;
   const users = getUsers();
@@ -1112,7 +1121,7 @@ export const saveUserTeamMappingsForYear = (year: number): void => {
  * Returns a map of teamName -> userId for that year
  */
 export const getUserTeamMappingsForYear = (
-  year: number
+  year: number,
 ): Record<string, string> => {
   const key = `userTeamMappings_${year}`;
   const stored = safeLocalStorage.getItem(key);
@@ -1133,7 +1142,7 @@ export const getUserTeamMappingsForYear = (
  */
 export const getUserForTeamInYear = (
   teamName: string,
-  year: number
+  year: number,
 ): import("@/types/user").User | undefined => {
   if (!teamName) return undefined;
 
@@ -1149,7 +1158,7 @@ export const getUserForTeamInYear = (
   const users = getUsers();
   return users.find((user) => {
     const assignment = user.teamHistory.find(
-      (th) => th.startYear <= year && (!th.endYear || th.endYear >= year)
+      (th) => th.startYear <= year && (!th.endYear || th.endYear >= year),
     );
     return assignment?.teamId === teamName;
   });
@@ -1159,7 +1168,7 @@ export const getUserForTeamInYear = (
  * Calculate head-to-head record against a specific user
  */
 export const getHeadToHeadRecord = (
-  userId: string
+  userId: string,
 ): import("@/types/user").HeadToHeadRecord | null => {
   const user = getUserById(userId);
   if (!user) return null;
