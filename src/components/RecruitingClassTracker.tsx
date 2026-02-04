@@ -517,9 +517,9 @@ const RecruitingClassTracker: React.FC = () => {
   const defensiveArchetypes = [
     { position: "EDGE", archetype: "Speed Rusher + Power Rusher" },
     { position: "DT", archetype: "Interior Disruptor + Gap Specialist" },
-    { position: "SAM", archetype: "Run Stopper / Hybrid" },
-    { position: "MIKE", archetype: "Field General" },
-    { position: "WILL", archetype: "Coverage / Hybrid" },
+    { position: "SAM", archetype: "Thumper" },
+    { position: "MIKE", archetype: "Field General / Signal Caller" },
+    { position: "WILL", archetype: "Lurker -> Thumper" },
     { position: "CB1", archetype: "Bump & Run" },
     { position: "Slot CB", archetype: "Field/Zone" },
     { position: "SS", archetype: "Box Specialist" },
