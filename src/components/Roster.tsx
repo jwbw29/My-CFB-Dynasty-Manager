@@ -80,6 +80,7 @@ import { getCoaches, setCoaches } from "@/utils/localStorage";
 import { getCoachProfile } from "@/utils/localStorage";
 import { useDynasty } from "@/contexts/DynastyContext";
 import { HeroHeader } from "@/components/ui/HeroHeader";
+import clsx from "clsx";
 
 interface Player {
   id: string;
@@ -231,7 +232,7 @@ const Roster: React.FC = () => {
   const [players, setPlayers] = useLocalStorage<Player[]>("players", []);
   const [filteredPlayers, setFilteredPlayers] = useState<Player[]>([]);
   const [newPlayer, setNewPlayer] = useState<Omit<Player, "id">>(
-    initialNewPlayerState
+    initialNewPlayerState,
   );
   const [editingId, setEditingId] = useState<string | null>(null);
   const [sortConfig, setSortConfig] = useState<{
@@ -305,15 +306,15 @@ const Roster: React.FC = () => {
     if (posFilter === FILTER_ALL) setFilteredPlayers(players);
     else if (posFilter === FILTER_OFFENSE)
       setFilteredPlayers(
-        players.filter((p) => offensePositions.includes(p.position))
+        players.filter((p) => offensePositions.includes(p.position)),
       );
     else if (posFilter === FILTER_DEFENSE)
       setFilteredPlayers(
-        players.filter((p) => defensivePositions.includes(p.position))
+        players.filter((p) => defensivePositions.includes(p.position)),
       );
     else if (posFilter === FILTER_SPECIAL_TEAMS)
       setFilteredPlayers(
-        players.filter((p) => specialTeamsPositions.includes(p.position))
+        players.filter((p) => specialTeamsPositions.includes(p.position)),
       );
     else setFilteredPlayers(players.filter((p) => p.position === posFilter));
   }, [posFilter, players]);
@@ -335,12 +336,12 @@ const Roster: React.FC = () => {
               notes: p.notes || "",
               isRedshirted: p.isRedshirted || false,
               isTransferring: false,
-            } as Player)
+            }) as Player,
         ),
       ]);
       toast.success("Roster imported successfully!");
     },
-    [setPlayers]
+    [setPlayers],
   );
 
   const exportToCSV = useCallback(() => {
@@ -433,8 +434,8 @@ const Roster: React.FC = () => {
           prev.map((p) =>
             p.id === editingId
               ? { ...newPlayer, id: p.id, name: capitalizeName(newPlayer.name) }
-              : p
-          )
+              : p,
+          ),
         );
         notifySuccess(MESSAGES.SAVE_SUCCESS);
         setIsFormOpen(false);
@@ -465,15 +466,20 @@ const Roster: React.FC = () => {
       setPlayers((prev) => prev.filter((p) => p.id !== id));
       notifySuccess(MESSAGES.DELETE_SUCCESS);
     },
-    [setPlayers]
+    [setPlayers],
   );
 
   const handleProcessComplete = useCallback(
     (
       processedNewPlayers: Omit<
         Player,
-        "id" | "devTrait" | "notes" | "jerseyNumber" | "isRedshirted" | "isTransferring"
-      >[]
+        | "id"
+        | "devTrait"
+        | "notes"
+        | "jerseyNumber"
+        | "isRedshirted"
+        | "isTransferring"
+      >[],
     ) => {
       const playersWithDefaults = processedNewPlayers.map((p) => ({
         ...p,
@@ -487,18 +493,18 @@ const Roster: React.FC = () => {
       setPlayers((prev) => [...prev, ...playersWithDefaults]);
       notifySuccess("Players processed from image!");
     },
-    [setPlayers]
+    [setPlayers],
   );
 
   const toggleRedshirtStatus = useCallback(
     (playerId: string) => {
       setPlayers((prev) =>
         prev.map((p) =>
-          p.id === playerId ? { ...p, isRedshirted: !p.isRedshirted } : p
-        )
+          p.id === playerId ? { ...p, isRedshirted: !p.isRedshirted } : p,
+        ),
       );
     },
-    [setPlayers]
+    [setPlayers],
   );
 
   // Coach handling functions
@@ -515,15 +521,15 @@ const Roster: React.FC = () => {
           position === "HC"
             ? "headCoach"
             : position === "OC"
-            ? "offensiveCoordinator"
-            : "defensiveCoordinator";
+              ? "offensiveCoordinator"
+              : "defensiveCoordinator";
         return {
           ...prev,
           [key]: { ...prev[key], ...updates },
         };
       });
     },
-    []
+    [],
   );
 
   const handleEditCoach = useCallback((position: CoachPosition) => {
@@ -546,7 +552,7 @@ const Roster: React.FC = () => {
           return coaches.defensiveCoordinator;
       }
     },
-    [coaches]
+    [coaches],
   );
 
   const getRowClassName = useCallback((player: Player) => {
@@ -719,6 +725,8 @@ const Roster: React.FC = () => {
             <CardTitle className="text-2xl font-black text-white">
               Team Roster
             </CardTitle>
+
+            {/* Roster Options */}
             <div className="flex flex-wrap items-center gap-2">
               <Button
                 onClick={handleOpenAddForm}
@@ -736,7 +744,10 @@ const Roster: React.FC = () => {
             </div>
           </div>
         </div>
+
         <CardHeader className="hidden"></CardHeader>
+
+        {/* Main Roster Content */}
         <CardContent className="bg-gradient-to-br from-gray-50 to-white dark:from-gray-900 dark:to-gray-800">
           <div className="w-full sm:w-1/2 md:w-1/3 lg:w-1/4 pb-4">
             <Select
@@ -794,15 +805,20 @@ const Roster: React.FC = () => {
                     ))}
                   </TableRow>
                 </TableHeader>
+
+                {/* Roster Data */}
                 <TableBody>
                   {sortedPlayers.map((player) => (
                     <TableRow
                       key={player.id}
                       className={getRowClassName(player)}
                     >
+                      {/* Player Number */}
                       <TableCell className="text-center font-mono">
                         {player.jerseyNumber}
                       </TableCell>
+
+                      {/* Player Name */}
                       <TableCell className="text-center font-medium">
                         <button
                           onClick={() => openPlayerCard(player)}
@@ -811,9 +827,13 @@ const Roster: React.FC = () => {
                           {player.name}
                         </button>
                       </TableCell>
+
+                      {/* Player Position */}
                       <TableCell className="text-center">
                         {player.position}
                       </TableCell>
+
+                      {/* Player Year & Transfer Status */}
                       <TableCell className="text-center">
                         {player.year}
                         {player.isTransferring && (
@@ -825,18 +845,39 @@ const Roster: React.FC = () => {
                           </Badge>
                         )}
                       </TableCell>
-                      <TableCell className="text-center font-bold">
-                        {player.rating}
+
+                      {/* Player OVR Rating */}
+                      <TableCell className="font-bold h-full">
+                        <div
+                          className={clsx(
+                            "flex size-9 p-2 rounded-full items-center justify-center place-self-center",
+                            parseInt(player.rating) >= 90
+                              ? "bg-green-500 text-white"
+                              : parseInt(player.rating) >= 80
+                                ? "bg-yellow-500 text-white"
+                                : parseInt(player.rating) >= 70
+                                  ? "bg-orange-500 text-white"
+                                  : "bg-red-500 text-white",
+                          )}
+                        >
+                          {player.rating}
+                        </div>
                       </TableCell>
+
+                      {/* Player Dev Trait */}
                       <TableCell className="text-center">
                         <DevTraitBadge trait={player.devTrait} />
                       </TableCell>
+
+                      {/* Player Notes */}
                       <TableCell
                         className="text-center text-sm text-muted-foreground max-w-xs truncate"
                         title={player.notes}
                       >
                         {player.notes}
                       </TableCell>
+
+                      {/* Action Buttons */}
                       <TableCell className="text-center">
                         <div className="flex items-center gap-1 justify-center">
                           <Button
@@ -847,8 +888,8 @@ const Roster: React.FC = () => {
                               player.year.includes("(RS)")
                                 ? "Player has already used a redshirt"
                                 : player.isRedshirted
-                                ? "Remove Redshirt"
-                                : "Add Redshirt"
+                                  ? "Remove Redshirt"
+                                  : "Add Redshirt"
                             }
                             // --- THIS IS THE FIX ---
                             // Disable the button if the player's year indicates they've already been redshirted.
