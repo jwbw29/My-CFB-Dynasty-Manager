@@ -124,7 +124,7 @@ const TeamStats: React.FC = () => {
   const { currentDynastyId } = useDynasty();
   const [currentYear] = useLocalStorage<number>(
     "currentYear",
-    new Date().getFullYear()
+    new Date().getFullYear(),
   );
   const [schedule] = useLocalStorage<Game[]>(`schedule_${currentYear}`, []);
   const [rosterPlayers] = useLocalStorage<RosterPlayer[]>("players", []);
@@ -140,8 +140,18 @@ const TeamStats: React.FC = () => {
       defPassYards: 0,
       defRushYards: 0,
       defPoints: 0,
-    }
+    },
   );
+
+  // Individual expand/collapse states for each stat category
+  const [isPassingExpanded, setIsPassingExpanded] = useState<boolean>(false);
+  const [isRushingExpanded, setIsRushingExpanded] = useState<boolean>(false);
+  const [isReceivingExpanded, setIsReceivingExpanded] =
+    useState<boolean>(false);
+  const [isTacklesExpanded, setIsTacklesExpanded] = useState<boolean>(false);
+  const [isTFLsExpanded, setIsTFLsExpanded] = useState<boolean>(false);
+  const [isSacksExpanded, setIsSacksExpanded] = useState<boolean>(false);
+  const [isIntsExpanded, setIsIntsExpanded] = useState<boolean>(false);
 
   const [teamLeaders, setTeamLeaders] = useLocalStorage<TeamLeaderStats>(
     `teamLeaders_${currentDynastyId}_${currentYear}`,
@@ -153,7 +163,7 @@ const TeamStats: React.FC = () => {
       tflLeaders: [],
       sackLeaders: [],
       intLeaders: [],
-    }
+    },
   );
 
   // Persistent sorting state per category
@@ -179,7 +189,7 @@ const TeamStats: React.FC = () => {
       career: [],
       season: [],
       game: [],
-    }
+    },
   );
 
   // State for editing records
@@ -232,7 +242,7 @@ const TeamStats: React.FC = () => {
   const calculatedGamesPlayed = useMemo(() => {
     return schedule.filter(
       (game) =>
-        game.result !== "Bye" && game.result !== "N/A" && game.score !== ""
+        game.result !== "Bye" && game.result !== "N/A" && game.score !== "",
     ).length;
   }, [schedule]);
 
@@ -279,7 +289,7 @@ const TeamStats: React.FC = () => {
         [field]: numValue,
       }));
     },
-    [setTeamStats]
+    [setTeamStats],
   );
 
   const handleLeaderChange = useCallback(
@@ -287,7 +297,7 @@ const TeamStats: React.FC = () => {
       category: keyof TeamLeaderStats,
       index: number,
       field: keyof PlayerLeaderStat,
-      value: string
+      value: string,
     ) => {
       setTeamLeaders((prev) => {
         const leaders = [...(prev[category] || [])];
@@ -307,7 +317,7 @@ const TeamStats: React.FC = () => {
         };
       });
     },
-    [setTeamLeaders]
+    [setTeamLeaders],
   );
 
   const addLeaderRow = useCallback(
@@ -317,7 +327,7 @@ const TeamStats: React.FC = () => {
         [category]: [...(prev[category] || []), { name: "" }],
       }));
     },
-    [setTeamLeaders]
+    [setTeamLeaders],
   );
 
   const removeLeaderRow = useCallback(
@@ -331,7 +341,7 @@ const TeamStats: React.FC = () => {
         };
       });
     },
-    [setTeamLeaders]
+    [setTeamLeaders],
   );
 
   const formatNumber = (num: number, decimals: number = 1): string => {
@@ -342,7 +352,7 @@ const TeamStats: React.FC = () => {
   const getSortedPlayers = () => {
     return rosterPlayers.sort(
       (a, b) =>
-        (parseInt(a.jerseyNumber) || 0) - (parseInt(b.jerseyNumber) || 0)
+        (parseInt(a.jerseyNumber) || 0) - (parseInt(b.jerseyNumber) || 0),
     );
   };
 
@@ -452,7 +462,7 @@ const TeamStats: React.FC = () => {
         stats: { ...prev.stats, [stat]: value },
       }));
     },
-    []
+    [],
   );
 
   const handleAddRecord = useCallback(() => {
@@ -524,7 +534,7 @@ const TeamStats: React.FC = () => {
         [recordType]: prev[recordType].filter((r) => r.id !== recordId),
       }));
     },
-    [setRecords]
+    [setRecords],
   );
 
   // Handle starting to edit a record
@@ -546,7 +556,7 @@ const TeamStats: React.FC = () => {
     setRecords((prev) => ({
       ...prev,
       [editingRecord.recordType]: prev[editingRecord.recordType].map((r) =>
-        r.id === editingRecord.id ? editingRecord : r
+        r.id === editingRecord.id ? editingRecord : r,
       ),
     }));
 
@@ -560,7 +570,7 @@ const TeamStats: React.FC = () => {
       if (!editingRecord) return;
       setEditingRecord((prev) => (prev ? { ...prev, [field]: value } : null));
     },
-    [editingRecord]
+    [editingRecord],
   );
 
   // Handle updating editing record stats
@@ -577,20 +587,20 @@ const TeamStats: React.FC = () => {
                 [stat]: numValue,
               },
             }
-          : null
+          : null,
       );
     },
-    [editingRecord]
+    [editingRecord],
   );
 
   // Helper to get records by type and level
   const getRecordsByLevel = useCallback(
     (recordType: RecordType, level: RecordLevel) => {
       return records[recordType].filter((record) =>
-        record.levels.includes(level)
+        record.levels.includes(level),
       );
     },
-    [records]
+    [records],
   );
 
   // Helper to render stat categories for a record
@@ -656,7 +666,7 @@ const TeamStats: React.FC = () => {
     recordType: RecordType,
     level: RecordLevel,
     title: string,
-    headerClassName?: string
+    headerClassName?: string,
   ) => {
     const levelRecords = getRecordsByLevel(recordType, level);
 
@@ -684,7 +694,7 @@ const TeamStats: React.FC = () => {
                             onChange={(e) =>
                               handleEditFieldChange(
                                 "playerName",
-                                e.target.value
+                                e.target.value,
                               )
                             }
                             className="font-bold text-lg"
@@ -749,7 +759,7 @@ const TeamStats: React.FC = () => {
                             onChange={(e) =>
                               handleEditFieldChange(
                                 "year",
-                                Number(e.target.value)
+                                Number(e.target.value),
                               )
                             }
                             className="text-sm w-24"
@@ -1110,524 +1120,606 @@ const TeamStats: React.FC = () => {
             <CardContent className="w-full px-24">
               <div className="space-y-6">
                 {/* Passing Leaders */}
-                <div>
-                  <h3 className="font-semibold text-lg bg-blue-100 dark:bg-blue-900 p-2 rounded">
-                    Passing
-                  </h3>
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead
-                          className="w-[30%] cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800"
-                          onClick={() => handleSort("passingLeaders", "name")}
-                        >
-                          Name {renderSortIcon("passingLeaders", "name")}
-                        </TableHead>
-                        <TableHead
-                          className="w-[14%] cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800"
-                          onClick={() => handleSort("passingLeaders", "yards")}
-                        >
-                          YDS {renderSortIcon("passingLeaders", "yards")}
-                        </TableHead>
-                        <TableHead
-                          className="w-[14%] cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800"
-                          onClick={() =>
-                            handleSort("passingLeaders", "completions")
-                          }
-                        >
-                          COMP%{" "}
-                          {renderSortIcon("passingLeaders", "completions")}
-                        </TableHead>
-                        <TableHead
-                          className="w-[14%] cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800"
-                          onClick={() =>
-                            handleSort("passingLeaders", "touchdowns")
-                          }
-                        >
-                          TDs {renderSortIcon("passingLeaders", "touchdowns")}
-                        </TableHead>
-                        <TableHead
-                          className="w-[14%] cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800"
-                          onClick={() =>
-                            handleSort("passingLeaders", "interceptions")
-                          }
-                        >
-                          INTs{" "}
-                          {renderSortIcon("passingLeaders", "interceptions")}
-                        </TableHead>
-                        <TableHead
-                          className="w-[14%] bg-gray-100 dark:bg-gray-800 cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-700"
-                          onClick={() => handleSort("passingLeaders", "ypg")}
-                        >
-                          YPG {renderSortIcon("passingLeaders", "ypg")}
-                        </TableHead>
-                        <TableHead className="w-12"></TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {getSortedLeaders("passingLeaders")?.map(
-                        (leader, index) => (
-                          <TableRow key={index}>
-                            <TableCell>
-                              <Select
-                                value={leader.name || ""}
-                                onValueChange={(value) =>
-                                  handleLeaderChange(
-                                    "passingLeaders",
-                                    index,
-                                    "name",
-                                    value
-                                  )
-                                }
-                              >
-                                <SelectTrigger>
-                                  <SelectValue placeholder="Select Player" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  {getSortedPlayers().map((player) => (
-                                    <SelectItem
-                                      key={player.id}
-                                      value={player.name}
-                                    >
-                                      {player.name} - {player.position} #
-                                      {player.jerseyNumber}
-                                    </SelectItem>
-                                  ))}
-                                </SelectContent>
-                              </Select>
-                            </TableCell>
-                            <TableCell>
-                              <Input
-                                type="number"
-                                value={leader.yards || ""}
-                                onChange={(e) =>
-                                  handleLeaderChange(
-                                    "passingLeaders",
-                                    index,
-                                    "yards",
-                                    e.target.value
-                                  )
-                                }
-                                className="text-center mx-auto"
-                              />
-                            </TableCell>
-                            <TableCell>
-                              <Input
-                                type="number"
-                                step="0.1"
-                                value={leader.completions || ""}
-                                onChange={(e) =>
-                                  handleLeaderChange(
-                                    "passingLeaders",
-                                    index,
-                                    "completions",
-                                    e.target.value
-                                  )
-                                }
-                                className="text-center mx-auto"
-                              />
-                            </TableCell>
-                            <TableCell>
-                              <Input
-                                type="number"
-                                value={leader.touchdowns || ""}
-                                onChange={(e) =>
-                                  handleLeaderChange(
-                                    "passingLeaders",
-                                    index,
-                                    "touchdowns",
-                                    e.target.value
-                                  )
-                                }
-                                className="text-center mx-auto"
-                              />
-                            </TableCell>
-                            <TableCell>
-                              <Input
-                                type="number"
-                                value={leader.interceptions || ""}
-                                onChange={(e) =>
-                                  handleLeaderChange(
-                                    "passingLeaders",
-                                    index,
-                                    "interceptions",
-                                    e.target.value
-                                  )
-                                }
-                                className="text-center mx-auto"
-                              />
-                            </TableCell>
-                            <TableCell className="bg-gray-100 dark:bg-gray-800">
-                              {formatNumber(
-                                (leader.yards || 0) / effectiveGamesPlayed
+                <Card className="border-2 border-gray-200 dark:border-gray-700 shadow-xl overflow-hidden">
+                  {/* Collapsed Header */}
+                  <div
+                    className="bg-gradient-to-r from-primary to-primary/90 p-4 cursor-pointer flex flex-row items-center justify-between hover:from-primary/80 hover:to-primary/70 transition-colors duration-200"
+                    onClick={() => setIsPassingExpanded(!isPassingExpanded)}
+                  >
+                    <span className="text-xl font-bold text-white">
+                      Passing
+                    </span>
+                    {isPassingExpanded ? (
+                      <ChevronUp className="h-6 w-6 text-white" />
+                    ) : (
+                      <ChevronDown className="h-6 w-6 text-white" />
+                    )}
+                  </div>
+                  <CardHeader className="hidden"></CardHeader>
+
+                  {/* Expanded Passing Stats */}
+                  {isPassingExpanded && (
+                    <CardContent className="bg-gradient-to-br from-gray-50 to-white dark:from-gray-900 dark:to-gray-800">
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead
+                              className="w-[30%] cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800"
+                              onClick={() =>
+                                handleSort("passingLeaders", "name")
+                              }
+                            >
+                              Name {renderSortIcon("passingLeaders", "name")}
+                            </TableHead>
+                            <TableHead
+                              className="w-[14%] cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800"
+                              onClick={() =>
+                                handleSort("passingLeaders", "yards")
+                              }
+                            >
+                              YDS {renderSortIcon("passingLeaders", "yards")}
+                            </TableHead>
+                            <TableHead
+                              className="w-[14%] cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800"
+                              onClick={() =>
+                                handleSort("passingLeaders", "completions")
+                              }
+                            >
+                              COMP%{" "}
+                              {renderSortIcon("passingLeaders", "completions")}
+                            </TableHead>
+                            <TableHead
+                              className="w-[14%] cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800"
+                              onClick={() =>
+                                handleSort("passingLeaders", "touchdowns")
+                              }
+                            >
+                              TDs{" "}
+                              {renderSortIcon("passingLeaders", "touchdowns")}
+                            </TableHead>
+                            <TableHead
+                              className="w-[14%] cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800"
+                              onClick={() =>
+                                handleSort("passingLeaders", "interceptions")
+                              }
+                            >
+                              INTs{" "}
+                              {renderSortIcon(
+                                "passingLeaders",
+                                "interceptions",
                               )}
-                            </TableCell>
-                            <TableCell>
+                            </TableHead>
+                            <TableHead
+                              className="w-[14%] bg-gray-100 dark:bg-gray-800 cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-700"
+                              onClick={() =>
+                                handleSort("passingLeaders", "ypg")
+                              }
+                            >
+                              YPG {renderSortIcon("passingLeaders", "ypg")}
+                            </TableHead>
+                            <TableHead className="w-12"></TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {getSortedLeaders("passingLeaders")?.map(
+                            (leader, index) => (
+                              <TableRow key={index}>
+                                <TableCell>
+                                  <Select
+                                    value={leader.name || ""}
+                                    onValueChange={(value) =>
+                                      handleLeaderChange(
+                                        "passingLeaders",
+                                        index,
+                                        "name",
+                                        value,
+                                      )
+                                    }
+                                  >
+                                    <SelectTrigger>
+                                      <SelectValue placeholder="Select Player" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      {getSortedPlayers().map((player) => (
+                                        <SelectItem
+                                          key={player.id}
+                                          value={player.name}
+                                        >
+                                          {player.name} - {player.position} #
+                                          {player.jerseyNumber}
+                                        </SelectItem>
+                                      ))}
+                                    </SelectContent>
+                                  </Select>
+                                </TableCell>
+                                <TableCell>
+                                  <Input
+                                    type="number"
+                                    value={leader.yards || ""}
+                                    onChange={(e) =>
+                                      handleLeaderChange(
+                                        "passingLeaders",
+                                        index,
+                                        "yards",
+                                        e.target.value,
+                                      )
+                                    }
+                                    className="text-center mx-auto"
+                                  />
+                                </TableCell>
+                                <TableCell>
+                                  <Input
+                                    type="number"
+                                    step="0.1"
+                                    value={leader.completions || ""}
+                                    onChange={(e) =>
+                                      handleLeaderChange(
+                                        "passingLeaders",
+                                        index,
+                                        "completions",
+                                        e.target.value,
+                                      )
+                                    }
+                                    className="text-center mx-auto"
+                                  />
+                                </TableCell>
+                                <TableCell>
+                                  <Input
+                                    type="number"
+                                    value={leader.touchdowns || ""}
+                                    onChange={(e) =>
+                                      handleLeaderChange(
+                                        "passingLeaders",
+                                        index,
+                                        "touchdowns",
+                                        e.target.value,
+                                      )
+                                    }
+                                    className="text-center mx-auto"
+                                  />
+                                </TableCell>
+                                <TableCell>
+                                  <Input
+                                    type="number"
+                                    value={leader.interceptions || ""}
+                                    onChange={(e) =>
+                                      handleLeaderChange(
+                                        "passingLeaders",
+                                        index,
+                                        "interceptions",
+                                        e.target.value,
+                                      )
+                                    }
+                                    className="text-center mx-auto"
+                                  />
+                                </TableCell>
+                                <TableCell className="bg-gray-100 dark:bg-gray-800">
+                                  {formatNumber(
+                                    (leader.yards || 0) / effectiveGamesPlayed,
+                                  )}
+                                </TableCell>
+                                <TableCell>
+                                  <button
+                                    onClick={() =>
+                                      removeLeaderRow("passingLeaders", index)
+                                    }
+                                    className="text-red-600 hover:text-red-800 text-sm px-2 py-1 rounded"
+                                    title="Remove Player"
+                                  >
+                                    ✕
+                                  </button>
+                                </TableCell>
+                              </TableRow>
+                            ),
+                          )}
+                          <TableRow>
+                            <TableCell colSpan={7}>
                               <button
-                                onClick={() =>
-                                  removeLeaderRow("passingLeaders", index)
-                                }
-                                className="text-red-600 hover:text-red-800 text-sm px-2 py-1 rounded"
-                                title="Remove Player"
+                                onClick={() => addLeaderRow("passingLeaders")}
+                                className="text-blue-600 hover:text-blue-800 text-sm"
                               >
-                                ✕
+                                + Add Player
                               </button>
                             </TableCell>
                           </TableRow>
-                        )
-                      )}
-                      <TableRow>
-                        <TableCell colSpan={7}>
-                          <button
-                            onClick={() => addLeaderRow("passingLeaders")}
-                            className="text-blue-600 hover:text-blue-800 text-sm"
-                          >
-                            + Add Player
-                          </button>
-                        </TableCell>
-                      </TableRow>
-                    </TableBody>
-                  </Table>
-                </div>
+                        </TableBody>
+                      </Table>
+                    </CardContent>
+                  )}
+                </Card>
 
                 {/* Rushing Leaders */}
-                <div>
-                  <h3 className="font-semibold text-lg bg-green-100 dark:bg-green-900 p-2 rounded">
-                    Rushing
-                  </h3>
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead
-                          className="w-[30%] cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800"
-                          onClick={() => handleSort("rushingLeaders", "name")}
-                        >
-                          Name {renderSortIcon("rushingLeaders", "name")}
-                        </TableHead>
-                        <TableHead
-                          className="w-[14%] cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800"
-                          onClick={() =>
-                            handleSort("rushingLeaders", "carries")
-                          }
-                        >
-                          CAR {renderSortIcon("rushingLeaders", "carries")}
-                        </TableHead>
-                        <TableHead
-                          className="w-[18%] cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800"
-                          onClick={() => handleSort("rushingLeaders", "yards")}
-                        >
-                          YDS {renderSortIcon("rushingLeaders", "yards")}
-                        </TableHead>
-                        <TableHead
-                          className="w-[14%] cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800"
-                          onClick={() =>
-                            handleSort("rushingLeaders", "touchdowns")
-                          }
-                        >
-                          TDs {renderSortIcon("rushingLeaders", "touchdowns")}
-                        </TableHead>
-                        <TableHead
-                          className="w-[14%] bg-gray-100 dark:bg-gray-800 cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-700"
-                          onClick={() =>
-                            handleSort("rushingLeaders", "ypc_rushing")
-                          }
-                        >
-                          YPC {renderSortIcon("rushingLeaders", "ypc_rushing")}
-                        </TableHead>
-                        <TableHead
-                          className="w-[14%] bg-gray-100 dark:bg-gray-800 cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-700"
-                          onClick={() => handleSort("rushingLeaders", "ypg")}
-                        >
-                          YPG {renderSortIcon("rushingLeaders", "ypg")}
-                        </TableHead>
-                        <TableHead className="w-12"></TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {getSortedLeaders("rushingLeaders")?.map(
-                        (leader, index) => (
-                          <TableRow key={index}>
-                            <TableCell>
-                              <Select
-                                value={leader.name || ""}
-                                onValueChange={(value) =>
-                                  handleLeaderChange(
-                                    "rushingLeaders",
-                                    index,
-                                    "name",
-                                    value
-                                  )
-                                }
-                              >
-                                <SelectTrigger>
-                                  <SelectValue placeholder="Select Player" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  {getSortedPlayers().map((player) => (
-                                    <SelectItem
-                                      key={player.id}
-                                      value={player.name}
-                                    >
-                                      {player.name} - {player.position} #
-                                      {player.jerseyNumber}
-                                    </SelectItem>
-                                  ))}
-                                </SelectContent>
-                              </Select>
-                            </TableCell>
-                            <TableCell>
-                              <Input
-                                type="number"
-                                value={leader.carries || ""}
-                                onChange={(e) =>
-                                  handleLeaderChange(
-                                    "rushingLeaders",
-                                    index,
-                                    "carries",
-                                    e.target.value
-                                  )
-                                }
-                                className="text-center mx-auto"
-                              />
-                            </TableCell>
-                            <TableCell>
-                              <Input
-                                type="number"
-                                value={leader.yards || ""}
-                                onChange={(e) =>
-                                  handleLeaderChange(
-                                    "rushingLeaders",
-                                    index,
-                                    "yards",
-                                    e.target.value
-                                  )
-                                }
-                                className="text-center mx-auto"
-                              />
-                            </TableCell>
-                            <TableCell>
-                              <Input
-                                type="number"
-                                value={leader.touchdowns || ""}
-                                onChange={(e) =>
-                                  handleLeaderChange(
-                                    "rushingLeaders",
-                                    index,
-                                    "touchdowns",
-                                    e.target.value
-                                  )
-                                }
-                                className="text-center mx-auto"
-                              />
-                            </TableCell>
-                            <TableCell className="bg-gray-100 dark:bg-gray-800">
-                              {formatNumber(
-                                (leader.yards || 0) / (leader.carries || 1)
-                              )}
-                            </TableCell>
-                            <TableCell className="bg-gray-100 dark:bg-gray-800">
-                              {formatNumber(
-                                (leader.yards || 0) / effectiveGamesPlayed
-                              )}
-                            </TableCell>
-                            <TableCell>
+                <Card className="border-2 border-gray-200 dark:border-gray-700 shadow-xl overflow-hidden">
+                  {/* Collapsed Header */}
+                  <div
+                    className="bg-gradient-to-r from-primary to-primary/90 p-4 cursor-pointer flex flex-row items-center justify-between hover:from-primary/80 hover:to-primary/70 transition-colors duration-200"
+                    onClick={() => setIsRushingExpanded(!isRushingExpanded)}
+                  >
+                    <span className="text-xl font-bold text-white">
+                      Rushing
+                    </span>
+                    {isRushingExpanded ? (
+                      <ChevronUp className="h-6 w-6 text-white" />
+                    ) : (
+                      <ChevronDown className="h-6 w-6 text-white" />
+                    )}
+                  </div>
+                  <CardHeader className="hidden"></CardHeader>
+
+                  {/* Expanded Rushing Stats */}
+                  {isRushingExpanded && (
+                    <CardContent className="bg-gradient-to-br from-gray-50 to-white dark:from-gray-900 dark:to-gray-800">
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead
+                              className="w-[30%] cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800"
+                              onClick={() =>
+                                handleSort("rushingLeaders", "name")
+                              }
+                            >
+                              Name {renderSortIcon("rushingLeaders", "name")}
+                            </TableHead>
+                            <TableHead
+                              className="w-[14%] cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800"
+                              onClick={() =>
+                                handleSort("rushingLeaders", "carries")
+                              }
+                            >
+                              CAR {renderSortIcon("rushingLeaders", "carries")}
+                            </TableHead>
+                            <TableHead
+                              className="w-[18%] cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800"
+                              onClick={() =>
+                                handleSort("rushingLeaders", "yards")
+                              }
+                            >
+                              YDS {renderSortIcon("rushingLeaders", "yards")}
+                            </TableHead>
+                            <TableHead
+                              className="w-[14%] cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800"
+                              onClick={() =>
+                                handleSort("rushingLeaders", "touchdowns")
+                              }
+                            >
+                              TDs{" "}
+                              {renderSortIcon("rushingLeaders", "touchdowns")}
+                            </TableHead>
+                            <TableHead
+                              className="w-[14%] bg-gray-100 dark:bg-gray-800 cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-700"
+                              onClick={() =>
+                                handleSort("rushingLeaders", "ypc_rushing")
+                              }
+                            >
+                              YPC{" "}
+                              {renderSortIcon("rushingLeaders", "ypc_rushing")}
+                            </TableHead>
+                            <TableHead
+                              className="w-[14%] bg-gray-100 dark:bg-gray-800 cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-700"
+                              onClick={() =>
+                                handleSort("rushingLeaders", "ypg")
+                              }
+                            >
+                              YPG {renderSortIcon("rushingLeaders", "ypg")}
+                            </TableHead>
+                            <TableHead className="w-12"></TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {getSortedLeaders("rushingLeaders")?.map(
+                            (leader, index) => (
+                              <TableRow key={index}>
+                                <TableCell>
+                                  <Select
+                                    value={leader.name || ""}
+                                    onValueChange={(value) =>
+                                      handleLeaderChange(
+                                        "rushingLeaders",
+                                        index,
+                                        "name",
+                                        value,
+                                      )
+                                    }
+                                  >
+                                    <SelectTrigger>
+                                      <SelectValue placeholder="Select Player" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      {getSortedPlayers().map((player) => (
+                                        <SelectItem
+                                          key={player.id}
+                                          value={player.name}
+                                        >
+                                          {player.name} - {player.position} #
+                                          {player.jerseyNumber}
+                                        </SelectItem>
+                                      ))}
+                                    </SelectContent>
+                                  </Select>
+                                </TableCell>
+                                <TableCell>
+                                  <Input
+                                    type="number"
+                                    value={leader.carries || ""}
+                                    onChange={(e) =>
+                                      handleLeaderChange(
+                                        "rushingLeaders",
+                                        index,
+                                        "carries",
+                                        e.target.value,
+                                      )
+                                    }
+                                    className="text-center mx-auto"
+                                  />
+                                </TableCell>
+                                <TableCell>
+                                  <Input
+                                    type="number"
+                                    value={leader.yards || ""}
+                                    onChange={(e) =>
+                                      handleLeaderChange(
+                                        "rushingLeaders",
+                                        index,
+                                        "yards",
+                                        e.target.value,
+                                      )
+                                    }
+                                    className="text-center mx-auto"
+                                  />
+                                </TableCell>
+                                <TableCell>
+                                  <Input
+                                    type="number"
+                                    value={leader.touchdowns || ""}
+                                    onChange={(e) =>
+                                      handleLeaderChange(
+                                        "rushingLeaders",
+                                        index,
+                                        "touchdowns",
+                                        e.target.value,
+                                      )
+                                    }
+                                    className="text-center mx-auto"
+                                  />
+                                </TableCell>
+                                <TableCell className="bg-gray-100 dark:bg-gray-800">
+                                  {formatNumber(
+                                    (leader.yards || 0) / (leader.carries || 1),
+                                  )}
+                                </TableCell>
+                                <TableCell className="bg-gray-100 dark:bg-gray-800">
+                                  {formatNumber(
+                                    (leader.yards || 0) / effectiveGamesPlayed,
+                                  )}
+                                </TableCell>
+                                <TableCell>
+                                  <button
+                                    onClick={() =>
+                                      removeLeaderRow("rushingLeaders", index)
+                                    }
+                                    className="text-red-600 hover:text-red-800 text-sm px-2 py-1 rounded"
+                                    title="Remove Player"
+                                  >
+                                    ✕
+                                  </button>
+                                </TableCell>
+                              </TableRow>
+                            ),
+                          )}
+                          <TableRow>
+                            <TableCell colSpan={7}>
                               <button
-                                onClick={() =>
-                                  removeLeaderRow("rushingLeaders", index)
-                                }
-                                className="text-red-600 hover:text-red-800 text-sm px-2 py-1 rounded"
-                                title="Remove Player"
+                                onClick={() => addLeaderRow("rushingLeaders")}
+                                className="text-blue-600 hover:text-blue-800 text-sm"
                               >
-                                ✕
+                                + Add Player
                               </button>
                             </TableCell>
                           </TableRow>
-                        )
-                      )}
-                      <TableRow>
-                        <TableCell colSpan={7}>
-                          <button
-                            onClick={() => addLeaderRow("rushingLeaders")}
-                            className="text-blue-600 hover:text-blue-800 text-sm"
-                          >
-                            + Add Player
-                          </button>
-                        </TableCell>
-                      </TableRow>
-                    </TableBody>
-                  </Table>
-                </div>
+                        </TableBody>
+                      </Table>
+                    </CardContent>
+                  )}
+                </Card>
 
                 {/* Receiving Leaders */}
-                <div>
-                  <h3 className="font-semibold text-lg bg-purple-100 dark:bg-purple-900 p-2 rounded">
-                    Receiving
-                  </h3>
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead
-                          className="w-[30%] cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800"
-                          onClick={() => handleSort("receivingLeaders", "name")}
-                        >
-                          Name {renderSortIcon("receivingLeaders", "name")}
-                        </TableHead>
-                        <TableHead
-                          className="w-[17%] cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800"
-                          onClick={() =>
-                            handleSort("receivingLeaders", "receptions")
-                          }
-                        >
-                          REC {renderSortIcon("receivingLeaders", "receptions")}
-                        </TableHead>
-                        <TableHead
-                          className="w-[17%] cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800"
-                          onClick={() =>
-                            handleSort("receivingLeaders", "yards")
-                          }
-                        >
-                          YDS {renderSortIcon("receivingLeaders", "yards")}
-                        </TableHead>
-                        <TableHead
-                          className="w-[14%] cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800"
-                          onClick={() =>
-                            handleSort("receivingLeaders", "touchdowns")
-                          }
-                        >
-                          TDs {renderSortIcon("receivingLeaders", "touchdowns")}
-                        </TableHead>
-                        <TableHead
-                          className="w-[11%] bg-gray-100 dark:bg-gray-800 cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-700"
-                          onClick={() =>
-                            handleSort("receivingLeaders", "ypc_receiving")
-                          }
-                        >
-                          YPC{" "}
-                          {renderSortIcon("receivingLeaders", "ypc_receiving")}
-                        </TableHead>
-                        <TableHead
-                          className="w-[11%] bg-gray-100 dark:bg-gray-800 cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-700"
-                          onClick={() => handleSort("receivingLeaders", "ypg")}
-                        >
-                          YPG {renderSortIcon("receivingLeaders", "ypg")}
-                        </TableHead>
-                        <TableHead className="w-12"></TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {getSortedLeaders("receivingLeaders")?.map(
-                        (leader, index) => (
-                          <TableRow key={index}>
-                            <TableCell>
-                              <Select
-                                value={leader.name || ""}
-                                onValueChange={(value) =>
-                                  handleLeaderChange(
-                                    "receivingLeaders",
-                                    index,
-                                    "name",
-                                    value
-                                  )
-                                }
-                              >
-                                <SelectTrigger>
-                                  <SelectValue placeholder="Select Player" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  {getSortedPlayers().map((player) => (
-                                    <SelectItem
-                                      key={player.id}
-                                      value={player.name}
-                                    >
-                                      {player.name} - {player.position} #
-                                      {player.jerseyNumber}
-                                    </SelectItem>
-                                  ))}
-                                </SelectContent>
-                              </Select>
-                            </TableCell>
-                            <TableCell>
-                              <Input
-                                type="number"
-                                value={leader.receptions || ""}
-                                onChange={(e) =>
-                                  handleLeaderChange(
-                                    "receivingLeaders",
-                                    index,
-                                    "receptions",
-                                    e.target.value
-                                  )
-                                }
-                                className="text-center mx-auto"
-                              />
-                            </TableCell>
-                            <TableCell>
-                              <Input
-                                type="number"
-                                value={leader.yards || ""}
-                                onChange={(e) =>
-                                  handleLeaderChange(
-                                    "receivingLeaders",
-                                    index,
-                                    "yards",
-                                    e.target.value
-                                  )
-                                }
-                                className="text-center mx-auto"
-                              />
-                            </TableCell>
-                            <TableCell>
-                              <Input
-                                type="number"
-                                value={leader.touchdowns || ""}
-                                onChange={(e) =>
-                                  handleLeaderChange(
-                                    "receivingLeaders",
-                                    index,
-                                    "touchdowns",
-                                    e.target.value
-                                  )
-                                }
-                                className="text-center mx-auto"
-                              />
-                            </TableCell>
-                            <TableCell className="bg-gray-100 dark:bg-gray-800">
-                              {formatNumber(
-                                (leader.yards || 0) / (leader.receptions || 1)
+                <Card className="border-2 border-gray-200 dark:border-gray-700 shadow-xl overflow-hidden">
+                  {/* Collapsed Header */}
+                  <div
+                    className="bg-gradient-to-r from-primary to-primary/90 p-4 cursor-pointer flex flex-row items-center justify-between hover:from-primary/80 hover:to-primary/70 transition-colors duration-200"
+                    onClick={() => setIsReceivingExpanded(!isReceivingExpanded)}
+                  >
+                    <span className="text-xl font-bold text-white">
+                      Receiving
+                    </span>
+                    {isReceivingExpanded ? (
+                      <ChevronUp className="h-6 w-6 text-white" />
+                    ) : (
+                      <ChevronDown className="h-6 w-6 text-white" />
+                    )}
+                  </div>
+                  <CardHeader className="hidden"></CardHeader>
+
+                  {/* Expanded Receiving Stats */}
+                  {isReceivingExpanded && (
+                    <CardContent className="bg-gradient-to-br from-gray-50 to-white dark:from-gray-900 dark:to-gray-800">
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead
+                              className="w-[30%] cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800"
+                              onClick={() =>
+                                handleSort("receivingLeaders", "name")
+                              }
+                            >
+                              Name {renderSortIcon("receivingLeaders", "name")}
+                            </TableHead>
+                            <TableHead
+                              className="w-[17%] cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800"
+                              onClick={() =>
+                                handleSort("receivingLeaders", "receptions")
+                              }
+                            >
+                              REC{" "}
+                              {renderSortIcon("receivingLeaders", "receptions")}
+                            </TableHead>
+                            <TableHead
+                              className="w-[17%] cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800"
+                              onClick={() =>
+                                handleSort("receivingLeaders", "yards")
+                              }
+                            >
+                              YDS {renderSortIcon("receivingLeaders", "yards")}
+                            </TableHead>
+                            <TableHead
+                              className="w-[14%] cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800"
+                              onClick={() =>
+                                handleSort("receivingLeaders", "touchdowns")
+                              }
+                            >
+                              TDs{" "}
+                              {renderSortIcon("receivingLeaders", "touchdowns")}
+                            </TableHead>
+                            <TableHead
+                              className="w-[11%] bg-gray-100 dark:bg-gray-800 cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-700"
+                              onClick={() =>
+                                handleSort("receivingLeaders", "ypc_receiving")
+                              }
+                            >
+                              YPC{" "}
+                              {renderSortIcon(
+                                "receivingLeaders",
+                                "ypc_receiving",
                               )}
-                            </TableCell>
-                            <TableCell className="bg-gray-100 dark:bg-gray-800">
-                              {formatNumber(
-                                (leader.yards || 0) / effectiveGamesPlayed
-                              )}
-                            </TableCell>
-                            <TableCell>
+                            </TableHead>
+                            <TableHead
+                              className="w-[11%] bg-gray-100 dark:bg-gray-800 cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-700"
+                              onClick={() =>
+                                handleSort("receivingLeaders", "ypg")
+                              }
+                            >
+                              YPG {renderSortIcon("receivingLeaders", "ypg")}
+                            </TableHead>
+                            <TableHead className="w-12"></TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {getSortedLeaders("receivingLeaders")?.map(
+                            (leader, index) => (
+                              <TableRow key={index}>
+                                <TableCell>
+                                  <Select
+                                    value={leader.name || ""}
+                                    onValueChange={(value) =>
+                                      handleLeaderChange(
+                                        "receivingLeaders",
+                                        index,
+                                        "name",
+                                        value,
+                                      )
+                                    }
+                                  >
+                                    <SelectTrigger>
+                                      <SelectValue placeholder="Select Player" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      {getSortedPlayers().map((player) => (
+                                        <SelectItem
+                                          key={player.id}
+                                          value={player.name}
+                                        >
+                                          {player.name} - {player.position} #
+                                          {player.jerseyNumber}
+                                        </SelectItem>
+                                      ))}
+                                    </SelectContent>
+                                  </Select>
+                                </TableCell>
+                                <TableCell>
+                                  <Input
+                                    type="number"
+                                    value={leader.receptions || ""}
+                                    onChange={(e) =>
+                                      handleLeaderChange(
+                                        "receivingLeaders",
+                                        index,
+                                        "receptions",
+                                        e.target.value,
+                                      )
+                                    }
+                                    className="text-center mx-auto"
+                                  />
+                                </TableCell>
+                                <TableCell>
+                                  <Input
+                                    type="number"
+                                    value={leader.yards || ""}
+                                    onChange={(e) =>
+                                      handleLeaderChange(
+                                        "receivingLeaders",
+                                        index,
+                                        "yards",
+                                        e.target.value,
+                                      )
+                                    }
+                                    className="text-center mx-auto"
+                                  />
+                                </TableCell>
+                                <TableCell>
+                                  <Input
+                                    type="number"
+                                    value={leader.touchdowns || ""}
+                                    onChange={(e) =>
+                                      handleLeaderChange(
+                                        "receivingLeaders",
+                                        index,
+                                        "touchdowns",
+                                        e.target.value,
+                                      )
+                                    }
+                                    className="text-center mx-auto"
+                                  />
+                                </TableCell>
+                                <TableCell className="bg-gray-100 dark:bg-gray-800">
+                                  {formatNumber(
+                                    (leader.yards || 0) /
+                                      (leader.receptions || 1),
+                                  )}
+                                </TableCell>
+                                <TableCell className="bg-gray-100 dark:bg-gray-800">
+                                  {formatNumber(
+                                    (leader.yards || 0) / effectiveGamesPlayed,
+                                  )}
+                                </TableCell>
+                                <TableCell>
+                                  <button
+                                    onClick={() =>
+                                      removeLeaderRow("receivingLeaders", index)
+                                    }
+                                    className="text-red-600 hover:text-red-800 text-sm px-2 py-1 rounded"
+                                    title="Remove Player"
+                                  >
+                                    ✕
+                                  </button>
+                                </TableCell>
+                              </TableRow>
+                            ),
+                          )}
+                          <TableRow>
+                            <TableCell colSpan={7}>
                               <button
-                                onClick={() =>
-                                  removeLeaderRow("receivingLeaders", index)
-                                }
-                                className="text-red-600 hover:text-red-800 text-sm px-2 py-1 rounded"
-                                title="Remove Player"
+                                onClick={() => addLeaderRow("receivingLeaders")}
+                                className="text-blue-600 hover:text-blue-800 text-sm"
                               >
-                                ✕
+                                + Add Player
                               </button>
                             </TableCell>
                           </TableRow>
-                        )
-                      )}
-                      <TableRow>
-                        <TableCell colSpan={7}>
-                          <button
-                            onClick={() => addLeaderRow("receivingLeaders")}
-                            className="text-blue-600 hover:text-blue-800 text-sm"
-                          >
-                            + Add Player
-                          </button>
-                        </TableCell>
-                      </TableRow>
-                    </TableBody>
-                  </Table>
-                </div>
+                        </TableBody>
+                      </Table>
+                    </CardContent>
+                  )}
+                </Card>
               </div>
             </CardContent>
           </Card>
@@ -1644,437 +1736,525 @@ const TeamStats: React.FC = () => {
               <div className="space-y-6">
                 {/* DEFENSIVE LEADERS */}
                 {/* Tackles */}
-                <div className="">
-                  <h3 className="font-semibold text-lg bg-red-100 dark:bg-red-900 p-2 rounded">
-                    TAKs
-                  </h3>
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead
-                          className="cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800"
-                          onClick={() => handleSort("tackleLeaders", "name")}
-                        >
-                          Name {renderSortIcon("tackleLeaders", "name")}
-                        </TableHead>
-                        <TableHead
-                          className="cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800"
-                          onClick={() => handleSort("tackleLeaders", "total")}
-                        >
-                          TOT {renderSortIcon("tackleLeaders", "total")}
-                        </TableHead>
-                        <TableHead
-                          className="bg-gray-100 dark:bg-gray-800 cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-700"
-                          onClick={() =>
-                            handleSort("tackleLeaders", "per_game")
-                          }
-                        >
-                          Per Game {renderSortIcon("tackleLeaders", "per_game")}
-                        </TableHead>
-                        <TableHead className="w-12"></TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {getSortedLeaders("tackleLeaders")?.map(
-                        (leader, index) => (
-                          <TableRow key={index}>
-                            <TableCell>
-                              <Select
-                                value={leader.name || ""}
-                                onValueChange={(value) =>
-                                  handleLeaderChange(
-                                    "tackleLeaders",
-                                    index,
-                                    "name",
-                                    value
-                                  )
-                                }
-                              >
-                                <SelectTrigger>
-                                  <SelectValue placeholder="Select Player" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  {getSortedPlayers().map((player) => (
-                                    <SelectItem
-                                      key={player.id}
-                                      value={player.name}
-                                    >
-                                      {player.name} - {player.position} #
-                                      {player.jerseyNumber}
-                                    </SelectItem>
-                                  ))}
-                                </SelectContent>
-                              </Select>
-                            </TableCell>
-                            <TableCell>
-                              <Input
-                                type="number"
-                                value={leader.total || ""}
-                                onChange={(e) =>
-                                  handleLeaderChange(
-                                    "tackleLeaders",
-                                    index,
-                                    "total",
-                                    e.target.value
-                                  )
-                                }
-                                className="text-center mx-auto"
-                              />
-                            </TableCell>
-                            <TableCell className="bg-gray-100 dark:bg-gray-800">
-                              {formatNumber(
-                                (leader.total || 0) / effectiveGamesPlayed
-                              )}
-                            </TableCell>
-                            <TableCell>
+                <Card className="border-2 border-gray-200 dark:border-gray-700 shadow-xl overflow-hidden">
+                  {/* Collapsed Header */}
+                  <div
+                    className="bg-gradient-to-r from-primary to-primary/90 p-4 cursor-pointer flex flex-row items-center justify-between hover:from-primary/80 hover:to-primary/70 transition-colors duration-200"
+                    onClick={() => setIsTacklesExpanded(!isTacklesExpanded)}
+                  >
+                    <span className="text-xl font-bold text-white">
+                      Tackles
+                    </span>
+                    {isTacklesExpanded ? (
+                      <ChevronUp className="h-6 w-6 text-white" />
+                    ) : (
+                      <ChevronDown className="h-6 w-6 text-white" />
+                    )}
+                  </div>
+                  <CardHeader className="hidden"></CardHeader>
+
+                  {/* Expanded Tackles Stats */}
+                  {isTacklesExpanded && (
+                    <CardContent className="bg-gradient-to-br from-gray-50 to-white dark:from-gray-900 dark:to-gray-800">
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead
+                              className="cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800"
+                              onClick={() =>
+                                handleSort("tackleLeaders", "name")
+                              }
+                            >
+                              Name {renderSortIcon("tackleLeaders", "name")}
+                            </TableHead>
+                            <TableHead
+                              className="cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800"
+                              onClick={() =>
+                                handleSort("tackleLeaders", "total")
+                              }
+                            >
+                              TOT {renderSortIcon("tackleLeaders", "total")}
+                            </TableHead>
+                            <TableHead
+                              className="bg-gray-100 dark:bg-gray-800 cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-700"
+                              onClick={() =>
+                                handleSort("tackleLeaders", "per_game")
+                              }
+                            >
+                              Per Game{" "}
+                              {renderSortIcon("tackleLeaders", "per_game")}
+                            </TableHead>
+                            <TableHead className="w-12"></TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {getSortedLeaders("tackleLeaders")?.map(
+                            (leader, index) => (
+                              <TableRow key={index}>
+                                <TableCell>
+                                  <Select
+                                    value={leader.name || ""}
+                                    onValueChange={(value) =>
+                                      handleLeaderChange(
+                                        "tackleLeaders",
+                                        index,
+                                        "name",
+                                        value,
+                                      )
+                                    }
+                                  >
+                                    <SelectTrigger>
+                                      <SelectValue placeholder="Select Player" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      {getSortedPlayers().map((player) => (
+                                        <SelectItem
+                                          key={player.id}
+                                          value={player.name}
+                                        >
+                                          {player.name} - {player.position} #
+                                          {player.jerseyNumber}
+                                        </SelectItem>
+                                      ))}
+                                    </SelectContent>
+                                  </Select>
+                                </TableCell>
+                                <TableCell>
+                                  <Input
+                                    type="number"
+                                    value={leader.total || ""}
+                                    onChange={(e) =>
+                                      handleLeaderChange(
+                                        "tackleLeaders",
+                                        index,
+                                        "total",
+                                        e.target.value,
+                                      )
+                                    }
+                                    className="text-center mx-auto"
+                                  />
+                                </TableCell>
+                                <TableCell className="bg-gray-100 dark:bg-gray-800">
+                                  {formatNumber(
+                                    (leader.total || 0) / effectiveGamesPlayed,
+                                  )}
+                                </TableCell>
+                                <TableCell>
+                                  <button
+                                    onClick={() =>
+                                      removeLeaderRow("tackleLeaders", index)
+                                    }
+                                    className="text-red-600 hover:text-red-800 text-sm px-2 py-1 rounded"
+                                    title="Remove Player"
+                                  >
+                                    ✕
+                                  </button>
+                                </TableCell>
+                              </TableRow>
+                            ),
+                          )}
+                          <TableRow>
+                            <TableCell colSpan={4}>
                               <button
-                                onClick={() =>
-                                  removeLeaderRow("tackleLeaders", index)
-                                }
-                                className="text-red-600 hover:text-red-800 text-sm px-2 py-1 rounded"
-                                title="Remove Player"
+                                onClick={() => addLeaderRow("tackleLeaders")}
+                                className="text-blue-600 hover:text-blue-800 text-sm"
                               >
-                                ✕
+                                + Add Player
                               </button>
                             </TableCell>
                           </TableRow>
-                        )
-                      )}
-                      <TableRow>
-                        <TableCell colSpan={4}>
-                          <button
-                            onClick={() => addLeaderRow("tackleLeaders")}
-                            className="text-blue-600 hover:text-blue-800 text-sm"
-                          >
-                            + Add Player
-                          </button>
-                        </TableCell>
-                      </TableRow>
-                    </TableBody>
-                  </Table>
-                </div>
+                        </TableBody>
+                      </Table>
+                    </CardContent>
+                  )}
+                </Card>
 
                 {/* TFLs */}
-                <div>
-                  <h3 className="font-semibold text-lg bg-orange-100 dark:bg-orange-900 p-2 rounded">
-                    TFLs
-                  </h3>
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead
-                          className="cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800"
-                          onClick={() => handleSort("tflLeaders", "name")}
-                        >
-                          Name {renderSortIcon("tflLeaders", "name")}
-                        </TableHead>
-                        <TableHead
-                          className="cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800"
-                          onClick={() => handleSort("tflLeaders", "total")}
-                        >
-                          TOT {renderSortIcon("tflLeaders", "total")}
-                        </TableHead>
-                        <TableHead
-                          className="bg-gray-100 dark:bg-gray-800 cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-700"
-                          onClick={() => handleSort("tflLeaders", "per_game")}
-                        >
-                          Per Game {renderSortIcon("tflLeaders", "per_game")}
-                        </TableHead>
-                        <TableHead className="w-12"></TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {getSortedLeaders("tflLeaders")?.map((leader, index) => (
-                        <TableRow key={index}>
-                          <TableCell>
-                            <Select
-                              value={leader.name || ""}
-                              onValueChange={(value) =>
-                                handleLeaderChange(
-                                  "tflLeaders",
-                                  index,
-                                  "name",
-                                  value
-                                )
-                              }
+                <Card className="border-2 border-gray-200 dark:border-gray-700 shadow-xl overflow-hidden">
+                  {/* Collapsed Header */}
+                  <div
+                    className="bg-gradient-to-r from-primary to-primary/90 p-4 cursor-pointer flex flex-row items-center justify-between hover:from-primary/80 hover:to-primary/70 transition-colors duration-200"
+                    onClick={() => setIsTFLsExpanded(!isTFLsExpanded)}
+                  >
+                    <span className="text-xl font-bold text-white">TFLs</span>
+                    {isTFLsExpanded ? (
+                      <ChevronUp className="h-6 w-6 text-white" />
+                    ) : (
+                      <ChevronDown className="h-6 w-6 text-white" />
+                    )}
+                  </div>
+                  <CardHeader className="hidden"></CardHeader>
+
+                  {/* Expanded TFLs Stats */}
+                  {isTFLsExpanded && (
+                    <CardContent className="bg-gradient-to-br from-gray-50 to-white dark:from-gray-900 dark:to-gray-800">
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead
+                              className="cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800"
+                              onClick={() => handleSort("tflLeaders", "name")}
                             >
-                              <SelectTrigger>
-                                <SelectValue placeholder="Select Player" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                {getSortedPlayers().map((player) => (
-                                  <SelectItem
-                                    key={player.id}
-                                    value={player.name}
-                                  >
-                                    {player.name} - {player.position} #
-                                    {player.jerseyNumber}
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                          </TableCell>
-                          <TableCell>
-                            <Input
-                              type="number"
-                              value={leader.total || ""}
-                              onChange={(e) =>
-                                handleLeaderChange(
-                                  "tflLeaders",
-                                  index,
-                                  "total",
-                                  e.target.value
-                                )
-                              }
-                              className="text-center mx-auto"
-                            />
-                          </TableCell>
-                          <TableCell className="bg-gray-100 dark:bg-gray-800">
-                            {formatNumber(
-                              (leader.total || 0) / effectiveGamesPlayed
-                            )}
-                          </TableCell>
-                          <TableCell>
-                            <button
+                              Name {renderSortIcon("tflLeaders", "name")}
+                            </TableHead>
+                            <TableHead
+                              className="cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800"
+                              onClick={() => handleSort("tflLeaders", "total")}
+                            >
+                              TOT {renderSortIcon("tflLeaders", "total")}
+                            </TableHead>
+                            <TableHead
+                              className="bg-gray-100 dark:bg-gray-800 cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-700"
                               onClick={() =>
-                                removeLeaderRow("tflLeaders", index)
+                                handleSort("tflLeaders", "per_game")
                               }
-                              className="text-red-600 hover:text-red-800 text-sm px-2 py-1 rounded"
-                              title="Remove Player"
                             >
-                              ✕
-                            </button>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                      <TableRow>
-                        <TableCell colSpan={4}>
-                          <button
-                            onClick={() => addLeaderRow("tflLeaders")}
-                            className="text-blue-600 hover:text-blue-800 text-sm"
-                          >
-                            + Add Player
-                          </button>
-                        </TableCell>
-                      </TableRow>
-                    </TableBody>
-                  </Table>
-                </div>
+                              Per Game{" "}
+                              {renderSortIcon("tflLeaders", "per_game")}
+                            </TableHead>
+                            <TableHead className="w-12"></TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {getSortedLeaders("tflLeaders")?.map(
+                            (leader, index) => (
+                              <TableRow key={index}>
+                                <TableCell>
+                                  <Select
+                                    value={leader.name || ""}
+                                    onValueChange={(value) =>
+                                      handleLeaderChange(
+                                        "tflLeaders",
+                                        index,
+                                        "name",
+                                        value,
+                                      )
+                                    }
+                                  >
+                                    <SelectTrigger>
+                                      <SelectValue placeholder="Select Player" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      {getSortedPlayers().map((player) => (
+                                        <SelectItem
+                                          key={player.id}
+                                          value={player.name}
+                                        >
+                                          {player.name} - {player.position} #
+                                          {player.jerseyNumber}
+                                        </SelectItem>
+                                      ))}
+                                    </SelectContent>
+                                  </Select>
+                                </TableCell>
+                                <TableCell>
+                                  <Input
+                                    type="number"
+                                    value={leader.total || ""}
+                                    onChange={(e) =>
+                                      handleLeaderChange(
+                                        "tflLeaders",
+                                        index,
+                                        "total",
+                                        e.target.value,
+                                      )
+                                    }
+                                    className="text-center mx-auto"
+                                  />
+                                </TableCell>
+                                <TableCell className="bg-gray-100 dark:bg-gray-800">
+                                  {formatNumber(
+                                    (leader.total || 0) / effectiveGamesPlayed,
+                                  )}
+                                </TableCell>
+                                <TableCell>
+                                  <button
+                                    onClick={() =>
+                                      removeLeaderRow("tflLeaders", index)
+                                    }
+                                    className="text-red-600 hover:text-red-800 text-sm px-2 py-1 rounded"
+                                    title="Remove Player"
+                                  >
+                                    ✕
+                                  </button>
+                                </TableCell>
+                              </TableRow>
+                            ),
+                          )}
+                          <TableRow>
+                            <TableCell colSpan={4}>
+                              <button
+                                onClick={() => addLeaderRow("tflLeaders")}
+                                className="text-blue-600 hover:text-blue-800 text-sm"
+                              >
+                                + Add Player
+                              </button>
+                            </TableCell>
+                          </TableRow>
+                        </TableBody>
+                      </Table>
+                    </CardContent>
+                  )}
+                </Card>
 
                 {/* Sacks */}
-                <div>
-                  <h3 className="font-semibold text-lg bg-yellow-100 dark:bg-yellow-900 p-2 rounded">
-                    SACKS
-                  </h3>
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead
-                          className="cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800"
-                          onClick={() => handleSort("sackLeaders", "name")}
-                        >
-                          Name {renderSortIcon("sackLeaders", "name")}
-                        </TableHead>
-                        <TableHead
-                          className="cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800"
-                          onClick={() => handleSort("sackLeaders", "total")}
-                        >
-                          TOT {renderSortIcon("sackLeaders", "total")}
-                        </TableHead>
-                        <TableHead
-                          className="bg-gray-100 dark:bg-gray-800 cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-700"
-                          onClick={() => handleSort("sackLeaders", "per_game")}
-                        >
-                          Per Game {renderSortIcon("sackLeaders", "per_game")}
-                        </TableHead>
-                        <TableHead className="w-12"></TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {getSortedLeaders("sackLeaders")?.map((leader, index) => (
-                        <TableRow key={index}>
-                          <TableCell>
-                            <Select
-                              value={leader.name || ""}
-                              onValueChange={(value) =>
-                                handleLeaderChange(
-                                  "sackLeaders",
-                                  index,
-                                  "name",
-                                  value
-                                )
-                              }
+                <Card className="border-2 border-gray-200 dark:border-gray-700 shadow-xl overflow-hidden">
+                  {/* Collapsed Header */}
+                  <div
+                    className="bg-gradient-to-r from-primary to-primary/90 p-4 cursor-pointer flex flex-row items-center justify-between hover:from-primary/80 hover:to-primary/70 transition-colors duration-200"
+                    onClick={() => setIsSacksExpanded(!isSacksExpanded)}
+                  >
+                    <span className="text-xl font-bold text-white">Sacks</span>
+                    {isSacksExpanded ? (
+                      <ChevronUp className="h-6 w-6 text-white" />
+                    ) : (
+                      <ChevronDown className="h-6 w-6 text-white" />
+                    )}
+                  </div>
+                  <CardHeader className="hidden"></CardHeader>
+
+                  {/* Expanded Sacks Stats */}
+                  {isSacksExpanded && (
+                    <CardContent className="bg-gradient-to-br from-gray-50 to-white dark:from-gray-900 dark:to-gray-800">
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead
+                              className="cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800"
+                              onClick={() => handleSort("sackLeaders", "name")}
                             >
-                              <SelectTrigger>
-                                <SelectValue placeholder="Select Player" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                {getSortedPlayers().map((player) => (
-                                  <SelectItem
-                                    key={player.id}
-                                    value={player.name}
-                                  >
-                                    {player.name} - {player.position} #
-                                    {player.jerseyNumber}
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                          </TableCell>
-                          <TableCell>
-                            <Input
-                              type="number"
-                              step="0.5"
-                              value={leader.total || ""}
-                              onChange={(e) =>
-                                handleLeaderChange(
-                                  "sackLeaders",
-                                  index,
-                                  "total",
-                                  e.target.value
-                                )
-                              }
-                              className="text-center mx-auto"
-                            />
-                          </TableCell>
-                          <TableCell className="bg-gray-100 dark:bg-gray-800">
-                            {formatNumber(
-                              (leader.total || 0) / effectiveGamesPlayed
-                            )}
-                          </TableCell>
-                          <TableCell>
-                            <button
+                              Name {renderSortIcon("sackLeaders", "name")}
+                            </TableHead>
+                            <TableHead
+                              className="cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800"
+                              onClick={() => handleSort("sackLeaders", "total")}
+                            >
+                              TOT {renderSortIcon("sackLeaders", "total")}
+                            </TableHead>
+                            <TableHead
+                              className="bg-gray-100 dark:bg-gray-800 cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-700"
                               onClick={() =>
-                                removeLeaderRow("sackLeaders", index)
+                                handleSort("sackLeaders", "per_game")
                               }
-                              className="text-red-600 hover:text-red-800 text-sm px-2 py-1 rounded"
-                              title="Remove Player"
                             >
-                              ✕
-                            </button>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                      <TableRow>
-                        <TableCell colSpan={4}>
-                          <button
-                            onClick={() => addLeaderRow("sackLeaders")}
-                            className="text-blue-600 hover:text-blue-800 text-sm"
-                          >
-                            + Add Player
-                          </button>
-                        </TableCell>
-                      </TableRow>
-                    </TableBody>
-                  </Table>
-                </div>
+                              Per Game{" "}
+                              {renderSortIcon("sackLeaders", "per_game")}
+                            </TableHead>
+                            <TableHead className="w-12"></TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {getSortedLeaders("sackLeaders")?.map(
+                            (leader, index) => (
+                              <TableRow key={index}>
+                                <TableCell>
+                                  <Select
+                                    value={leader.name || ""}
+                                    onValueChange={(value) =>
+                                      handleLeaderChange(
+                                        "sackLeaders",
+                                        index,
+                                        "name",
+                                        value,
+                                      )
+                                    }
+                                  >
+                                    <SelectTrigger>
+                                      <SelectValue placeholder="Select Player" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      {getSortedPlayers().map((player) => (
+                                        <SelectItem
+                                          key={player.id}
+                                          value={player.name}
+                                        >
+                                          {player.name} - {player.position} #
+                                          {player.jerseyNumber}
+                                        </SelectItem>
+                                      ))}
+                                    </SelectContent>
+                                  </Select>
+                                </TableCell>
+                                <TableCell>
+                                  <Input
+                                    type="number"
+                                    step="0.5"
+                                    value={leader.total || ""}
+                                    onChange={(e) =>
+                                      handleLeaderChange(
+                                        "sackLeaders",
+                                        index,
+                                        "total",
+                                        e.target.value,
+                                      )
+                                    }
+                                    className="text-center mx-auto"
+                                  />
+                                </TableCell>
+                                <TableCell className="bg-gray-100 dark:bg-gray-800">
+                                  {formatNumber(
+                                    (leader.total || 0) / effectiveGamesPlayed,
+                                  )}
+                                </TableCell>
+                                <TableCell>
+                                  <button
+                                    onClick={() =>
+                                      removeLeaderRow("sackLeaders", index)
+                                    }
+                                    className="text-red-600 hover:text-red-800 text-sm px-2 py-1 rounded"
+                                    title="Remove Player"
+                                  >
+                                    ✕
+                                  </button>
+                                </TableCell>
+                              </TableRow>
+                            ),
+                          )}
+                          <TableRow>
+                            <TableCell colSpan={4}>
+                              <button
+                                onClick={() => addLeaderRow("sackLeaders")}
+                                className="text-blue-600 hover:text-blue-800 text-sm"
+                              >
+                                + Add Player
+                              </button>
+                            </TableCell>
+                          </TableRow>
+                        </TableBody>
+                      </Table>
+                    </CardContent>
+                  )}
+                </Card>
 
                 {/* Interceptions */}
-                <div>
-                  <h3 className="font-semibold text-lg bg-indigo-100 dark:bg-indigo-900 p-2 rounded">
-                    INTs
-                  </h3>
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead
-                          className="cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800"
-                          onClick={() => handleSort("intLeaders", "name")}
-                        >
-                          Name {renderSortIcon("intLeaders", "name")}
-                        </TableHead>
-                        <TableHead
-                          className="cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800"
-                          onClick={() => handleSort("intLeaders", "total")}
-                        >
-                          TOT {renderSortIcon("intLeaders", "total")}
-                        </TableHead>
-                        <TableHead
-                          className="bg-gray-100 dark:bg-gray-800 cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-700"
-                          onClick={() => handleSort("intLeaders", "per_game")}
-                        >
-                          Per Game {renderSortIcon("intLeaders", "per_game")}
-                        </TableHead>
-                        <TableHead className="w-12"></TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {getSortedLeaders("intLeaders")?.map((leader, index) => (
-                        <TableRow key={index}>
-                          <TableCell>
-                            <Select
-                              value={leader.name || ""}
-                              onValueChange={(value) =>
-                                handleLeaderChange(
-                                  "intLeaders",
-                                  index,
-                                  "name",
-                                  value
-                                )
-                              }
+                <Card className="border-2 border-gray-200 dark:border-gray-700 shadow-xl overflow-hidden">
+                  {/* Collapsed Header */}
+                  <div
+                    className="bg-gradient-to-r from-primary to-primary/90 p-4 cursor-pointer flex flex-row items-center justify-between hover:from-primary/80 hover:to-primary/70 transition-colors duration-200"
+                    onClick={() => setIsIntsExpanded(!isIntsExpanded)}
+                  >
+                    <span className="text-xl font-bold text-white">
+                      Interceptions
+                    </span>
+                    {isIntsExpanded ? (
+                      <ChevronUp className="h-6 w-6 text-white" />
+                    ) : (
+                      <ChevronDown className="h-6 w-6 text-white" />
+                    )}
+                  </div>
+                  <CardHeader className="hidden"></CardHeader>
+
+                  {/* Expanded Interceptions Stats */}
+                  {isIntsExpanded && (
+                    <CardContent className="bg-gradient-to-br from-gray-50 to-white dark:from-gray-900 dark:to-gray-800">
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead
+                              className="cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800"
+                              onClick={() => handleSort("intLeaders", "name")}
                             >
-                              <SelectTrigger>
-                                <SelectValue placeholder="Select Player" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                {getSortedPlayers().map((player) => (
-                                  <SelectItem
-                                    key={player.id}
-                                    value={player.name}
-                                  >
-                                    {player.name} - {player.position} #
-                                    {player.jerseyNumber}
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                          </TableCell>
-                          <TableCell>
-                            <Input
-                              type="number"
-                              value={leader.total || ""}
-                              onChange={(e) =>
-                                handleLeaderChange(
-                                  "intLeaders",
-                                  index,
-                                  "total",
-                                  e.target.value
-                                )
-                              }
-                              className="text-center mx-auto"
-                            />
-                          </TableCell>
-                          <TableCell className="bg-gray-100 dark:bg-gray-800">
-                            {formatNumber(
-                              (leader.total || 0) / effectiveGamesPlayed
-                            )}
-                          </TableCell>
-                          <TableCell>
-                            <button
+                              Name {renderSortIcon("intLeaders", "name")}
+                            </TableHead>
+                            <TableHead
+                              className="cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800"
+                              onClick={() => handleSort("intLeaders", "total")}
+                            >
+                              TOT {renderSortIcon("intLeaders", "total")}
+                            </TableHead>
+                            <TableHead
+                              className="bg-gray-100 dark:bg-gray-800 cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-700"
                               onClick={() =>
-                                removeLeaderRow("intLeaders", index)
+                                handleSort("intLeaders", "per_game")
                               }
-                              className="text-red-600 hover:text-red-800 text-sm px-2 py-1 rounded"
-                              title="Remove Player"
                             >
-                              ✕
-                            </button>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                      <TableRow>
-                        <TableCell colSpan={4}>
-                          <button
-                            onClick={() => addLeaderRow("intLeaders")}
-                            className="text-blue-600 hover:text-blue-800 text-sm"
-                          >
-                            + Add Player
-                          </button>
-                        </TableCell>
-                      </TableRow>
-                    </TableBody>
-                  </Table>
-                </div>
+                              Per Game{" "}
+                              {renderSortIcon("intLeaders", "per_game")}
+                            </TableHead>
+                            <TableHead className="w-12"></TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {getSortedLeaders("intLeaders")?.map(
+                            (leader, index) => (
+                              <TableRow key={index}>
+                                <TableCell>
+                                  <Select
+                                    value={leader.name || ""}
+                                    onValueChange={(value) =>
+                                      handleLeaderChange(
+                                        "intLeaders",
+                                        index,
+                                        "name",
+                                        value,
+                                      )
+                                    }
+                                  >
+                                    <SelectTrigger>
+                                      <SelectValue placeholder="Select Player" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      {getSortedPlayers().map((player) => (
+                                        <SelectItem
+                                          key={player.id}
+                                          value={player.name}
+                                        >
+                                          {player.name} - {player.position} #
+                                          {player.jerseyNumber}
+                                        </SelectItem>
+                                      ))}
+                                    </SelectContent>
+                                  </Select>
+                                </TableCell>
+                                <TableCell>
+                                  <Input
+                                    type="number"
+                                    value={leader.total || ""}
+                                    onChange={(e) =>
+                                      handleLeaderChange(
+                                        "intLeaders",
+                                        index,
+                                        "total",
+                                        e.target.value,
+                                      )
+                                    }
+                                    className="text-center mx-auto"
+                                  />
+                                </TableCell>
+                                <TableCell className="bg-gray-100 dark:bg-gray-800">
+                                  {formatNumber(
+                                    (leader.total || 0) / effectiveGamesPlayed,
+                                  )}
+                                </TableCell>
+                                <TableCell>
+                                  <button
+                                    onClick={() =>
+                                      removeLeaderRow("intLeaders", index)
+                                    }
+                                    className="text-red-600 hover:text-red-800 text-sm px-2 py-1 rounded"
+                                    title="Remove Player"
+                                  >
+                                    ✕
+                                  </button>
+                                </TableCell>
+                              </TableRow>
+                            ),
+                          )}
+                          <TableRow>
+                            <TableCell colSpan={4}>
+                              <button
+                                onClick={() => addLeaderRow("intLeaders")}
+                                className="text-blue-600 hover:text-blue-800 text-sm"
+                              >
+                                + Add Player
+                              </button>
+                            </TableCell>
+                          </TableRow>
+                        </TableBody>
+                      </Table>
+                    </CardContent>
+                  )}
+                </Card>
               </div>
             </CardContent>
           </Card>
@@ -2089,7 +2269,7 @@ const TeamStats: React.FC = () => {
           <Card className="flex flex-col border-2 border-gray-200 dark:border-gray-700 shadow-xl overflow-hidden items-center justify-center w-full">
             {/* Add Record Accordion */}
             <div
-              className="bg-gradient-to-r from-primary to-primary/90 p-6 cursor-pointer flex flex-row items-center justify-between hover:from-primary/80 hover:to-primary/70 transition-all w-full"
+              className="bg-gradient-to-r from-primary to-primary/90 p-6 cursor-pointer flex flex-row items-center justify-between hover:from-primary/80 hover:to-primary/70 transition-colors duration-200 w-full"
               onClick={() => setIsFormExpanded(!isFormExpanded)}
             >
               <span className="text-2xl font-black text-white">Add Record</span>
@@ -2238,7 +2418,7 @@ const TeamStats: React.FC = () => {
                               <Checkbox
                                 id="conference"
                                 checked={newRecord.levels.includes(
-                                  "conference"
+                                  "conference",
                                 )}
                                 onCheckedChange={() =>
                                   handleLevelToggle("conference")
@@ -2500,19 +2680,19 @@ const TeamStats: React.FC = () => {
                       "career",
                       "national",
                       "National Records",
-                      "bg-yellow-600 text-white p-2 rounded-md text-center"
+                      "bg-yellow-600 text-white p-2 rounded-md text-center",
                     )}
                     {renderRecordsSection(
                       "career",
                       "conference",
                       "Conference Records",
-                      "bg-gray-600 text-white p-2 rounded-md text-center"
+                      "bg-gray-600 text-white p-2 rounded-md text-center",
                     )}
                     {renderRecordsSection(
                       "career",
                       "school",
                       "School Records",
-                      "bg-primary text-white p-2 rounded-md text-center"
+                      "bg-primary text-white p-2 rounded-md text-center",
                     )}
                   </div>
                 </TabsContent>
@@ -2524,19 +2704,19 @@ const TeamStats: React.FC = () => {
                       "season",
                       "national",
                       "National Records",
-                      "bg-yellow-600 text-white p-2 rounded-md text-center"
+                      "bg-yellow-600 text-white p-2 rounded-md text-center",
                     )}
                     {renderRecordsSection(
                       "season",
                       "conference",
                       "Conference Records",
-                      "bg-gray-600 text-white p-2 rounded-md text-center"
+                      "bg-gray-600 text-white p-2 rounded-md text-center",
                     )}
                     {renderRecordsSection(
                       "season",
                       "school",
                       "School Records",
-                      "bg-primary text-white p-2 rounded-md text-center"
+                      "bg-primary text-white p-2 rounded-md text-center",
                     )}
                   </div>
                 </TabsContent>
@@ -2548,19 +2728,19 @@ const TeamStats: React.FC = () => {
                       "game",
                       "national",
                       "National Records",
-                      "bg-yellow-600 text-white p-2 rounded-md text-center"
+                      "bg-yellow-600 text-white p-2 rounded-md text-center",
                     )}
                     {renderRecordsSection(
                       "game",
                       "conference",
                       "Conference Records",
-                      "bg-gray-600 text-white p-2 rounded-md text-center"
+                      "bg-gray-600 text-white p-2 rounded-md text-center",
                     )}
                     {renderRecordsSection(
                       "game",
                       "school",
                       "School Records",
-                      "bg-primary text-white p-2 rounded-md text-center"
+                      "bg-primary text-white p-2 rounded-md text-center",
                     )}
                   </div>
                 </TabsContent>
