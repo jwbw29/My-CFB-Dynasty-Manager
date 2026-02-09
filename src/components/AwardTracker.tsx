@@ -56,7 +56,7 @@ const predefinedAwards = [
   "Davey O'Brien Award",
   "Doak Walker Award",
   "Edge Rusher of the Year",
-  "Hesiman Memorial Trophy",
+  "Heisman Memorial Trophy",
   "Jim Thorpe Award",
   "John Mackey Award",
   "Lombardi Award",
@@ -76,14 +76,14 @@ const teamAwards = ["All-American", "All-Conference"];
 const AwardTracker: React.FC = () => {
   const [currentYear] = useLocalStorage<number>(
     "currentYear",
-    new Date().getFullYear()
+    new Date().getFullYear(),
   );
   const [players] = useLocalStorage<Player[]>("players", []);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [selectedYear, setSelectedYear] = useState<number>(currentYear);
 
   const [awardsForSelectedYear, setAwardsForSelectedYear] = useState<Award[]>(
-    []
+    [],
   );
 
   useEffect(() => {
@@ -129,7 +129,7 @@ const AwardTracker: React.FC = () => {
 
       if (!coordinatorName || !coordinatorName.trim()) {
         toast.error(
-          `Please add the ${broylesPosition} name in the Roster Management page first.`
+          `Please add the ${broylesPosition} name in the Roster Management page first.`,
         );
         return;
       }
@@ -156,7 +156,7 @@ const AwardTracker: React.FC = () => {
     let updatedAwards: Award[];
     if (editingId) {
       updatedAwards = awardsForSelectedYear.map((award) =>
-        award.id === editingId ? { ...awardData, id: editingId } : award
+        award.id === editingId ? { ...awardData, id: editingId } : award,
       );
       toast.success("Award updated successfully");
     } else {
@@ -195,7 +195,7 @@ const AwardTracker: React.FC = () => {
 
   const removeAward = (id: number) => {
     const updatedAwards = awardsForSelectedYear.filter(
-      (award) => award.id !== id
+      (award) => award.id !== id,
     );
     const record = getYearRecord(selectedYear);
     setYearRecord(selectedYear, { ...record, playerAwards: updatedAwards });
@@ -237,7 +237,7 @@ const AwardTracker: React.FC = () => {
                   {[...players]
                     .sort(
                       (a, b) =>
-                        parseInt(a.jerseyNumber) - parseInt(b.jerseyNumber)
+                        parseInt(a.jerseyNumber) - parseInt(b.jerseyNumber),
                     )
                     .map((player) => (
                       <SelectItem key={player.id} value={player.name}>
