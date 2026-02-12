@@ -68,11 +68,11 @@ const sortTransfersByStars = (transfers: Transfer[]): Transfer[] => {
 const TransferPortalTracker: React.FC = () => {
   const [currentYear] = useLocalStorage<number>(
     "currentYear",
-    new Date().getFullYear()
+    new Date().getFullYear(),
   );
   const [allTransfers, setAllTransfers] = useLocalStorage<Transfer[]>(
     "allTransfers",
-    []
+    [],
   );
   const [players, setPlayersState] = useLocalStorage<Player[]>("players", []);
   const [newIncomingTransfer, setNewIncomingTransfer] = useState<
@@ -106,7 +106,7 @@ const TransferPortalTracker: React.FC = () => {
 
   // NEW: Apply star rating sorting to displayed transfers
   const transfersForSelectedYear = sortTransfersByStars(
-    getTransfers(selectedYear)
+    getTransfers(selectedYear),
   );
 
   const addIncomingTransfer = () => {
@@ -129,7 +129,7 @@ const TransferPortalTracker: React.FC = () => {
 
   const addOutgoingTransfer = () => {
     const selectedPlayer = players.find(
-      (p) => p.id.toString() === newOutgoingTransfer.playerId
+      (p) => p.id.toString() === newOutgoingTransfer.playerId,
     );
     if (!selectedPlayer) {
       notifyError("Please select a player");
@@ -151,7 +151,7 @@ const TransferPortalTracker: React.FC = () => {
     const updatedPlayers = players.map((p) =>
       p.id.toString() === newOutgoingTransfer.playerId
         ? { ...p, isTransferring: true }
-        : p
+        : p,
     );
     setPlayersState(updatedPlayers);
     setPlayers(updatedPlayers);
@@ -197,8 +197,8 @@ const TransferPortalTracker: React.FC = () => {
                 stars: newIncomingTransfer.stars,
                 school: newIncomingTransfer.school,
               }
-            : transfer
-        )
+            : transfer,
+        ),
       );
     } else {
       setAllTransfers(
@@ -211,8 +211,8 @@ const TransferPortalTracker: React.FC = () => {
                 stars: editingOutgoingTransfer.stars,
                 school: editingOutgoingTransfer.school,
               }
-            : transfer
-        )
+            : transfer,
+        ),
       );
     }
 
@@ -256,7 +256,7 @@ const TransferPortalTracker: React.FC = () => {
       const updatedPlayers = players.map((p) =>
         p.name === transferToRemove.playerName && p.isTransferring
           ? { ...p, isTransferring: false }
-          : p
+          : p,
       );
       setPlayersState(updatedPlayers);
       setPlayers(updatedPlayers);
@@ -275,7 +275,7 @@ const TransferPortalTracker: React.FC = () => {
       {editingId &&
         (() => {
           const transferBeingEdited = allTransfers.find(
-            (t) => t.id === editingId
+            (t) => t.id === editingId,
           );
           if (!transferBeingEdited) return null;
 
@@ -387,7 +387,7 @@ const TransferPortalTracker: React.FC = () => {
       {(!editingId ||
         (() => {
           const transferBeingEdited = allTransfers.find(
-            (t) => t.id === editingId
+            (t) => t.id === editingId,
           );
           return transferBeingEdited?.transferDirection === "From";
         })()) && (
@@ -521,7 +521,9 @@ const TransferPortalTracker: React.FC = () => {
               </SelectTrigger>
               <SelectContent>
                 {players
-                  .filter((player) => !player.isTransferring)
+                  .filter(
+                    (player) => !player.isTransferring && !player.isDrafted,
+                  )
                   .map((player) => (
                     <SelectItem key={player.id} value={player.id.toString()}>
                       {player.name} - {player.position} ({player.rating}⭐)

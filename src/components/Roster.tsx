@@ -93,6 +93,7 @@ interface Player {
   notes: string;
   isRedshirted: boolean;
   isTransferring: boolean;
+  isDrafted: boolean;
 }
 
 interface DevTraitBadgeProps {
@@ -179,6 +180,7 @@ const initialNewPlayerState: Omit<Player, "id"> = {
   notes: "",
   isRedshirted: false,
   isTransferring: false,
+  isDrafted: false,
 };
 
 const DevTraitBadge: React.FC<DevTraitBadgeProps> = ({ trait }) => {
@@ -336,6 +338,7 @@ const Roster: React.FC = () => {
               notes: p.notes || "",
               isRedshirted: p.isRedshirted || false,
               isTransferring: false,
+              isDrafted: false,
             }) as Player,
         ),
       ]);
@@ -479,6 +482,7 @@ const Roster: React.FC = () => {
         | "jerseyNumber"
         | "isRedshirted"
         | "isTransferring"
+        | "isDrafted"
       >[],
     ) => {
       const playersWithDefaults = processedNewPlayers.map((p) => ({
@@ -489,6 +493,7 @@ const Roster: React.FC = () => {
         notes: "",
         isRedshirted: false,
         isTransferring: false,
+        isDrafted: false,
       }));
       setPlayers((prev) => [...prev, ...playersWithDefaults]);
       notifySuccess("Players processed from image!");
@@ -556,6 +561,9 @@ const Roster: React.FC = () => {
   );
 
   const getRowClassName = useCallback((player: Player) => {
+    if (player.isDrafted) {
+      return "border-t transition-colors bg-green-100 dark:bg-green-900/30 hover:bg-green-200/80 dark:hover:bg-green-800/50";
+    }
     if (player.isTransferring) {
       return "border-t transition-colors bg-blue-100 dark:bg-blue-900/30 hover:bg-blue-200/80 dark:hover:bg-blue-800/50";
     }
@@ -833,7 +841,7 @@ const Roster: React.FC = () => {
                         {player.position}
                       </TableCell>
 
-                      {/* Player Year & Transfer Status */}
+                      {/* Player Year & Transfer/Draft Status */}
                       <TableCell className="text-center">
                         {player.year}
                         {player.isTransferring && (
@@ -842,6 +850,14 @@ const Roster: React.FC = () => {
                             className="ml-2 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 border-blue-300 dark:border-blue-700"
                           >
                             Transferring
+                          </Badge>
+                        )}
+                        {player.isDrafted && (
+                          <Badge
+                            variant="outline"
+                            className="ml-2 bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 border-green-300 dark:border-green-700"
+                          >
+                            Entering Draft
                           </Badge>
                         )}
                       </TableCell>

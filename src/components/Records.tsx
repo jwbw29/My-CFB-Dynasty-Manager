@@ -30,6 +30,7 @@ import {
   getRivalTrophiesForYear,
   getBowlTrophiesForYear,
   getConferenceTrophiesForYear,
+  setPlayers,
 } from "@/utils/localStorage";
 import {
   YearRecord,
@@ -37,7 +38,7 @@ import {
   TeamStatsData,
   TeamLeaderStats,
 } from "@/types/yearRecord";
-import { DraftedPlayer } from "@/types/playerTypes";
+import { DraftedPlayer, Player } from "@/types/playerTypes";
 import {
   Trophy,
   Medal,
@@ -62,6 +63,7 @@ import { toast } from "react-hot-toast";
 import { MESSAGES } from "@/utils/notification-utils";
 import { Badge } from "@/components/ui/badge";
 import { useDynasty } from "@/contexts/DynastyContext";
+import useLocalStorage from "@/hooks/useLocalStorage";
 
 const classOptions = [
   "FR",
@@ -114,13 +116,13 @@ const Records: React.FC = () => {
   const [selectedYear, setSelectedYear] = useState<number | null>(null);
   const [activeRecord, setActiveRecord] = useState<YearRecord | null>(null);
   const [hasChanges, setHasChanges] = useState(false);
-  const [editingDraftPlayerId, setEditingDraftPlayerId] = useState<
-    string | null
-  >(null);
-  const [draftPlayerEditValues, setDraftPlayerEditValues] = useState<{
-    playerName: string;
+  const [newDraftPlayer, setNewDraftPlayer] = useState<{
+    playerId: string;
     round: number;
-  }>({ playerName: "", round: 1 });
+  }>({ playerId: "", round: 1 });
+
+  // Player state for drafted player dropdown
+  const [players, setPlayersState] = useLocalStorage<Player[]>("players", []);
 
   // --- MODIFICATION: Get current year and dynasty ID ---
   const { dataVersion, currentDynastyId } = useDynasty();
@@ -131,7 +133,7 @@ const Records: React.FC = () => {
     if (!record) return 1;
     const calculatedGamesPlayed = record.schedule.filter(
       (game) =>
-        game.result !== "Bye" && game.result !== "N/A" && game.score !== ""
+        game.result !== "Bye" && game.result !== "N/A" && game.score !== "",
     ).length;
     return record.teamStats?.gamesPlayed || calculatedGamesPlayed || 1;
   }, []);
@@ -140,7 +142,7 @@ const Records: React.FC = () => {
     const loadRecords = () => {
       const records = getAllYearRecords();
       const currentYearRecordExists = records.some(
-        (r) => r.year === currentYear
+        (r) => r.year === currentYear,
       );
 
       if (!currentYearRecordExists) {
@@ -148,7 +150,7 @@ const Records: React.FC = () => {
         const schedule = getSchedule(currentYear);
         const stats = calculateStats(
           schedule,
-          getCoachProfile()?.schoolName || ""
+          getCoachProfile()?.schoolName || "",
         );
         const newCurrentRecord: YearRecord = {
           year: currentYear,
@@ -197,7 +199,7 @@ const Records: React.FC = () => {
       const liveSchedule = getSchedule(currentYear);
       const liveStats = calculateStats(
         liveSchedule,
-        getCoachProfile()?.schoolName || ""
+        getCoachProfile()?.schoolName || "",
       );
 
       // --- MODIFICATION START: Provide a structured default object ---
@@ -352,68 +354,64 @@ const Records: React.FC = () => {
     handleFieldChange("heisman", newHeismanStr);
   };
 
-  const updateDraftedPlayer = (
-    index: number,
-    field: keyof DraftedPlayer,
-    value: string | number
-  ) => {
-    if (!activeRecord) return;
-    const updatedPlayers = [...(activeRecord.playersDrafted || [])];
-    (updatedPlayers[index] as any)[field] = value;
-    handleFieldChange("playersDrafted", updatedPlayers);
-  };
-
   const addDraftedPlayer = () => {
     if (!activeRecord) return;
+    const selectedPlayer = players.find(
+      (p) => p.id.toString() === newDraftPlayer.playerId,
+    );
+    if (!selectedPlayer) {
+      toast.error("Please select a player");
+      return;
+    }
+
     const newPlayer: DraftedPlayer = {
       id: Date.now().toString(),
-      playerName: "",
+      playerName: selectedPlayer.name,
       originalTeam: "",
       draftedTeam: "",
-      round: 1,
+      round: newDraftPlayer.round,
       year: selectedYear!,
     };
     handleFieldChange("playersDrafted", [
       ...(activeRecord.playersDrafted || []),
       newPlayer,
     ]);
-    // Enter edit mode for this new player
-    setEditingDraftPlayerId(newPlayer.id);
-    setDraftPlayerEditValues({ playerName: "", round: 1 });
-  };
 
-  const saveDraftedPlayer = (id: string) => {
-    if (!activeRecord) return;
-    const updatedPlayers = (activeRecord.playersDrafted || []).map((p) =>
-      p.id === id
-        ? {
-            ...p,
-            playerName: draftPlayerEditValues.playerName,
-            round: draftPlayerEditValues.round,
-          }
-        : p
+    // Mark player as drafted on the roster
+    const updatedPlayers = players.map((p) =>
+      p.id.toString() === newDraftPlayer.playerId
+        ? { ...p, isDrafted: true }
+        : p,
     );
-    handleFieldChange("playersDrafted", updatedPlayers);
-    setEditingDraftPlayerId(null);
-    setDraftPlayerEditValues({ playerName: "", round: 1 });
-  };
+    setPlayersState(updatedPlayers);
+    setPlayers(updatedPlayers);
 
-  const cancelDraftedPlayerEdit = (id: string) => {
-    // If the player has no name, remove them entirely (they were just added)
-    if (!activeRecord) return;
-    const player = (activeRecord.playersDrafted || []).find((p) => p.id === id);
-    if (player && !player.playerName.trim()) {
-      removeDraftedPlayer(id);
-    }
-    setEditingDraftPlayerId(null);
-    setDraftPlayerEditValues({ playerName: "", round: 1 });
+    // Reset the form
+    setNewDraftPlayer({ playerId: "", round: 1 });
   };
 
   const removeDraftedPlayer = (id: string) => {
     if (!activeRecord) return;
+
+    // Find the drafted player to get their name
+    const draftedPlayer = (activeRecord.playersDrafted || []).find(
+      (p) => p.id === id,
+    );
+
+    // Remove the isDrafted flag from the roster player
+    if (draftedPlayer) {
+      const updatedPlayers = players.map((p) =>
+        p.name === draftedPlayer.playerName && p.isDrafted
+          ? { ...p, isDrafted: false }
+          : p,
+      );
+      setPlayersState(updatedPlayers);
+      setPlayers(updatedPlayers);
+    }
+
     handleFieldChange(
       "playersDrafted",
-      (activeRecord.playersDrafted || []).filter((p) => p.id !== id)
+      (activeRecord.playersDrafted || []).filter((p) => p.id !== id),
     );
   };
 
@@ -428,7 +426,7 @@ const Records: React.FC = () => {
     if (activeRecord) {
       setYearRecord(activeRecord.year, activeRecord);
       setAllRecords((prev) =>
-        prev.map((r) => (r.year === activeRecord.year ? activeRecord : r))
+        prev.map((r) => (r.year === activeRecord.year ? activeRecord : r)),
       );
       setHasChanges(false);
       toast.success("Season record saved!");
@@ -441,7 +439,7 @@ const Records: React.FC = () => {
       return { bestWin: null, worstLoss: null, longestStreak: 0 };
 
     const playedGames = activeRecord.schedule.filter(
-      (g) => g.result === "Win" || g.result === "Loss"
+      (g) => g.result === "Win" || g.result === "Loss",
     );
     if (playedGames.length === 0)
       return { bestWin: null, worstLoss: null, longestStreak: 0 };
@@ -501,7 +499,7 @@ const Records: React.FC = () => {
   }
 
   const sortedTeams = [...fbsTeams].sort((a, b) =>
-    a.name.localeCompare(b.name)
+    a.name.localeCompare(b.name),
   );
 
   return (
@@ -570,7 +568,7 @@ const Records: React.FC = () => {
                         <div className="flex items-center justify-center md:justify-start gap-2 mt-2">
                           {(() => {
                             const conference = getConferenceForYear(
-                              activeRecord.year
+                              activeRecord.year,
                             );
                             return conference !== "N/A" ? (
                               <>
@@ -830,7 +828,7 @@ const Records: React.FC = () => {
                                   </div>
                                 </div>
                               </div>
-                            )
+                            ),
                           )}
                         </div>
                       )}
@@ -1400,8 +1398,8 @@ const Records: React.FC = () => {
                           game.result === "Win"
                             ? "border-l-green-500 bg-green-50 dark:bg-green-900/20"
                             : game.result === "Loss"
-                            ? "border-l-red-500 bg-red-50 dark:bg-red-900/20"
-                            : "border-l-gray-300 dark:border-l-gray-600"
+                              ? "border-l-red-500 bg-red-50 dark:bg-red-900/20"
+                              : "border-l-gray-300 dark:border-l-gray-600"
                         }`}
                       >
                         <div className="flex items-center gap-4">
@@ -1424,8 +1422,8 @@ const Records: React.FC = () => {
                                 game.result === "Win"
                                   ? "bg-green-600"
                                   : game.result === "Loss"
-                                  ? "bg-red-600"
-                                  : "bg-gray-500"
+                                    ? "bg-red-600"
+                                    : "bg-gray-500"
                               } text-white`}
                             >
                               {game.result}
@@ -1511,8 +1509,8 @@ const Records: React.FC = () => {
                         (activeRecord.transfers || [])
                           .sort((a, b) =>
                             a.transferDirection.localeCompare(
-                              b.transferDirection
-                            )
+                              b.transferDirection,
+                            ),
                           )
                           .map((transfer) => (
                             <div
@@ -1693,7 +1691,7 @@ const Records: React.FC = () => {
                         <Input
                           value={
                             (activeRecord.heisman || " -  -  - ").split(
-                              " - "
+                              " - ",
                             )[0]
                           }
                           onChange={(e) =>
@@ -1704,7 +1702,7 @@ const Records: React.FC = () => {
                         <Select
                           value={
                             (activeRecord.heisman || " -  -  - ").split(
-                              " - "
+                              " - ",
                             )[1]
                           }
                           onValueChange={(v) =>
@@ -1725,7 +1723,7 @@ const Records: React.FC = () => {
                         <Select
                           value={
                             (activeRecord.heisman || " -  -  - ").split(
-                              " - "
+                              " - ",
                             )[2]
                           }
                           onValueChange={(v) => handleHeismanChange("class", v)}
@@ -1744,7 +1742,7 @@ const Records: React.FC = () => {
                         <Select
                           value={
                             (activeRecord.heisman || " -  -  - ").split(
-                              " - "
+                              " - ",
                             )[3]
                           }
                           onValueChange={(v) =>
@@ -1813,129 +1811,111 @@ const Records: React.FC = () => {
                   </CardContent>
                 </Card>
                 <Card className="flex-1 flex flex-col">
-                  <CardHeader className="flex flex-row items-center justify-between">
+                  <CardHeader>
                     <CardTitle className="flex items-center gap-2">
-                      <ShieldCheck className="text-blue-600" />
+                      <ShieldCheck className="text-green-600" />
                       NFL Draft Class (
                       {(activeRecord.playersDrafted || []).length})
                     </CardTitle>
-                    <Button
-                      onClick={addDraftedPlayer}
-                      size="sm"
-                      variant="outline"
-                    >
-                      Add
-                    </Button>
                   </CardHeader>
-                  <CardContent className="flex-grow">
+                  <CardContent className="flex-grow space-y-4">
+                    {/* Add Drafted Player Form */}
+                    {selectedYear === currentYear && (
+                      <div className="grid grid-cols-[1fr,auto,auto] gap-2 items-end">
+                        <Select
+                          value={newDraftPlayer.playerId}
+                          onValueChange={(value) =>
+                            setNewDraftPlayer((prev) => ({
+                              ...prev,
+                              playerId: value,
+                            }))
+                          }
+                        >
+                          <SelectTrigger className="h-9">
+                            <SelectValue placeholder="Select Player" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {players
+                              .filter(
+                                (player) =>
+                                  !player.isDrafted && !player.isTransferring,
+                              )
+                              .map((player) => (
+                                <SelectItem
+                                  key={player.id}
+                                  value={player.id.toString()}
+                                >
+                                  {player.name} - {player.position} (
+                                  {player.rating}⭐)
+                                </SelectItem>
+                              ))}
+                          </SelectContent>
+                        </Select>
+                        <div className="flex items-center gap-1">
+                          <label className="text-xs font-medium whitespace-nowrap">
+                            Rd:
+                          </label>
+                          <Input
+                            type="number"
+                            value={newDraftPlayer.round}
+                            onChange={(e) =>
+                              setNewDraftPlayer((prev) => ({
+                                ...prev,
+                                round: parseInt(e.target.value) || 1,
+                              }))
+                            }
+                            className="h-9 w-16 text-center"
+                            min="1"
+                            max="7"
+                          />
+                        </div>
+                        <Button
+                          onClick={addDraftedPlayer}
+                          size="sm"
+                          className="h-9"
+                        >
+                          Add
+                        </Button>
+                      </div>
+                    )}
+
+                    {/* Drafted Players List */}
                     <ScrollArea className="h-48 pr-3">
                       <div className="space-y-2">
                         {(activeRecord.playersDrafted || [])
                           .sort((a, b) => a.round - b.round)
-                          .map((player, index) => {
-                            // If player is being edited, show edit mode
-                            if (editingDraftPlayerId === player.id) {
-                              return (
-                                <div
-                                  key={player.id}
-                                  className="grid grid-cols-[1fr,auto] gap-2 items-center p-2 border-2 border-dashed border-blue-400 dark:border-blue-600 rounded-lg bg-blue-50 dark:bg-blue-900/20"
-                                >
-                                  <div className="space-y-2">
-                                    <Input
-                                      value={draftPlayerEditValues.playerName}
-                                      onChange={(e) =>
-                                        setDraftPlayerEditValues((prev) => ({
-                                          ...prev,
-                                          playerName: e.target.value,
-                                        }))
-                                      }
-                                      placeholder="Player Name"
-                                      className="h-8"
-                                      autoFocus
-                                    />
-                                    <div className="flex items-center gap-2">
-                                      <label className="text-xs font-medium">
-                                        Round:
-                                      </label>
-                                      <Input
-                                        type="number"
-                                        value={draftPlayerEditValues.round}
-                                        onChange={(e) =>
-                                          setDraftPlayerEditValues((prev) => ({
-                                            ...prev,
-                                            round:
-                                              parseInt(e.target.value) || 1,
-                                          }))
-                                        }
-                                        className="h-8 w-16 text-center"
-                                        min="1"
-                                        max="7"
-                                      />
-                                    </div>
-                                  </div>
-                                  <div className="flex flex-col gap-1">
-                                    <Button
-                                      onClick={() =>
-                                        saveDraftedPlayer(player.id)
-                                      }
-                                      variant="default"
-                                      size="sm"
-                                      className="h-8"
-                                      disabled={
-                                        !draftPlayerEditValues.playerName.trim()
-                                      }
-                                    >
-                                      <Save className="h-3 w-3 mr-1" />
-                                      Save
-                                    </Button>
-                                    <Button
-                                      onClick={() =>
-                                        cancelDraftedPlayerEdit(player.id)
-                                      }
-                                      variant="ghost"
-                                      size="sm"
-                                      className="h-8"
-                                    >
-                                      <X className="h-3 w-3 mr-1" />
-                                      Cancel
-                                    </Button>
+                          .map((player) => (
+                            <div
+                              key={player.id}
+                              className="flex items-center justify-between p-3 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800"
+                            >
+                              <div className="flex items-center gap-3">
+                                <div className="flex-shrink-0">
+                                  <div className="w-8 h-8 bg-green-600 text-white rounded-full flex items-center justify-center text-sm font-bold">
+                                    R{player.round}
                                   </div>
                                 </div>
-                              );
-                            }
-
-                            // Show display mode for players with names
-                            return (
-                              <div
-                                key={player.id}
-                                className="flex items-center justify-between p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800"
-                              >
-                                <div className="flex items-center gap-3">
-                                  <div className="flex-shrink-0">
-                                    <div className="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-bold">
-                                      R{player.round}
-                                    </div>
-                                  </div>
-                                  <div className="min-w-0">
-                                    <p className="font-semibold text-blue-800 dark:text-blue-200 truncate">
-                                      {player.playerName || "(Unnamed)"}
-                                    </p>
-                                    <p className="text-xs text-blue-600 dark:text-blue-400">
-                                      Round {player.round}
-                                    </p>
-                                  </div>
+                                <div className="min-w-0">
+                                  <p className="font-semibold text-green-800 dark:text-green-200 truncate">
+                                    {player.playerName || "(Unnamed)"}
+                                  </p>
+                                  <p className="text-xs text-green-600 dark:text-green-400">
+                                    Round {player.round}
+                                  </p>
                                 </div>
+                              </div>
+                              {selectedYear === currentYear && (
                                 <Button
                                   onClick={() => removeDraftedPlayer(player.id)}
                                   variant="ghost"
                                   size="icon"
-                                  className="h-8 w-8 opacity-70 hover:opacity-100 text-blue-600 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20"
+                                  className="h-8 w-8 opacity-70 hover:opacity-100 text-green-600 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20"
                                 >
                                   <X className="h-4 w-4" />
                                 </Button>
-                              </div>
-                            );
-                          })}
+                              )}
+                            </div>
+                          ))}
                         {(activeRecord.playersDrafted || []).length === 0 && (
                           <p className="text-center text-muted-foreground py-4">
                             No players drafted yet.

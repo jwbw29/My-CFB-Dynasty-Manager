@@ -74,6 +74,7 @@ export interface Player {
   notes?: string;
   isRedshirted: boolean;
   isTransferring: boolean;
+  isDrafted: boolean;
 }
 
 export interface Recruit {

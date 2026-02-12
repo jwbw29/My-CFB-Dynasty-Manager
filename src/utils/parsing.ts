@@ -1,9 +1,9 @@
 // src/utils/parsing.ts
-import { Player } from '@/types/playerTypes';
+import { Player } from "@/types/playerTypes";
 
-export function parsePlayerData(text: string): Omit<Player, 'id'>[] {
-  const columns = text.split('\n').map(column => column.split('\n'));
-  const players: Omit<Player, 'id'>[] = [];
+export function parsePlayerData(text: string): Omit<Player, "id">[] {
+  const columns = text.split("\n").map((column) => column.split("\n"));
+  const players: Omit<Player, "id">[] = [];
 
   for (let i = 0; i < columns[0].length; i++) {
     const name = correctName(columns[0][i]);
@@ -12,7 +12,16 @@ export function parsePlayerData(text: string): Omit<Player, 'id'>[] {
     const rating = correctRating(columns[3][i]);
 
     if (name && position && year && rating) {
-      players.push({ name, position, year, rating, jerseyNumber: '', isRedshirted: false });
+      players.push({
+        name,
+        position,
+        year,
+        rating,
+        jerseyNumber: "",
+        isRedshirted: false,
+        isTransferring: false,
+        isDrafted: false,
+      });
     }
   }
 
@@ -20,21 +29,37 @@ export function parsePlayerData(text: string): Omit<Player, 'id'>[] {
 }
 
 function correctName(name: string): string {
-  return name.replace(/[^a-zA-Z\.\s]/g, '').trim();
+  return name.replace(/[^a-zA-Z\.\s]/g, "").trim();
 }
 
 function correctPosition(position: string): string {
-  const validPositions = ['QB', 'HB', 'WR', 'TE', 'OL', 'DL', 'LB', 'CB', 'S', 'K', 'P'];
-  return validPositions.find(pos => position.toUpperCase().includes(pos)) || position;
+  const validPositions = [
+    "QB",
+    "HB",
+    "WR",
+    "TE",
+    "OL",
+    "DL",
+    "LB",
+    "CB",
+    "S",
+    "K",
+    "P",
+  ];
+  return (
+    validPositions.find((pos) => position.toUpperCase().includes(pos)) ||
+    position
+  );
 }
 
 function correctYear(year: string): string {
-  const validYears = ['FR', 'SO', 'JR', 'SR'];
-  const corrected = validYears.find(y => year.toUpperCase().includes(y)) || year;
-  return year.toUpperCase().includes('RS') ? `${corrected} (RS)` : corrected;
+  const validYears = ["FR", "SO", "JR", "SR"];
+  const corrected =
+    validYears.find((y) => year.toUpperCase().includes(y)) || year;
+  return year.toUpperCase().includes("RS") ? `${corrected} (RS)` : corrected;
 }
 
 function correctRating(rating: string): string {
-  const num = parseInt(rating.replace(/\D/g, ''));
+  const num = parseInt(rating.replace(/\D/g, ""));
   return num >= 40 && num <= 99 ? num.toString() : rating;
 }

@@ -598,13 +598,13 @@ export const progressRosterForNewSeason = (endedYear: number): void => {
     const allRecruits = getAllRecruits();
     const allTransfers = getAllTransfers();
 
-    // Remove players marked as transferring before processing the roster
-    const playersAfterTransfers = currentPlayers.filter(
-      (player) => !player.isTransferring,
+    // Remove players marked as transferring or drafted before processing the roster
+    const playersAfterRemovals = currentPlayers.filter(
+      (player) => !player.isTransferring && !player.isDrafted,
     );
 
     // 1. Progress the roster: Graduate, Age Up, and Handle Redshirts
-    const progressedPlayers = playersAfterTransfers
+    const progressedPlayers = playersAfterRemovals
       .map((player) => {
         const isRedshirtedThisSeason = player.isRedshirted;
         const hasRedshirtHistory = player.year.includes("(RS)");
@@ -691,6 +691,7 @@ export const progressRosterForNewSeason = (endedYear: number): void => {
           notes: `Recruited in the class of ${endedYear}.`,
           isRedshirted: false,
           isTransferring: false,
+          isDrafted: false,
         }),
       );
 
@@ -713,6 +714,7 @@ export const progressRosterForNewSeason = (endedYear: number): void => {
           notes: `Transferred from ${transfer.school} in ${endedYear}.`,
           isRedshirted: false,
           isTransferring: false,
+          isDrafted: false,
         }),
       );
 
