@@ -169,6 +169,9 @@ const FILTER_ALL = "all";
 const FILTER_OFFENSE = "offense";
 const FILTER_DEFENSE = "defense";
 const FILTER_SPECIAL_TEAMS = "specialTeams";
+const FILTER_OL = "ol";
+
+const offensiveLinePositions = ["OL", "LT", "LG", "C", "RG", "RT"];
 
 const initialNewPlayerState: Omit<Player, "id"> = {
   jerseyNumber: "",
@@ -317,6 +320,10 @@ const Roster: React.FC = () => {
     else if (posFilter === FILTER_SPECIAL_TEAMS)
       setFilteredPlayers(
         players.filter((p) => specialTeamsPositions.includes(p.position)),
+      );
+    else if (posFilter === FILTER_OL)
+      setFilteredPlayers(
+        players.filter((p) => offensiveLinePositions.includes(p.position)),
       );
     else setFilteredPlayers(players.filter((p) => p.position === posFilter));
   }, [posFilter, players]);
@@ -772,6 +779,7 @@ const Roster: React.FC = () => {
                 <SelectItem value={FILTER_SPECIAL_TEAMS}>
                   Special Teams
                 </SelectItem>
+                <SelectItem value={FILTER_OL}>OL</SelectItem>
                 {positions.map((pos) => (
                   <SelectItem key={pos} value={pos}>
                     {pos}
