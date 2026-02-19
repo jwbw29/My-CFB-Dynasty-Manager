@@ -299,7 +299,7 @@ const AwardTracker: React.FC = () => {
 
             {isTeamAwardSelected && (
               <Select
-                value={selectedTeam}
+                value={selectedTeam || ""}
                 onValueChange={(value: any) => setSelectedTeam(value)}
               >
                 <SelectTrigger>
