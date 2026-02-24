@@ -144,14 +144,13 @@ const TeamStats: React.FC = () => {
   );
 
   // Individual expand/collapse states for each stat category
-  const [isPassingExpanded, setIsPassingExpanded] = useState<boolean>(false);
-  const [isRushingExpanded, setIsRushingExpanded] = useState<boolean>(false);
-  const [isReceivingExpanded, setIsReceivingExpanded] =
-    useState<boolean>(false);
-  const [isTacklesExpanded, setIsTacklesExpanded] = useState<boolean>(false);
-  const [isTFLsExpanded, setIsTFLsExpanded] = useState<boolean>(false);
-  const [isSacksExpanded, setIsSacksExpanded] = useState<boolean>(false);
-  const [isIntsExpanded, setIsIntsExpanded] = useState<boolean>(false);
+  const [isPassingExpanded, setIsPassingExpanded] = useState<boolean>(true);
+  const [isRushingExpanded, setIsRushingExpanded] = useState<boolean>(true);
+  const [isReceivingExpanded, setIsReceivingExpanded] = useState<boolean>(true);
+  const [isTacklesExpanded, setIsTacklesExpanded] = useState<boolean>(true);
+  const [isTFLsExpanded, setIsTFLsExpanded] = useState<boolean>(true);
+  const [isSacksExpanded, setIsSacksExpanded] = useState<boolean>(true);
+  const [isIntsExpanded, setIsIntsExpanded] = useState<boolean>(true);
 
   const [teamLeaders, setTeamLeaders] = useLocalStorage<TeamLeaderStats>(
     `teamLeaders_${currentDynastyId}_${currentYear}`,
