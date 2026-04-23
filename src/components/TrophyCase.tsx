@@ -113,6 +113,7 @@ const TROPHY_CATEGORIES = {
       "R+L Carriers New Orleans Bowl",
       "Reliaquest Bowl",
       "Rose Bowl",
+      "Salute to Veterans Bowl",
       "Scooter’s Coffee Frisco Bowl",
       "Servpro First Responder Bowl",
       "Snoop Dogg Arizona Bowl presented by Gin & Juice by Dre and Snoop",
@@ -216,11 +217,11 @@ const TROPHY_CATEGORIES = {
 const TrophyCase: React.FC = () => {
   const [currentYear] = useLocalStorage<number>(
     "currentYear",
-    new Date().getFullYear()
+    new Date().getFullYear(),
   );
   const [allTrophies, setAllTrophies] = useLocalStorage<Trophy[]>(
     "allTrophies",
-    []
+    [],
   );
   const [isAddFormExpanded, setIsAddFormExpanded] = useState<boolean>(false); // New state for collapsible form
   const [newTrophy, setNewTrophy] = useState<Omit<Trophy, "id" | "year">>({
@@ -312,6 +313,7 @@ const TrophyCase: React.FC = () => {
         "Pop-Tarts Bowl": "bowl",
         "Snoop Dogg Arizona Bowl presented by Gin & Juice by Dre and Snoop":
           "bowl",
+        "Salute to Veterans Bowl": "bowl",
         "Go Bowling Military Bowl": "bowl",
         "Valero Alamo Bowl": "bowl",
         "Radiance Technologies Independence Bowl": "bowl",
@@ -454,7 +456,7 @@ const TrophyCase: React.FC = () => {
     const stats: Record<string, number> = {};
     Object.keys(TROPHY_CATEGORIES).forEach((category) => {
       stats[category] = currentTrophies.filter(
-        (trophy) => trophy.category === category
+        (trophy) => trophy.category === category,
       ).length;
     });
     stats.total = currentTrophies.length;
@@ -468,7 +470,7 @@ const TrophyCase: React.FC = () => {
     const playoffYears = new Set(
       currentTrophies
         .filter((trophy) => trophy.isPlayoffGame === true)
-        .map((trophy) => trophy.year)
+        .map((trophy) => trophy.year),
     );
     return playoffYears.size;
   };
@@ -648,7 +650,7 @@ const TrophyCase: React.FC = () => {
                             {category.name}
                           </div>
                         </SelectItem>
-                      )
+                      ),
                     )}
                   </SelectContent>
                 </Select>
@@ -731,7 +733,7 @@ const TrophyCase: React.FC = () => {
                     <SelectItem value="NONE">No Opponent</SelectItem>
                     {availableTeams.map((team) => {
                       const isCustom = CustomTeamManager.isCustomTeam(
-                        team.name
+                        team.name,
                       );
                       const isFCS = "isFCS" in team && team.isFCS;
                       const rank = getRankForTeam(team.name);
@@ -877,7 +879,7 @@ const TrophyCase: React.FC = () => {
                                     <ConferenceLogo
                                       conference={trophy.type.replace(
                                         " Champions",
-                                        ""
+                                        "",
                                       )}
                                       size="xl"
                                       showFallback={false}
@@ -915,7 +917,7 @@ const TrophyCase: React.FC = () => {
                                     <ConferenceLogo
                                       conference={trophy.type.replace(
                                         " Champions",
-                                        ""
+                                        "",
                                       )}
                                       size="md"
                                       showFallback={false}
@@ -947,7 +949,7 @@ const TrophyCase: React.FC = () => {
                                     <span className={categoryInfo.textColor}>
                                       {(() => {
                                         const rank = getRankForTeam(
-                                          trophy.opponent
+                                          trophy.opponent,
                                         );
                                         return rank
                                           ? `#${rank} ${trophy.opponent}`
@@ -973,7 +975,7 @@ const TrophyCase: React.FC = () => {
                 </div>
               </div>
             );
-          }
+          },
         )}
 
         {/* Empty State - Show only if no trophies at all */}
