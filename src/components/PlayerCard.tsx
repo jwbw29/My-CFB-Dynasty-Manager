@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Trophy, Info, BarChart2, User, StickyNote } from "lucide-react";
+import { Trophy, Info, BarChart2, User, StickyNote, Star } from "lucide-react";
 import {
   getCoachProfile,
   getPlayerStats,
@@ -696,6 +696,10 @@ const PlayerCard: React.FC<PlayerCardProps> = ({ player, isOpen, onClose }) => {
                             ): number => {
                               const name = awardName.toLowerCase();
                               if (name.includes("heisman")) return 0;
+                              // Pre-season checks MUST come before generic all-american/all-conference
+                              // checks because "pre-season all-american" also includes "all-american".
+                              if (name.includes("pre-season all-american") || name.includes("pre-season all american")) return 2.5;
+                              if (name.includes("pre-season all-conference") || name.includes("pre-season all conference")) return 3.5;
                               if (
                                 name.includes("all-american") ||
                                 name.includes("all american")
@@ -706,7 +710,7 @@ const PlayerCard: React.FC<PlayerCardProps> = ({ player, isOpen, onClose }) => {
                                 name.includes("all conference")
                               )
                                 return 3;
-                              return 1; // Other awards (Maxwell, Doak Walker, etc.)
+                              return 1;
                             };
 
                             // Helper function to format award display name
@@ -799,6 +803,7 @@ const PlayerCard: React.FC<PlayerCardProps> = ({ player, isOpen, onClose }) => {
                                 award.team
                               );
                               const name = award.awardName.toLowerCase();
+                              const isPreSeason = name.includes("pre-season");
                               const showTeamBadge =
                                 award.team &&
                                 !name.includes("all-american") &&
@@ -806,38 +811,56 @@ const PlayerCard: React.FC<PlayerCardProps> = ({ player, isOpen, onClose }) => {
                                 !name.includes("all-conference") &&
                                 !name.includes("all conference");
 
+                              const IconComponent = isPreSeason ? Star : Trophy;
+
                               return (
                                 <div
                                   key={index}
-                                  className="bg-white rounded-lg border-2 border-yellow-300 shadow-md hover:shadow-lg transition-all hover:border-yellow-400"
+                                  className={`bg-white dark:bg-gray-800 rounded-lg border-2 shadow-md hover:shadow-lg transition-all ${
+                                    isPreSeason
+                                      ? "border-blue-300 hover:border-blue-400 dark:border-blue-600 dark:hover:border-blue-500"
+                                      : "border-yellow-300 hover:border-yellow-400 dark:border-yellow-600 dark:hover:border-yellow-500"
+                                  }`}
                                 >
                                   <div className="p-5">
                                     <div className="flex items-start gap-3 mb-3">
                                       <div className="flex-shrink-0">
-                                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-yellow-400 to-amber-500 flex items-center justify-center shadow">
-                                          <Trophy className="h-5 w-5 text-white" />
+                                        <div className={`w-10 h-10 rounded-full flex items-center justify-center shadow ${
+                                          isPreSeason
+                                            ? "bg-gradient-to-br from-blue-400 to-indigo-500"
+                                            : "bg-gradient-to-br from-yellow-400 to-amber-500"
+                                        }`}>
+                                          <IconComponent className="h-5 w-5 text-white" />
                                         </div>
                                       </div>
                                       <div className="flex-1 min-w-0">
-                                        <h3 className="font-bold text-gray-900 text-base leading-tight">
+                                        <h3 className="font-bold text-gray-900 dark:text-gray-100 text-base leading-tight">
                                           {displayName}
                                         </h3>
                                         {showTeamBadge && (
                                           <Badge
                                             variant="secondary"
-                                            className="mt-1.5 text-xs bg-yellow-100 text-yellow-900 border-yellow-300"
+                                            className={`mt-1.5 text-xs ${
+                                              isPreSeason
+                                                ? "bg-blue-100 text-blue-900 border-blue-300 dark:bg-blue-900 dark:text-blue-200 dark:border-blue-700"
+                                                : "bg-yellow-100 text-yellow-900 border-yellow-300 dark:bg-yellow-900 dark:text-yellow-200 dark:border-yellow-700"
+                                            }`}
                                           >
                                             {award.team}
                                           </Badge>
                                         )}
                                       </div>
                                     </div>
-                                    <div className="mt-3 pt-3 border-t border-gray-200">
+                                    <div className={`mt-3 pt-3 border-t ${
+                                      isPreSeason
+                                        ? "border-blue-200 dark:border-blue-700"
+                                        : "border-gray-200 dark:border-gray-700"
+                                    }`}>
                                       <div className="text-center">
-                                        <div className="text-xl font-bold text-gray-900">
+                                        <div className="text-xl font-bold text-gray-900 dark:text-gray-100">
                                           {award.years.join(", ")}
                                         </div>
-                                        <div className="text-xs text-gray-500 mt-1 uppercase tracking-wide">
+                                        <div className="text-xs text-gray-500 dark:text-gray-400 mt-1 uppercase tracking-wide">
                                           {award.years.length === 1
                                             ? "1 time"
                                             : `${award.years.length} times`}
