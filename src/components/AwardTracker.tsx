@@ -17,7 +17,9 @@ import {
 import {
   Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
+  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
@@ -47,6 +49,10 @@ import { HeroHeader } from "@/components/ui/HeroHeader";
 const predefinedAwards = [
   "All-American",
   "All-Conference",
+  // Pre-season variants are tracked separately from post-season awards so they
+  // can receive distinct priority sorting and visual treatment on the PlayerCard.
+  "Pre-Season All-American",
+  "Pre-Season All-Conference",
   "Bear Bryant Coach of the Year Award",
   "Biletnikoff Award",
   "Bronco Nagurksi Trophy",
@@ -71,7 +77,12 @@ const predefinedAwards = [
   "Walter Camp Award",
 ];
 
-const teamAwards = ["All-American", "All-Conference"];
+const teamAwards = [
+  "All-American",
+  "All-Conference",
+  "Pre-Season All-American",
+  "Pre-Season All-Conference",
+];
 
 const AwardTracker: React.FC = () => {
   const [currentYear] = useLocalStorage<number>(
@@ -289,11 +300,34 @@ const AwardTracker: React.FC = () => {
                 <SelectValue placeholder="Select Award" />
               </SelectTrigger>
               <SelectContent>
-                {predefinedAwards.map((award) => (
-                  <SelectItem key={award} value={award}>
-                    {award}
-                  </SelectItem>
-                ))}
+                <SelectGroup>
+                  <SelectLabel>Post-Season Awards</SelectLabel>
+                  <SelectItem value="All-American">All-American</SelectItem>
+                  <SelectItem value="All-Conference">All-Conference</SelectItem>
+                </SelectGroup>
+                <SelectGroup>
+                  <SelectLabel>Pre-Season Awards</SelectLabel>
+                  <SelectItem value="Pre-Season All-American">Pre-Season All-American</SelectItem>
+                  <SelectItem value="Pre-Season All-Conference">Pre-Season All-Conference</SelectItem>
+                </SelectGroup>
+                <SelectGroup>
+                  <SelectLabel>Named Awards</SelectLabel>
+                  {predefinedAwards
+                    .filter(
+                      (award) =>
+                        !["All-American", "All-Conference", "Pre-Season All-American", "Pre-Season All-Conference", "Bear Bryant Coach of the Year Award", "Broyles Award"].includes(award)
+                    )
+                    .map((award) => (
+                      <SelectItem key={award} value={award}>
+                        {award}
+                      </SelectItem>
+                    ))}
+                </SelectGroup>
+                <SelectGroup>
+                  <SelectLabel>Coaching Awards</SelectLabel>
+                  <SelectItem value="Bear Bryant Coach of the Year Award">Bear Bryant Coach of the Year Award</SelectItem>
+                  <SelectItem value="Broyles Award">Broyles Award</SelectItem>
+                </SelectGroup>
               </SelectContent>
             </Select>
 
@@ -349,6 +383,11 @@ const AwardTracker: React.FC = () => {
                     {award.playerName}
                   </TableCell>
                   <TableCell className="text-center">
+                    {award.awardName.toLowerCase().includes("pre-season") && (
+                      <span className="mr-1.5 inline-flex items-center rounded-full bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-700 dark:bg-blue-900 dark:text-blue-300">
+                        Pre-Season
+                      </span>
+                    )}
                     {award.awardName}
                     {award.team && (
                       <span className="ml-2 font-semibold text-gray-600 dark:text-gray-400">
