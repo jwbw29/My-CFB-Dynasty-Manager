@@ -10,7 +10,15 @@ import {
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Trophy, Info, BarChart2, User, StickyNote, Star } from "lucide-react";
+import {
+  Trophy,
+  Info,
+  BarChart2,
+  User,
+  StickyNote,
+  Star,
+  Award as AwardIcon,
+} from "lucide-react";
 import {
   getCoachProfile,
   getPlayerStats,
@@ -23,6 +31,7 @@ import { PlayerStat } from "@/types/playerStats";
 import { Recruit, Transfer } from "@/types/playerTypes";
 import { TeamLeaderStats, PlayerLeaderStat } from "@/types/yearRecord";
 import { useDynasty } from "@/contexts/DynastyContext";
+import { isWeeklyAward, getWeeklyAwardPriority } from "@/utils/weeklyAwardUtils";
 
 // Extended Player interface to include optional properties that may exist in roster
 interface ExtendedPlayer {
@@ -710,6 +719,9 @@ const PlayerCard: React.FC<PlayerCardProps> = ({ player, isOpen, onClose }) => {
                                 name.includes("all conference")
                               )
                                 return 3;
+                              // Weekly Player of the Week awards sort below season awards.
+                              if (name.endsWith("player of the week"))
+                                return getWeeklyAwardPriority(awardName);
                               return 1;
                             };
 
@@ -741,18 +753,34 @@ const PlayerCard: React.FC<PlayerCardProps> = ({ player, isOpen, onClose }) => {
                             // Group awards by award name (including team designation)
                             const awardsByName = playerAwards.reduce(
                               (acc, award) => {
-                                const key = award.team
+                                // Weekly awards are grouped by award name only so all week occurrences
+                                // for a given weekly title can be displayed together by year/week.
+                                const weekly = isWeeklyAward(award);
+                                const key = weekly
+                                  ? award.awardName
+                                  : award.team
                                   ? `${award.awardName}|${award.team}`
                                   : award.awardName;
 
                                 if (!acc[key]) {
                                   acc[key] = {
                                     awardName: award.awardName,
-                                    team: award.team,
+                                    team: weekly ? undefined : award.team,
                                     years: [],
+                                    weekOccurrences: weekly ? [] : undefined,
                                   };
                                 }
+
+                                // Keep years populated for count compatibility with existing seasonal logic.
                                 acc[key].years.push(award.year);
+
+                                if (weekly && award.week !== undefined) {
+                                  acc[key].weekOccurrences?.push({
+                                    year: award.year,
+                                    week: award.week,
+                                  });
+                                }
+
                                 return acc;
                               },
                               {} as Record<
@@ -761,6 +789,7 @@ const PlayerCard: React.FC<PlayerCardProps> = ({ player, isOpen, onClose }) => {
                                   awardName: string;
                                   team?: string;
                                   years: number[];
+                                  weekOccurrences?: { year: number; week: number }[];
                                 }
                               >
                             );
@@ -804,6 +833,10 @@ const PlayerCard: React.FC<PlayerCardProps> = ({ player, isOpen, onClose }) => {
                               );
                               const name = award.awardName.toLowerCase();
                               const isPreSeason = name.includes("pre-season");
+                              // Weekly awards are identified by saved week/year occurrences from reducer grouping.
+                              const isWeekly =
+                                award.weekOccurrences !== undefined &&
+                                award.weekOccurrences.length > 0;
                               const showTeamBadge =
                                 award.team &&
                                 !name.includes("all-american") &&
@@ -811,13 +844,46 @@ const PlayerCard: React.FC<PlayerCardProps> = ({ player, isOpen, onClose }) => {
                                 !name.includes("all-conference") &&
                                 !name.includes("all conference");
 
-                              const IconComponent = isPreSeason ? Star : Trophy;
+                              // Weekly awards intentionally use a distinct icon and green palette to avoid
+                              // visual overlap with seasonal gold and pre-season blue treatments.
+                              const IconComponent = isWeekly
+                                ? AwardIcon
+                                : isPreSeason
+                                ? Star
+                                : Trophy;
+
+                              // Weekly display format groups weeks by season year for compact readability:
+                              // "2024: Wk 3, 7 | 2025: Wk 2"
+                              let weeklyDisplayText = "";
+                              let weeklyCount = 0;
+                              if (isWeekly) {
+                                const byYear = new Map<number, number[]>();
+                                award.weekOccurrences?.forEach(({ year, week }) => {
+                                  if (!byYear.has(year)) byYear.set(year, []);
+                                  byYear.get(year)!.push(week);
+                                });
+
+                                const yearEntries = [...byYear.entries()].sort(
+                                  ([a], [b]) => a - b
+                                );
+                                weeklyDisplayText = yearEntries
+                                  .map(
+                                    ([year, weeks]) =>
+                                      `${year}: Wk ${weeks
+                                        .sort((a, b) => a - b)
+                                        .join(", ")}`
+                                  )
+                                  .join(" | ");
+                                weeklyCount = award.weekOccurrences?.length || 0;
+                              }
 
                               return (
                                 <div
                                   key={index}
                                   className={`bg-white dark:bg-gray-800 rounded-lg border-2 shadow-md hover:shadow-lg transition-all ${
-                                    isPreSeason
+                                    isWeekly
+                                      ? "border-green-300 hover:border-green-400 dark:border-green-600 dark:hover:border-green-500"
+                                      : isPreSeason
                                       ? "border-blue-300 hover:border-blue-400 dark:border-blue-600 dark:hover:border-blue-500"
                                       : "border-yellow-300 hover:border-yellow-400 dark:border-yellow-600 dark:hover:border-yellow-500"
                                   }`}
@@ -826,7 +892,9 @@ const PlayerCard: React.FC<PlayerCardProps> = ({ player, isOpen, onClose }) => {
                                     <div className="flex items-start gap-3 mb-3">
                                       <div className="flex-shrink-0">
                                         <div className={`w-10 h-10 rounded-full flex items-center justify-center shadow ${
-                                          isPreSeason
+                                          isWeekly
+                                            ? "bg-gradient-to-br from-green-400 to-emerald-500"
+                                            : isPreSeason
                                             ? "bg-gradient-to-br from-blue-400 to-indigo-500"
                                             : "bg-gradient-to-br from-yellow-400 to-amber-500"
                                         }`}>
@@ -841,7 +909,9 @@ const PlayerCard: React.FC<PlayerCardProps> = ({ player, isOpen, onClose }) => {
                                           <Badge
                                             variant="secondary"
                                             className={`mt-1.5 text-xs ${
-                                              isPreSeason
+                                              isWeekly
+                                                ? "bg-green-100 text-green-900 border-green-300 dark:bg-green-900 dark:text-green-200 dark:border-green-700"
+                                                : isPreSeason
                                                 ? "bg-blue-100 text-blue-900 border-blue-300 dark:bg-blue-900 dark:text-blue-200 dark:border-blue-700"
                                                 : "bg-yellow-100 text-yellow-900 border-yellow-300 dark:bg-yellow-900 dark:text-yellow-200 dark:border-yellow-700"
                                             }`}
@@ -852,18 +922,28 @@ const PlayerCard: React.FC<PlayerCardProps> = ({ player, isOpen, onClose }) => {
                                       </div>
                                     </div>
                                     <div className={`mt-3 pt-3 border-t ${
-                                      isPreSeason
+                                      isWeekly
+                                        ? "border-green-200 dark:border-green-700"
+                                        : isPreSeason
                                         ? "border-blue-200 dark:border-blue-700"
                                         : "border-gray-200 dark:border-gray-700"
                                     }`}>
                                       <div className="text-center">
                                         <div className="text-xl font-bold text-gray-900 dark:text-gray-100">
-                                          {award.years.join(", ")}
+                                          {isWeekly
+                                            ? weeklyDisplayText
+                                            : award.years.join(", ")}
                                         </div>
                                         <div className="text-xs text-gray-500 dark:text-gray-400 mt-1 uppercase tracking-wide">
-                                          {award.years.length === 1
+                                          {(isWeekly
+                                            ? weeklyCount
+                                            : award.years.length) === 1
                                             ? "1 time"
-                                            : `${award.years.length} times`}
+                                            : `${
+                                                isWeekly
+                                                  ? weeklyCount
+                                                  : award.years.length
+                                              } times`}
                                         </div>
                                       </div>
                                     </div>
