@@ -39,7 +39,10 @@ import {
   isTeamUserControlled,
   getUsernameForTeam,
   saveUserTeamMappingsForYear,
+  getGameStats,
+  hasGameStatsForYear,
 } from "@/utils/localStorage";
+import { accumulateGameStats } from "@/utils/accumulateGameStats";
 import useLocalStorage from "@/hooks/useLocalStorage";
 import { validateYear } from "@/utils/validationUtils";
 import { toast } from "react-hot-toast";
@@ -309,6 +312,15 @@ const TeamHome: React.FC = () => {
   const statLeaders = useMemo<StatLeaders>(() => {
     if (typeof window === "undefined") return {};
     try {
+      // Use computed leaders from per-game stats when available, else fall back to manual teamLeaders
+      const leadersSource = (() => {
+        if (currentDynastyId && hasGameStatsForYear(currentDynastyId, currentYear)) {
+          const gameStats = getGameStats(currentDynastyId, currentYear);
+          return accumulateGameStats(gameStats);
+        }
+        return teamLeaders;
+      })();
+
       // Calculate games played for per-game averages
       const gamesPlayed = currentSchedule.filter(
         (g) => g.result !== "N/A" && g.result !== "Bye" && g.opponent !== "BYE"
@@ -328,13 +340,13 @@ const TeamHome: React.FC = () => {
           )[0];
       };
 
-      const passingLeader = getTopLeader(teamLeaders.passingLeaders, "yards");
-      const rushingLeader = getTopLeader(teamLeaders.rushingLeaders, "yards");
+      const passingLeader = getTopLeader(leadersSource.passingLeaders, "yards");
+      const rushingLeader = getTopLeader(leadersSource.rushingLeaders, "yards");
       const receivingLeader = getTopLeader(
-        teamLeaders.receivingLeaders,
+        leadersSource.receivingLeaders,
         "yards"
       );
-      const tacklesLeader = getTopLeader(teamLeaders.tackleLeaders, "total");
+      const tacklesLeader = getTopLeader(leadersSource.tackleLeaders, "total");
 
       // Calculate per-game averages
       return {
@@ -379,7 +391,7 @@ const TeamHome: React.FC = () => {
       console.error("Error parsing teamLeaders for leaders:", error);
       return {};
     }
-  }, [teamLeaders, currentSchedule]);
+  }, [teamLeaders, currentSchedule, currentDynastyId, currentYear]);
 
   const locationRecords = useMemo<{
     home: LocationRecord;

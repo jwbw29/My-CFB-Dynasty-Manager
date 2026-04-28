@@ -25,7 +25,10 @@ import {
   getAllRecruits,
   getAllTransfers,
   getAllYearRecords,
+  getGameStats,
+  hasGameStatsForYear,
 } from "@/utils/localStorage";
+import { accumulateGameStats } from "@/utils/accumulateGameStats";
 import { Award } from "@/types/statTypes";
 import { PlayerStat } from "@/types/playerStats";
 import { Recruit, Transfer } from "@/types/playerTypes";
@@ -112,14 +115,32 @@ const PlayerCard: React.FC<PlayerCardProps> = ({ player, isOpen, onClose }) => {
       allYearRecords.forEach((yearRecord) => {
         const year = yearRecord.year;
 
-        // Try to load team leaders for this year
-        const teamLeadersKey = `teamLeaders_${currentDynastyId}_${year}`;
-        const teamLeadersData = localStorage.getItem(teamLeadersKey);
+        // Dual-read path: check if per-game stats exist for this year
+        // If yes, compute team leaders from accumulated game stats
+        // If no, fall back to reading manually-entered teamLeaders from localStorage
+        let teamLeaders: TeamLeaderStats | null = null;
 
-        if (teamLeadersData) {
+        if (hasGameStatsForYear(currentDynastyId, year)) {
+          // Compute leaders from per-game stats
+          const gameStats = getGameStats(currentDynastyId, year);
+          teamLeaders = accumulateGameStats(gameStats);
+        } else {
+          // Fallback: load team leaders from localStorage (for seasons without per-game data)
+          const teamLeadersKey = `teamLeaders_${currentDynastyId}_${year}`;
+          const teamLeadersData = localStorage.getItem(teamLeadersKey);
+
+          if (teamLeadersData) {
+            try {
+              teamLeaders = JSON.parse(teamLeadersData);
+            } catch (e) {
+              console.error(`Error parsing team leaders for year ${year}:`, e);
+            }
+          }
+        }
+
+        // If we have team leaders (from either source), extract this player's stats
+        if (teamLeaders) {
           try {
-            const teamLeaders: TeamLeaderStats = JSON.parse(teamLeadersData);
-
             // Check passing leaders
             const passingLeader = teamLeaders.passingLeaders?.find(
               (leader) => leader.name === player.name
@@ -201,7 +222,7 @@ const PlayerCard: React.FC<PlayerCardProps> = ({ player, isOpen, onClose }) => {
               });
             }
           } catch (e) {
-            console.error(`Error parsing team leaders for year ${year}:`, e);
+            console.error(`Error processing team leaders for year ${year}:`, e);
           }
         }
       });
