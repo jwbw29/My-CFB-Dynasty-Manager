@@ -340,7 +340,8 @@ export const GameStatsModal: React.FC<GameStatsModalProps> = ({
               <TabsContent
                 key={category}
                 value={category}
-                className="flex flex-col w-full space-y-4 mt-4"
+                forceMount
+                className="flex flex-col w-full space-y-4 mt-4 data-[state=inactive]:hidden"
               >
                 {/* Add Player Stats Button */}
                 <div className="flex justify-end items-center">
