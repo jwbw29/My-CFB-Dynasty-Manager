@@ -29,6 +29,7 @@ import {
   getCoachProfile,
   getUserForTeam,
   getUsers,
+  getGameStats,
 } from "@/utils/localStorage";
 import { getTeamData } from "@/utils/fbsTeams";
 import { fcsTeams } from "@/utils/fcsTeams";
@@ -39,12 +40,27 @@ import {
   TrendingDown,
   Minus,
   Calendar,
+  BarChart2,
 } from "lucide-react";
 import { CustomTeamManager } from "@/utils/customTeamManager";
-import { useDynasty } from "@/contexts/DynastyContext"; // <-- IMPORT CONTEXT HOOK
+import { useDynasty } from "@/contexts/DynastyContext";
 import { Game } from "@/types/yearRecord";
+import { Button } from "@/components/ui/button";
+import { GameStatsModal } from "@/components/GameStatsModal";
+import useLocalStorage from "@/hooks/useLocalStorage";
 
 type UpdateableField = "location" | "opponent" | "result" | "score";
+
+interface RosterPlayer {
+  id: number;
+  name: string;
+  position: string;
+  jerseyNumber: string;
+  year: string;
+  rating: string;
+  devTrait?: string;
+  notes?: string;
+}
 
 const getWeekDisplayName = (weekNumber: number): string => {
   switch (weekNumber) {
@@ -70,7 +86,9 @@ interface GameRowProps {
   availableTeams: any[];
   onUpdateGame: (week: number, field: UpdateableField, value: any) => void;
   getRankForTeam: (teamName: string, week: number) => number | null;
-  teamUsernameMap: Map<string, string>; // <-- Memoized username lookup
+  teamUsernameMap: Map<string, string>;
+  onOpenStats?: (week: number) => void;
+  hasStats?: boolean;
 }
 
 const GameRow = React.memo(
@@ -80,6 +98,8 @@ const GameRow = React.memo(
     onUpdateGame,
     getRankForTeam,
     teamUsernameMap,
+    onOpenStats,
+    hasStats,
   }: GameRowProps) => {
     const [localTeamScore, setLocalTeamScore] = useState("");
     const [localOppScore, setLocalOppScore] = useState("");
@@ -308,6 +328,27 @@ const GameRow = React.memo(
             className="h-8 text-center w-20"
           />
         </div>
+        <div className="flex items-center justify-center">
+          {(game.result === "Win" ||
+            game.result === "Loss" ||
+            game.result === "Tie") && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => onOpenStats?.(game.week)}
+              className="h-8 w-8 p-0"
+              title={hasStats ? "View Stats" : "Enter Stats"}
+            >
+              <BarChart2
+                className={`h-4 w-4 ${
+                  hasStats
+                    ? "text-green-500 dark:text-green-400"
+                    : "text-gray-400 dark:text-gray-600"
+                }`}
+              />
+            </Button>
+          )}
+        </div>
       </div>
     );
   }
@@ -322,9 +363,21 @@ const SchedulePage = () => {
   const [isSaving, setIsSaving] = useState(false);
   const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
+  const [selectedGameWeek, setSelectedGameWeek] = useState<number | null>(null);
+  const [gameStatsExist, setGameStatsExist] = useState<Record<number, boolean>>(
+    {}
+  );
+
+  const [rosterPlayers] = useLocalStorage<RosterPlayer[]>("players", []);
+
   // --- GET GLOBAL STATE AND ACTIONS FROM CONTEXT ---
-  const { dataVersion, activeWeek, setActiveWeek, getRankingsForWeek } =
-    useDynasty();
+  const {
+    dataVersion,
+    activeWeek,
+    setActiveWeek,
+    getRankingsForWeek,
+    currentDynastyId,
+  } = useDynasty();
 
   const scheduleRef = useRef<Game[]>(currentSchedule);
   useEffect(() => {
@@ -495,6 +548,20 @@ const SchedulePage = () => {
   useEffect(() => {
     rankingsMapsCache.current.clear();
   }, [currentYear, dataVersion]);
+
+  const refreshGameStatsIndicators = useCallback(() => {
+    if (!currentDynastyId) return;
+    const data = getGameStats(currentDynastyId, currentYear);
+    const existMap: Record<number, boolean> = {};
+    currentSchedule.forEach((game) => {
+      existMap[game.week] = !!(data[game.week] && data[game.week].length > 0);
+    });
+    setGameStatsExist(existMap);
+  }, [currentDynastyId, currentYear, currentSchedule]);
+
+  useEffect(() => {
+    refreshGameStatsIndicators();
+  }, [refreshGameStatsIndicators]);
 
   const handleUpdateGame = useCallback(
     (week: number, field: UpdateableField, value: any) => {
@@ -700,7 +767,7 @@ const SchedulePage = () => {
             <div>Opponent</div>
             <div>Result</div>
             <div>Score</div>
-            <div></div>
+            <div className="text-center">Stats</div>
           </div>
 
           <div className="grid grid-cols-1 gap-1">
@@ -712,6 +779,8 @@ const SchedulePage = () => {
                 onUpdateGame={handleUpdateGame}
                 getRankForTeam={getRankForTeam}
                 teamUsernameMap={teamUsernameMap}
+                onOpenStats={(week) => setSelectedGameWeek(week)}
+                hasStats={gameStatsExist[game.week] || false}
               />
             ))}
           </div>
@@ -726,6 +795,26 @@ const SchedulePage = () => {
             <span className="text-sm">Saving changes...</span>
           </div>
         </div>
+      )}
+
+      {selectedGameWeek !== null && (
+        <GameStatsModal
+          open={selectedGameWeek !== null}
+          onOpenChange={(open) => {
+            if (!open) {
+              setSelectedGameWeek(null);
+              refreshGameStatsIndicators();
+            }
+          }}
+          gameWeek={selectedGameWeek}
+          opponent={
+            currentSchedule.find((g) => g.week === selectedGameWeek)
+              ?.opponent || ""
+          }
+          rosterPlayers={rosterPlayers}
+          dynastyId={currentDynastyId || ""}
+          currentYear={currentYear}
+        />
       )}
     </div>
   );

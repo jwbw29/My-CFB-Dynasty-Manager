@@ -45,6 +45,8 @@ import { ScrollArea } from "./ui/scroll-area";
 import { HeroHeader } from "@/components/ui/HeroHeader";
 import { fbsTeams } from "@/utils/fbsTeams";
 import { positions } from "@/types/playerTypes";
+import { getGameStats, hasGameStatsForYear } from "@/utils/localStorage";
+import { accumulateGameStats, getGamesPlayedByPlayer } from "@/utils/accumulateGameStats";
 
 // Conference list
 const conferences = [
@@ -121,7 +123,7 @@ interface RosterPlayer {
 }
 
 const TeamStats: React.FC = () => {
-  const { currentDynastyId } = useDynasty();
+  const { currentDynastyId, dataVersion } = useDynasty();
   const [currentYear] = useLocalStorage<number>(
     "currentYear",
     new Date().getFullYear(),
@@ -164,6 +166,22 @@ const TeamStats: React.FC = () => {
       intLeaders: [],
     },
   );
+
+  // Determine if per-game stats exist for this season — controls computed vs manual mode
+  const hasPerGameStats = useMemo(() => {
+    if (!currentDynastyId) return false;
+    return hasGameStatsForYear(currentDynastyId, currentYear);
+  }, [currentDynastyId, currentYear, dataVersion]); // dataVersion ensures re-check after modal saves
+
+  // When per-game stats exist, compute leaders from accumulated game data
+  const computedLeaders = useMemo<TeamLeaderStats | null>(() => {
+    if (!hasPerGameStats || !currentDynastyId) return null;
+    const gameStats = getGameStats(currentDynastyId, currentYear);
+    return accumulateGameStats(gameStats);
+  }, [hasPerGameStats, currentDynastyId, currentYear, dataVersion]);
+
+  // The leaders to display — computed from per-game stats or manual from localStorage
+  const displayLeaders: TeamLeaderStats = computedLeaders ?? teamLeaders;
 
   // Persistent sorting state per category
   const [sortConfigs, setSortConfigs] = useLocalStorage<
@@ -298,6 +316,7 @@ const TeamStats: React.FC = () => {
       field: keyof PlayerLeaderStat,
       value: string,
     ) => {
+      if (hasPerGameStats) return;
       setTeamLeaders((prev) => {
         const leaders = [...(prev[category] || [])];
         if (!leaders[index]) {
@@ -316,21 +335,23 @@ const TeamStats: React.FC = () => {
         };
       });
     },
-    [setTeamLeaders],
+    [setTeamLeaders, hasPerGameStats],
   );
 
   const addLeaderRow = useCallback(
     (category: keyof TeamLeaderStats) => {
+      if (hasPerGameStats) return;
       setTeamLeaders((prev) => ({
         ...prev,
         [category]: [...(prev[category] || []), { name: "" }],
       }));
     },
-    [setTeamLeaders],
+    [setTeamLeaders, hasPerGameStats],
   );
 
   const removeLeaderRow = useCallback(
     (category: keyof TeamLeaderStats, index: number) => {
+      if (hasPerGameStats) return;
       setTeamLeaders((prev) => {
         const leaders = [...(prev[category] || [])];
         leaders.splice(index, 1);
@@ -340,7 +361,7 @@ const TeamStats: React.FC = () => {
         };
       });
     },
-    [setTeamLeaders],
+    [setTeamLeaders, hasPerGameStats],
   );
 
   const formatNumber = (num: number, decimals: number = 1): string => {
@@ -368,7 +389,16 @@ const TeamStats: React.FC = () => {
       sortField = "";
     }
 
-    // Apply sorting immediately to the team leaders data
+    // In computed mode, only update sort config — don't write to teamLeaders
+    if (hasPerGameStats) {
+      setSortConfigs((prev) => ({
+        ...prev,
+        [category]: { field: sortField, direction },
+      }));
+      return;
+    }
+
+    // Manual mode: apply sorting immediately to the team leaders data
     const leaders = teamLeaders[category] || [];
     let sortedLeaders = [...leaders];
 
@@ -385,7 +415,7 @@ const TeamStats: React.FC = () => {
           bVal = (b.yards || 0) / (b.carries || 1);
         } else if (sortField === "ypc_receiving") {
           aVal = (a.yards || 0) / (a.receptions || 1);
-          bVal = (b.yards || 0) / (b.receptions || 1);
+          bVal = (b.yards || 0) / (a.receptions || 1);
         } else if (sortField === "per_game") {
           aVal = (a.total || 0) / effectiveGamesPlayed;
           bVal = (b.total || 0) / effectiveGamesPlayed;
@@ -423,8 +453,44 @@ const TeamStats: React.FC = () => {
   };
 
   const getSortedLeaders = (category: keyof TeamLeaderStats) => {
-    // Simply return the leaders as they are - sorting is handled by handleSort
-    return teamLeaders[category] || [];
+    const leaders = displayLeaders[category] || [];
+    const config = sortConfigs[category];
+    if (!config?.field) return leaders;
+
+    return [...leaders].sort((a, b) => {
+      let aVal, bVal;
+      const field = config.field;
+
+      if (field === "ypg") {
+        aVal = (a.yards || 0) / effectiveGamesPlayed;
+        bVal = (b.yards || 0) / effectiveGamesPlayed;
+      } else if (field === "ypc_rushing") {
+        aVal = (a.yards || 0) / (a.carries || 1);
+        bVal = (b.yards || 0) / (b.carries || 1);
+      } else if (field === "ypc_receiving") {
+        aVal = (a.yards || 0) / (a.receptions || 1);
+        bVal = (b.yards || 0) / (a.receptions || 1);
+      } else if (field === "per_game") {
+        aVal = (a.total || 0) / effectiveGamesPlayed;
+        bVal = (b.total || 0) / effectiveGamesPlayed;
+      } else {
+        aVal = a[field as keyof PlayerLeaderStat];
+        bVal = b[field as keyof PlayerLeaderStat];
+      }
+
+      if (field === "name") {
+        const aStr = (aVal as string) || "";
+        const bStr = (bVal as string) || "";
+        return config.direction === "asc"
+          ? aStr.localeCompare(bStr)
+          : bStr.localeCompare(aStr);
+      }
+
+      const aNum = Number(aVal) || 0;
+      const bNum = Number(bVal) || 0;
+
+      return config.direction === "asc" ? aNum - bNum : bNum - aNum;
+    });
   };
 
   const renderSortIcon = (category: keyof TeamLeaderStats, field: string) => {
@@ -1117,6 +1183,11 @@ const TeamStats: React.FC = () => {
             </CardHeader>
 
             <CardContent className="w-full px-24">
+              {hasPerGameStats && (
+                <div className="mb-4 p-3 rounded-lg bg-blue-500/10 border border-blue-500/30 text-blue-400 text-sm">
+                  Team Leaders are automatically calculated from per-game stats entered in the Schedule.
+                </div>
+              )}
               <div className="space-y-6">
                 {/* Passing Leaders */}
                 <Card className="border-2 border-gray-200 dark:border-gray-700 shadow-xl overflow-hidden">
@@ -1214,6 +1285,7 @@ const TeamStats: React.FC = () => {
                                         value,
                                       )
                                     }
+                                    disabled={hasPerGameStats}
                                   >
                                     <SelectTrigger>
                                       <SelectValue placeholder="Select Player" />
@@ -1244,6 +1316,7 @@ const TeamStats: React.FC = () => {
                                       )
                                     }
                                     className="text-center mx-auto"
+                                    disabled={hasPerGameStats}
                                   />
                                 </TableCell>
                                 <TableCell>
@@ -1260,6 +1333,7 @@ const TeamStats: React.FC = () => {
                                       )
                                     }
                                     className="text-center mx-auto"
+                                    disabled={hasPerGameStats}
                                   />
                                 </TableCell>
                                 <TableCell>
@@ -1275,6 +1349,7 @@ const TeamStats: React.FC = () => {
                                       )
                                     }
                                     className="text-center mx-auto"
+                                    disabled={hasPerGameStats}
                                   />
                                 </TableCell>
                                 <TableCell>
@@ -1290,6 +1365,7 @@ const TeamStats: React.FC = () => {
                                       )
                                     }
                                     className="text-center mx-auto"
+                                    disabled={hasPerGameStats}
                                   />
                                 </TableCell>
                                 <TableCell className="bg-gray-100 dark:bg-gray-800">
@@ -1298,27 +1374,31 @@ const TeamStats: React.FC = () => {
                                   )}
                                 </TableCell>
                                 <TableCell>
-                                  <button
-                                    onClick={() =>
-                                      removeLeaderRow("passingLeaders", index)
-                                    }
-                                    className="text-red-600 hover:text-red-800 text-sm px-2 py-1 rounded"
-                                    title="Remove Player"
-                                  >
-                                    ✕
-                                  </button>
+                                  {!hasPerGameStats && (
+                                    <button
+                                      onClick={() =>
+                                        removeLeaderRow("passingLeaders", index)
+                                      }
+                                      className="text-red-600 hover:text-red-800 text-sm px-2 py-1 rounded"
+                                      title="Remove Player"
+                                    >
+                                      ✕
+                                    </button>
+                                  )}
                                 </TableCell>
                               </TableRow>
                             ),
                           )}
                           <TableRow>
                             <TableCell colSpan={7}>
-                              <button
-                                onClick={() => addLeaderRow("passingLeaders")}
-                                className="text-blue-600 hover:text-blue-800 text-sm"
-                              >
-                                + Add Player
-                              </button>
+                              {!hasPerGameStats && (
+                                <button
+                                  onClick={() => addLeaderRow("passingLeaders")}
+                                  className="text-blue-600 hover:text-blue-800 text-sm"
+                                >
+                                  + Add Player
+                                </button>
+                              )}
                             </TableCell>
                           </TableRow>
                         </TableBody>
@@ -1419,6 +1499,7 @@ const TeamStats: React.FC = () => {
                                         value,
                                       )
                                     }
+                                    disabled={hasPerGameStats}
                                   >
                                     <SelectTrigger>
                                       <SelectValue placeholder="Select Player" />
@@ -1449,6 +1530,7 @@ const TeamStats: React.FC = () => {
                                       )
                                     }
                                     className="text-center mx-auto"
+                                    disabled={hasPerGameStats}
                                   />
                                 </TableCell>
                                 <TableCell>
@@ -1464,6 +1546,7 @@ const TeamStats: React.FC = () => {
                                       )
                                     }
                                     className="text-center mx-auto"
+                                    disabled={hasPerGameStats}
                                   />
                                 </TableCell>
                                 <TableCell>
@@ -1479,6 +1562,7 @@ const TeamStats: React.FC = () => {
                                       )
                                     }
                                     className="text-center mx-auto"
+                                    disabled={hasPerGameStats}
                                   />
                                 </TableCell>
                                 <TableCell className="bg-gray-100 dark:bg-gray-800">
@@ -1492,27 +1576,31 @@ const TeamStats: React.FC = () => {
                                   )}
                                 </TableCell>
                                 <TableCell>
-                                  <button
-                                    onClick={() =>
-                                      removeLeaderRow("rushingLeaders", index)
-                                    }
-                                    className="text-red-600 hover:text-red-800 text-sm px-2 py-1 rounded"
-                                    title="Remove Player"
-                                  >
-                                    ✕
-                                  </button>
+                                  {!hasPerGameStats && (
+                                    <button
+                                      onClick={() =>
+                                        removeLeaderRow("rushingLeaders", index)
+                                      }
+                                      className="text-red-600 hover:text-red-800 text-sm px-2 py-1 rounded"
+                                      title="Remove Player"
+                                    >
+                                      ✕
+                                    </button>
+                                  )}
                                 </TableCell>
                               </TableRow>
                             ),
                           )}
                           <TableRow>
                             <TableCell colSpan={7}>
-                              <button
-                                onClick={() => addLeaderRow("rushingLeaders")}
-                                className="text-blue-600 hover:text-blue-800 text-sm"
-                              >
-                                + Add Player
-                              </button>
+                              {!hasPerGameStats && (
+                                <button
+                                  onClick={() => addLeaderRow("rushingLeaders")}
+                                  className="text-blue-600 hover:text-blue-800 text-sm"
+                                >
+                                  + Add Player
+                                </button>
+                              )}
                             </TableCell>
                           </TableRow>
                         </TableBody>
@@ -1617,6 +1705,7 @@ const TeamStats: React.FC = () => {
                                         value,
                                       )
                                     }
+                                    disabled={hasPerGameStats}
                                   >
                                     <SelectTrigger>
                                       <SelectValue placeholder="Select Player" />
@@ -1647,6 +1736,7 @@ const TeamStats: React.FC = () => {
                                       )
                                     }
                                     className="text-center mx-auto"
+                                    disabled={hasPerGameStats}
                                   />
                                 </TableCell>
                                 <TableCell>
@@ -1662,6 +1752,7 @@ const TeamStats: React.FC = () => {
                                       )
                                     }
                                     className="text-center mx-auto"
+                                    disabled={hasPerGameStats}
                                   />
                                 </TableCell>
                                 <TableCell>
@@ -1677,6 +1768,7 @@ const TeamStats: React.FC = () => {
                                       )
                                     }
                                     className="text-center mx-auto"
+                                    disabled={hasPerGameStats}
                                   />
                                 </TableCell>
                                 <TableCell className="bg-gray-100 dark:bg-gray-800">
@@ -1691,27 +1783,31 @@ const TeamStats: React.FC = () => {
                                   )}
                                 </TableCell>
                                 <TableCell>
-                                  <button
-                                    onClick={() =>
-                                      removeLeaderRow("receivingLeaders", index)
-                                    }
-                                    className="text-red-600 hover:text-red-800 text-sm px-2 py-1 rounded"
-                                    title="Remove Player"
-                                  >
-                                    ✕
-                                  </button>
+                                  {!hasPerGameStats && (
+                                    <button
+                                      onClick={() =>
+                                        removeLeaderRow("receivingLeaders", index)
+                                      }
+                                      className="text-red-600 hover:text-red-800 text-sm px-2 py-1 rounded"
+                                      title="Remove Player"
+                                    >
+                                      ✕
+                                    </button>
+                                  )}
                                 </TableCell>
                               </TableRow>
                             ),
                           )}
                           <TableRow>
                             <TableCell colSpan={7}>
-                              <button
-                                onClick={() => addLeaderRow("receivingLeaders")}
-                                className="text-blue-600 hover:text-blue-800 text-sm"
-                              >
-                                + Add Player
-                              </button>
+                              {!hasPerGameStats && (
+                                <button
+                                  onClick={() => addLeaderRow("receivingLeaders")}
+                                  className="text-blue-600 hover:text-blue-800 text-sm"
+                                >
+                                  + Add Player
+                                </button>
+                              )}
                             </TableCell>
                           </TableRow>
                         </TableBody>
@@ -1732,6 +1828,11 @@ const TeamStats: React.FC = () => {
               <CardTitle>Defensive Team Leaders</CardTitle>
             </CardHeader>
             <CardContent className="w-full px-24">
+              {hasPerGameStats && (
+                <div className="mb-4 p-3 rounded-lg bg-blue-500/10 border border-blue-500/30 text-blue-400 text-sm">
+                  Team Leaders are automatically calculated from per-game stats entered in the Schedule.
+                </div>
+              )}
               <div className="space-y-6">
                 {/* DEFENSIVE LEADERS */}
                 {/* Tackles */}
@@ -1801,6 +1902,7 @@ const TeamStats: React.FC = () => {
                                         value,
                                       )
                                     }
+                                    disabled={hasPerGameStats}
                                   >
                                     <SelectTrigger>
                                       <SelectValue placeholder="Select Player" />
@@ -1831,6 +1933,7 @@ const TeamStats: React.FC = () => {
                                       )
                                     }
                                     className="text-center mx-auto"
+                                    disabled={hasPerGameStats}
                                   />
                                 </TableCell>
                                 <TableCell className="bg-gray-100 dark:bg-gray-800">
@@ -1839,27 +1942,31 @@ const TeamStats: React.FC = () => {
                                   )}
                                 </TableCell>
                                 <TableCell>
-                                  <button
-                                    onClick={() =>
-                                      removeLeaderRow("tackleLeaders", index)
-                                    }
-                                    className="text-red-600 hover:text-red-800 text-sm px-2 py-1 rounded"
-                                    title="Remove Player"
-                                  >
-                                    ✕
-                                  </button>
+                                  {!hasPerGameStats && (
+                                    <button
+                                      onClick={() =>
+                                        removeLeaderRow("tackleLeaders", index)
+                                      }
+                                      className="text-red-600 hover:text-red-800 text-sm px-2 py-1 rounded"
+                                      title="Remove Player"
+                                    >
+                                      ✕
+                                    </button>
+                                  )}
                                 </TableCell>
                               </TableRow>
                             ),
                           )}
                           <TableRow>
                             <TableCell colSpan={4}>
-                              <button
-                                onClick={() => addLeaderRow("tackleLeaders")}
-                                className="text-blue-600 hover:text-blue-800 text-sm"
-                              >
-                                + Add Player
-                              </button>
+                              {!hasPerGameStats && (
+                                <button
+                                  onClick={() => addLeaderRow("tackleLeaders")}
+                                  className="text-blue-600 hover:text-blue-800 text-sm"
+                                >
+                                  + Add Player
+                                </button>
+                              )}
                             </TableCell>
                           </TableRow>
                         </TableBody>
@@ -1929,6 +2036,7 @@ const TeamStats: React.FC = () => {
                                         value,
                                       )
                                     }
+                                    disabled={hasPerGameStats}
                                   >
                                     <SelectTrigger>
                                       <SelectValue placeholder="Select Player" />
@@ -1959,6 +2067,7 @@ const TeamStats: React.FC = () => {
                                       )
                                     }
                                     className="text-center mx-auto"
+                                    disabled={hasPerGameStats}
                                   />
                                 </TableCell>
                                 <TableCell className="bg-gray-100 dark:bg-gray-800">
@@ -1967,27 +2076,31 @@ const TeamStats: React.FC = () => {
                                   )}
                                 </TableCell>
                                 <TableCell>
-                                  <button
-                                    onClick={() =>
-                                      removeLeaderRow("tflLeaders", index)
-                                    }
-                                    className="text-red-600 hover:text-red-800 text-sm px-2 py-1 rounded"
-                                    title="Remove Player"
-                                  >
-                                    ✕
-                                  </button>
+                                  {!hasPerGameStats && (
+                                    <button
+                                      onClick={() =>
+                                        removeLeaderRow("tflLeaders", index)
+                                      }
+                                      className="text-red-600 hover:text-red-800 text-sm px-2 py-1 rounded"
+                                      title="Remove Player"
+                                    >
+                                      ✕
+                                    </button>
+                                  )}
                                 </TableCell>
                               </TableRow>
                             ),
                           )}
                           <TableRow>
                             <TableCell colSpan={4}>
-                              <button
-                                onClick={() => addLeaderRow("tflLeaders")}
-                                className="text-blue-600 hover:text-blue-800 text-sm"
-                              >
-                                + Add Player
-                              </button>
+                              {!hasPerGameStats && (
+                                <button
+                                  onClick={() => addLeaderRow("tflLeaders")}
+                                  className="text-blue-600 hover:text-blue-800 text-sm"
+                                >
+                                  + Add Player
+                                </button>
+                              )}
                             </TableCell>
                           </TableRow>
                         </TableBody>
@@ -2057,6 +2170,7 @@ const TeamStats: React.FC = () => {
                                         value,
                                       )
                                     }
+                                    disabled={hasPerGameStats}
                                   >
                                     <SelectTrigger>
                                       <SelectValue placeholder="Select Player" />
@@ -2088,6 +2202,7 @@ const TeamStats: React.FC = () => {
                                       )
                                     }
                                     className="text-center mx-auto"
+                                    disabled={hasPerGameStats}
                                   />
                                 </TableCell>
                                 <TableCell className="bg-gray-100 dark:bg-gray-800">
@@ -2096,27 +2211,31 @@ const TeamStats: React.FC = () => {
                                   )}
                                 </TableCell>
                                 <TableCell>
-                                  <button
-                                    onClick={() =>
-                                      removeLeaderRow("sackLeaders", index)
-                                    }
-                                    className="text-red-600 hover:text-red-800 text-sm px-2 py-1 rounded"
-                                    title="Remove Player"
-                                  >
-                                    ✕
-                                  </button>
+                                  {!hasPerGameStats && (
+                                    <button
+                                      onClick={() =>
+                                        removeLeaderRow("sackLeaders", index)
+                                      }
+                                      className="text-red-600 hover:text-red-800 text-sm px-2 py-1 rounded"
+                                      title="Remove Player"
+                                    >
+                                      ✕
+                                    </button>
+                                  )}
                                 </TableCell>
                               </TableRow>
                             ),
                           )}
                           <TableRow>
                             <TableCell colSpan={4}>
-                              <button
-                                onClick={() => addLeaderRow("sackLeaders")}
-                                className="text-blue-600 hover:text-blue-800 text-sm"
-                              >
-                                + Add Player
-                              </button>
+                              {!hasPerGameStats && (
+                                <button
+                                  onClick={() => addLeaderRow("sackLeaders")}
+                                  className="text-blue-600 hover:text-blue-800 text-sm"
+                                >
+                                  + Add Player
+                                </button>
+                              )}
                             </TableCell>
                           </TableRow>
                         </TableBody>
@@ -2188,6 +2307,7 @@ const TeamStats: React.FC = () => {
                                         value,
                                       )
                                     }
+                                    disabled={hasPerGameStats}
                                   >
                                     <SelectTrigger>
                                       <SelectValue placeholder="Select Player" />
@@ -2218,6 +2338,7 @@ const TeamStats: React.FC = () => {
                                       )
                                     }
                                     className="text-center mx-auto"
+                                    disabled={hasPerGameStats}
                                   />
                                 </TableCell>
                                 <TableCell className="bg-gray-100 dark:bg-gray-800">
@@ -2226,27 +2347,31 @@ const TeamStats: React.FC = () => {
                                   )}
                                 </TableCell>
                                 <TableCell>
-                                  <button
-                                    onClick={() =>
-                                      removeLeaderRow("intLeaders", index)
-                                    }
-                                    className="text-red-600 hover:text-red-800 text-sm px-2 py-1 rounded"
-                                    title="Remove Player"
-                                  >
-                                    ✕
-                                  </button>
+                                  {!hasPerGameStats && (
+                                    <button
+                                      onClick={() =>
+                                        removeLeaderRow("intLeaders", index)
+                                      }
+                                      className="text-red-600 hover:text-red-800 text-sm px-2 py-1 rounded"
+                                      title="Remove Player"
+                                    >
+                                      ✕
+                                    </button>
+                                  )}
                                 </TableCell>
                               </TableRow>
                             ),
                           )}
                           <TableRow>
                             <TableCell colSpan={4}>
-                              <button
-                                onClick={() => addLeaderRow("intLeaders")}
-                                className="text-blue-600 hover:text-blue-800 text-sm"
-                              >
-                                + Add Player
-                              </button>
+                              {!hasPerGameStats && (
+                                <button
+                                  onClick={() => addLeaderRow("intLeaders")}
+                                  className="text-blue-600 hover:text-blue-800 text-sm"
+                                >
+                                  + Add Player
+                                </button>
+                              )}
                             </TableCell>
                           </TableRow>
                         </TableBody>

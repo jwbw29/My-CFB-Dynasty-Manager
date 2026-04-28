@@ -16,6 +16,7 @@ import {
   CoachType,
   CoachPrestige,
 } from "@/types/coaches";
+import { GameStatsData } from "@/types/gameStats";
 
 const COACH_PROFILE_KEY = "coachProfile";
 const COACHES_KEY = "coaches";
@@ -495,6 +496,7 @@ export const clearActiveSessionData = (): void => {
           key.startsWith("records_") ||
           key.startsWith("teamStats_") ||
           key.startsWith("teamLeaders_") ||
+          key.startsWith("gameStats_") ||
           key.startsWith("userTeamMappings_"))
       ) {
         keysToDelete.push(key);
@@ -935,6 +937,63 @@ export const getTeamLeaders = (
     );
     return defaultLeaders;
   }
+};
+
+/**
+ * Get per-game stats for a specific dynasty and year.
+ * Storage key pattern: gameStats_{dynastyId}_{year}
+ * @param dynastyId - The dynasty identifier
+ * @param year - The year to retrieve stats for
+ * @returns GameStatsData object (Record<number, GameStatEntry[]>), or empty object if not found
+ */
+export const getGameStats = (
+  dynastyId: string,
+  year: number,
+): GameStatsData => {
+  const key = `gameStats_${dynastyId}_${year}`;
+  const stored = safeLocalStorage.getItem(key);
+
+  try {
+    return stored ? JSON.parse(stored) : {};
+  } catch (error) {
+    console.error(`Error parsing game stats for ${dynastyId}_${year}:`, error);
+    return {};
+  }
+};
+
+/**
+ * Set per-game stats for a specific dynasty and year.
+ * Storage key pattern: gameStats_{dynastyId}_{year}
+ * @param dynastyId - The dynasty identifier
+ * @param year - The year to store stats for
+ * @param data - GameStatsData object to persist
+ */
+export const setGameStats = (
+  dynastyId: string,
+  year: number,
+  data: GameStatsData,
+): void => {
+  const key = `gameStats_${dynastyId}_${year}`;
+  try {
+    safeLocalStorage.setItem(key, JSON.stringify(data));
+  } catch (error) {
+    console.error(`Error saving game stats for ${dynastyId}_${year}:`, error);
+  }
+};
+
+/**
+ * Check if any per-game stats exist for this dynasty+year.
+ * Used to determine whether Team Leaders should be computed (read-only) or manually editable.
+ * @param dynastyId - The dynasty identifier
+ * @param year - The year to check
+ * @returns true if at least one game stat entry exists for any category
+ */
+export const hasGameStatsForYear = (
+  dynastyId: string,
+  year: number,
+): boolean => {
+  const data = getGameStats(dynastyId, year);
+  return Object.values(data).some((entries) => entries.length > 0);
 };
 
 // --- USER VS USER TRACKING ---
