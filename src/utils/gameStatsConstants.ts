@@ -47,7 +47,7 @@ export const POSITION_FILTERS: Record<GameStatCategory, string[]> = {
   Passing: ["QB"],
   Rushing: ["QB", "RB", "FB", "WR"],
   Receiving: ["WR", "TE", "RB", "FB"],
-  Defense: ["CB", "FS", "SS", "OLB", "MLB", "ILB", "DE", "DT", "NT", "S", "LB", "DB", "DL"],
+  Defense: ["CB", "FS", "SS", "OLB", "MLB", "ILB", "DE", "DT", "NT", "S", "LB", "DB", "DL", "LEDGE", "REDGE", "SAM", "MIKE", "WILL"],
 };
 
 /**

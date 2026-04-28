@@ -34,7 +34,10 @@ import { PlayerStat } from "@/types/playerStats";
 import { Recruit, Transfer } from "@/types/playerTypes";
 import { TeamLeaderStats, PlayerLeaderStat } from "@/types/yearRecord";
 import { useDynasty } from "@/contexts/DynastyContext";
-import { isWeeklyAward, getWeeklyAwardPriority } from "@/utils/weeklyAwardUtils";
+import {
+  isWeeklyAward,
+  getWeeklyAwardPriority,
+} from "@/utils/weeklyAwardUtils";
 
 // Extended Player interface to include optional properties that may exist in roster
 interface ExtendedPlayer {
@@ -143,7 +146,7 @@ const PlayerCard: React.FC<PlayerCardProps> = ({ player, isOpen, onClose }) => {
           try {
             // Check passing leaders
             const passingLeader = teamLeaders.passingLeaders?.find(
-              (leader) => leader.name === player.name
+              (leader) => leader.name === player.name,
             );
             if (passingLeader && passingLeader.yards) {
               if (!playerStats[year]) playerStats[year] = [];
@@ -162,7 +165,7 @@ const PlayerCard: React.FC<PlayerCardProps> = ({ player, isOpen, onClose }) => {
 
             // Check rushing leaders
             const rushingLeader = teamLeaders.rushingLeaders?.find(
-              (leader) => leader.name === player.name
+              (leader) => leader.name === player.name,
             );
             if (rushingLeader && rushingLeader.yards) {
               if (!playerStats[year]) playerStats[year] = [];
@@ -179,7 +182,7 @@ const PlayerCard: React.FC<PlayerCardProps> = ({ player, isOpen, onClose }) => {
 
             // Check receiving leaders
             const receivingLeader = teamLeaders.receivingLeaders?.find(
-              (leader) => leader.name === player.name
+              (leader) => leader.name === player.name,
             );
             if (receivingLeader && receivingLeader.yards) {
               if (!playerStats[year]) playerStats[year] = [];
@@ -196,16 +199,16 @@ const PlayerCard: React.FC<PlayerCardProps> = ({ player, isOpen, onClose }) => {
 
             // Check defensive leaders
             const tackleLeader = teamLeaders.tackleLeaders?.find(
-              (leader) => leader.name === player.name
+              (leader) => leader.name === player.name,
             );
             const tflLeader = teamLeaders.tflLeaders?.find(
-              (leader) => leader.name === player.name
+              (leader) => leader.name === player.name,
             );
             const sackLeader = teamLeaders.sackLeaders?.find(
-              (leader) => leader.name === player.name
+              (leader) => leader.name === player.name,
             );
             const intLeader = teamLeaders.intLeaders?.find(
-              (leader) => leader.name === player.name
+              (leader) => leader.name === player.name,
             );
 
             if (tackleLeader || tflLeader || sackLeader || intLeader) {
@@ -234,8 +237,8 @@ const PlayerCard: React.FC<PlayerCardProps> = ({ player, isOpen, onClose }) => {
         if (record.playerAwards) {
           awards.push(
             ...record.playerAwards.filter(
-              (award) => award.playerName === player.name
-            )
+              (award) => award.playerName === player.name,
+            ),
           );
         }
       });
@@ -249,7 +252,7 @@ const PlayerCard: React.FC<PlayerCardProps> = ({ player, isOpen, onClose }) => {
       } else {
         const allTransfers = getAllTransfers();
         const playerTransfer = allTransfers.find(
-          (t) => t.playerName === player.name && t.transferDirection === "From"
+          (t) => t.playerName === player.name && t.transferDirection === "From",
         );
         setOriginInfo(playerTransfer || null);
       }
@@ -347,7 +350,7 @@ const PlayerCard: React.FC<PlayerCardProps> = ({ player, isOpen, onClose }) => {
                     </div>
                     <Badge
                       className={`${getDevTraitColor(
-                        enhancedPlayer.devTrait
+                        enhancedPlayer.devTrait,
                       )} text-sm`}
                     >
                       {enhancedPlayer.devTrait || "Normal"}
@@ -404,8 +407,8 @@ const PlayerCard: React.FC<PlayerCardProps> = ({ player, isOpen, onClose }) => {
                             const categories = new Set<string>();
                             Object.values(careerStats).forEach((yearStats) =>
                               yearStats.forEach((stat: { category: string }) =>
-                                categories.add(stat.category)
-                              )
+                                categories.add(stat.category),
+                              ),
                             );
                             return Array.from(categories).map((category) => {
                               const categoryStats: (PlayerStat & {
@@ -414,14 +417,14 @@ const PlayerCard: React.FC<PlayerCardProps> = ({ player, isOpen, onClose }) => {
                               Object.entries(careerStats).forEach(
                                 ([year, yearStats]) => {
                                   const categoryStat = yearStats.find(
-                                    (s: PlayerStat) => s.category === category
+                                    (s: PlayerStat) => s.category === category,
                                   );
                                   if (categoryStat)
                                     categoryStats.push({
                                       ...categoryStat,
                                       year: parseInt(year),
                                     });
-                                }
+                                },
                               );
                               if (categoryStats.length === 0) return null;
                               categoryStats.sort((a, b) => a.year - b.year);
@@ -437,13 +440,13 @@ const PlayerCard: React.FC<PlayerCardProps> = ({ player, isOpen, onClose }) => {
                                     if (key.toLowerCase().includes("long"))
                                       careerTotals[key] = Math.max(
                                         careerTotals[key] || 0,
-                                        value
+                                        value,
                                       );
                                     else
                                       careerTotals[key] =
                                         (careerTotals[key] || 0) + value;
                                   }
-                                })
+                                }),
                               );
                               const columns: {
                                 key: string;
@@ -525,7 +528,7 @@ const PlayerCard: React.FC<PlayerCardProps> = ({ player, isOpen, onClose }) => {
                               const getStatValue = (
                                 stat: PlayerStat | { [key: string]: number },
                                 key: string,
-                                isCareerTotal = false
+                                isCareerTotal = false,
                               ): string => {
                                 const isFullStat = "id" in stat;
                                 switch (key) {
@@ -586,14 +589,14 @@ const PlayerCard: React.FC<PlayerCardProps> = ({ player, isOpen, onClose }) => {
                                             .punts;
                                       return (punts || 0) > 0
                                         ? ((yards || 0) / (punts || 1)).toFixed(
-                                            1
+                                            1,
                                           )
                                         : "0.0";
                                     }
                                     break;
                                   case "qbr":
                                     return calculateQBR(
-                                      stat as Partial<PlayerStat>
+                                      stat as Partial<PlayerStat>,
                                     ).toString();
                                   case "fgpct":
                                     const made = isFullStat
@@ -693,7 +696,7 @@ const PlayerCard: React.FC<PlayerCardProps> = ({ player, isOpen, onClose }) => {
                                               {getStatValue(
                                                 careerTotals,
                                                 col.key,
-                                                true
+                                                true,
                                               )}
                                             </td>
                                           ))}
@@ -722,14 +725,22 @@ const PlayerCard: React.FC<PlayerCardProps> = ({ player, isOpen, onClose }) => {
                           {(() => {
                             // Helper function to determine award priority
                             const getAwardPriority = (
-                              awardName: string
+                              awardName: string,
                             ): number => {
                               const name = awardName.toLowerCase();
                               if (name.includes("heisman")) return 0;
                               // Pre-season checks MUST come before generic all-american/all-conference
                               // checks because "pre-season all-american" also includes "all-american".
-                              if (name.includes("pre-season all-american") || name.includes("pre-season all american")) return 2.5;
-                              if (name.includes("pre-season all-conference") || name.includes("pre-season all conference")) return 3.5;
+                              if (
+                                name.includes("pre-season all-american") ||
+                                name.includes("pre-season all american")
+                              )
+                                return 2.5;
+                              if (
+                                name.includes("pre-season all-conference") ||
+                                name.includes("pre-season all conference")
+                              )
+                                return 3.5;
                               if (
                                 name.includes("all-american") ||
                                 name.includes("all american")
@@ -749,7 +760,7 @@ const PlayerCard: React.FC<PlayerCardProps> = ({ player, isOpen, onClose }) => {
                             // Helper function to format award display name
                             const formatAwardName = (
                               awardName: string,
-                              team?: string
+                              team?: string,
                             ): string => {
                               const name = awardName.toLowerCase();
                               if (
@@ -764,8 +775,8 @@ const PlayerCard: React.FC<PlayerCardProps> = ({ player, isOpen, onClose }) => {
                                   team === "1st Team"
                                     ? "First Team"
                                     : team === "2nd Team"
-                                    ? "Second Team"
-                                    : team;
+                                      ? "Second Team"
+                                      : team;
                                 return `${awardName} ${teamText}`;
                               }
                               return awardName;
@@ -780,8 +791,8 @@ const PlayerCard: React.FC<PlayerCardProps> = ({ player, isOpen, onClose }) => {
                                 const key = weekly
                                   ? award.awardName
                                   : award.team
-                                  ? `${award.awardName}|${award.team}`
-                                  : award.awardName;
+                                    ? `${award.awardName}|${award.team}`
+                                    : award.awardName;
 
                                 if (!acc[key]) {
                                   acc[key] = {
@@ -810,9 +821,12 @@ const PlayerCard: React.FC<PlayerCardProps> = ({ player, isOpen, onClose }) => {
                                   awardName: string;
                                   team?: string;
                                   years: number[];
-                                  weekOccurrences?: { year: number; week: number }[];
+                                  weekOccurrences?: {
+                                    year: number;
+                                    week: number;
+                                  }[];
                                 }
-                              >
+                              >,
                             );
 
                             // Sort awards by priority, then alphabetically, and years in ascending order
@@ -850,7 +864,7 @@ const PlayerCard: React.FC<PlayerCardProps> = ({ player, isOpen, onClose }) => {
                             return sortedAwards.map((award, index) => {
                               const displayName = formatAwardName(
                                 award.awardName,
-                                award.team
+                                award.team,
                               );
                               const name = award.awardName.toLowerCase();
                               const isPreSeason = name.includes("pre-season");
@@ -870,8 +884,8 @@ const PlayerCard: React.FC<PlayerCardProps> = ({ player, isOpen, onClose }) => {
                               const IconComponent = isWeekly
                                 ? AwardIcon
                                 : isPreSeason
-                                ? Star
-                                : Trophy;
+                                  ? Star
+                                  : Trophy;
 
                               // Weekly display format groups weeks by season year for compact readability:
                               // "2024: Wk 3, 7 | 2025: Wk 2"
@@ -879,23 +893,26 @@ const PlayerCard: React.FC<PlayerCardProps> = ({ player, isOpen, onClose }) => {
                               let weeklyCount = 0;
                               if (isWeekly) {
                                 const byYear = new Map<number, number[]>();
-                                award.weekOccurrences?.forEach(({ year, week }) => {
-                                  if (!byYear.has(year)) byYear.set(year, []);
-                                  byYear.get(year)!.push(week);
-                                });
+                                award.weekOccurrences?.forEach(
+                                  ({ year, week }) => {
+                                    if (!byYear.has(year)) byYear.set(year, []);
+                                    byYear.get(year)!.push(week);
+                                  },
+                                );
 
                                 const yearEntries = [...byYear.entries()].sort(
-                                  ([a], [b]) => a - b
+                                  ([a], [b]) => a - b,
                                 );
                                 weeklyDisplayText = yearEntries
                                   .map(
                                     ([year, weeks]) =>
                                       `${year}: Wk ${weeks
                                         .sort((a, b) => a - b)
-                                        .join(", ")}`
+                                        .join(", ")}`,
                                   )
                                   .join(" | ");
-                                weeklyCount = award.weekOccurrences?.length || 0;
+                                weeklyCount =
+                                  award.weekOccurrences?.length || 0;
                               }
 
                               return (
@@ -905,20 +922,22 @@ const PlayerCard: React.FC<PlayerCardProps> = ({ player, isOpen, onClose }) => {
                                     isWeekly
                                       ? "border-green-300 hover:border-green-400 dark:border-green-600 dark:hover:border-green-500"
                                       : isPreSeason
-                                      ? "border-blue-300 hover:border-blue-400 dark:border-blue-600 dark:hover:border-blue-500"
-                                      : "border-yellow-300 hover:border-yellow-400 dark:border-yellow-600 dark:hover:border-yellow-500"
+                                        ? "border-blue-300 hover:border-blue-400 dark:border-blue-600 dark:hover:border-blue-500"
+                                        : "border-yellow-300 hover:border-yellow-400 dark:border-yellow-600 dark:hover:border-yellow-500"
                                   }`}
                                 >
                                   <div className="p-5">
                                     <div className="flex items-start gap-3 mb-3">
                                       <div className="flex-shrink-0">
-                                        <div className={`w-10 h-10 rounded-full flex items-center justify-center shadow ${
-                                          isWeekly
-                                            ? "bg-gradient-to-br from-green-400 to-emerald-500"
-                                            : isPreSeason
-                                            ? "bg-gradient-to-br from-blue-400 to-indigo-500"
-                                            : "bg-gradient-to-br from-yellow-400 to-amber-500"
-                                        }`}>
+                                        <div
+                                          className={`w-10 h-10 rounded-full flex items-center justify-center shadow ${
+                                            isWeekly
+                                              ? "bg-gradient-to-br from-green-400 to-emerald-500"
+                                              : isPreSeason
+                                                ? "bg-gradient-to-br from-blue-400 to-indigo-500"
+                                                : "bg-gradient-to-br from-yellow-400 to-amber-500"
+                                          }`}
+                                        >
                                           <IconComponent className="h-5 w-5 text-white" />
                                         </div>
                                       </div>
@@ -933,8 +952,8 @@ const PlayerCard: React.FC<PlayerCardProps> = ({ player, isOpen, onClose }) => {
                                               isWeekly
                                                 ? "bg-green-100 text-green-900 border-green-300 dark:bg-green-900 dark:text-green-200 dark:border-green-700"
                                                 : isPreSeason
-                                                ? "bg-blue-100 text-blue-900 border-blue-300 dark:bg-blue-900 dark:text-blue-200 dark:border-blue-700"
-                                                : "bg-yellow-100 text-yellow-900 border-yellow-300 dark:bg-yellow-900 dark:text-yellow-200 dark:border-yellow-700"
+                                                  ? "bg-blue-100 text-blue-900 border-blue-300 dark:bg-blue-900 dark:text-blue-200 dark:border-blue-700"
+                                                  : "bg-yellow-100 text-yellow-900 border-yellow-300 dark:bg-yellow-900 dark:text-yellow-200 dark:border-yellow-700"
                                             }`}
                                           >
                                             {award.team}
@@ -942,13 +961,15 @@ const PlayerCard: React.FC<PlayerCardProps> = ({ player, isOpen, onClose }) => {
                                         )}
                                       </div>
                                     </div>
-                                    <div className={`mt-3 pt-3 border-t ${
-                                      isWeekly
-                                        ? "border-green-200 dark:border-green-700"
-                                        : isPreSeason
-                                        ? "border-blue-200 dark:border-blue-700"
-                                        : "border-gray-200 dark:border-gray-700"
-                                    }`}>
+                                    <div
+                                      className={`mt-3 pt-3 border-t ${
+                                        isWeekly
+                                          ? "border-green-200 dark:border-green-700"
+                                          : isPreSeason
+                                            ? "border-blue-200 dark:border-blue-700"
+                                            : "border-gray-200 dark:border-gray-700"
+                                      }`}
+                                    >
                                       <div className="text-center">
                                         <div className="text-xl font-bold text-gray-900 dark:text-gray-100">
                                           {isWeekly
@@ -1062,7 +1083,7 @@ const PlayerCard: React.FC<PlayerCardProps> = ({ player, isOpen, onClose }) => {
                           value={
                             <Badge
                               className={`${getDevTraitColor(
-                                enhancedPlayer.devTrait
+                                enhancedPlayer.devTrait,
                               )} text-xs`}
                             >
                               {enhancedPlayer.devTrait || "Normal"}
