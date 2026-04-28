@@ -463,8 +463,7 @@ export const GameStatsModal: React.FC<GameStatsModalProps> = ({
                             <Input
                               id={`stat-${activeCategory}-${field.key}`}
                               type="number"
-                              min={0}
-                              step={isHalfStep ? 0.5 : 1}
+                                                            step={isHalfStep ? 0.5 : 1}
                               value={statValues[field.key] ?? 0}
                               onChange={(event) => {
                                 const value = Number(event.target.value);
