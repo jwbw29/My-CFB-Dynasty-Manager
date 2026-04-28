@@ -173,8 +173,10 @@ export const GameStatsModal: React.FC<GameStatsModalProps> = ({
       .sort((a, b) => {
         const aJersey = Number.parseInt(a.jerseyNumber, 10);
         const bJersey = Number.parseInt(b.jerseyNumber, 10);
-        return (Number.isNaN(aJersey) ? Number.MAX_SAFE_INTEGER : aJersey) -
-          (Number.isNaN(bJersey) ? Number.MAX_SAFE_INTEGER : bJersey);
+        return (
+          (Number.isNaN(aJersey) ? Number.MAX_SAFE_INTEGER : aJersey) -
+          (Number.isNaN(bJersey) ? Number.MAX_SAFE_INTEGER : bJersey)
+        );
       });
   }, [rosterPlayers, activeCategory]);
 
@@ -223,13 +225,16 @@ export const GameStatsModal: React.FC<GameStatsModalProps> = ({
     if (!editingEntry) {
       const duplicateEntry = weekEntries.find(
         (entry) =>
-          entry.category === activeCategory && entry.playerName === selectedPlayer,
+          entry.category === activeCategory &&
+          entry.playerName === selectedPlayer,
       );
 
       if (duplicateEntry) {
         setEditingEntry(duplicateEntry);
         setSelectedPlayer(duplicateEntry.playerName);
-        setStatValues(buildCategoryStatValues(activeCategory, duplicateEntry.stats));
+        setStatValues(
+          buildCategoryStatValues(activeCategory, duplicateEntry.stats),
+        );
         setIsFormOpen(true);
         toast("Existing entry found. Edit the stats and save to update.");
         return;
@@ -252,7 +257,9 @@ export const GameStatsModal: React.FC<GameStatsModalProps> = ({
         };
 
     const updatedWeekEntries = editingEntry
-      ? weekEntries.map((entry) => (entry.id === editingEntry.id ? nextEntry : entry))
+      ? weekEntries.map((entry) =>
+          entry.id === editingEntry.id ? nextEntry : entry,
+        )
       : [...weekEntries, nextEntry];
 
     const updatedData: GameStatsData = {
@@ -274,7 +281,9 @@ export const GameStatsModal: React.FC<GameStatsModalProps> = ({
   const handleDelete = (entry: GameStatEntry) => {
     const latestData = getGameStats(dynastyId, currentYear);
     const weekEntries = latestData[gameWeek] || [];
-    const updatedWeekEntries = weekEntries.filter((item) => item.id !== entry.id);
+    const updatedWeekEntries = weekEntries.filter(
+      (item) => item.id !== entry.id,
+    );
 
     const updatedData: GameStatsData = {
       ...latestData,
@@ -304,7 +313,9 @@ export const GameStatsModal: React.FC<GameStatsModalProps> = ({
 
         <Tabs
           value={activeCategory}
-          onValueChange={(value) => setActiveCategory(value as GameStatCategory)}
+          onValueChange={(value) =>
+            setActiveCategory(value as GameStatCategory)
+          }
           defaultValue="Passing"
           className="w-full"
         >
@@ -326,16 +337,44 @@ export const GameStatsModal: React.FC<GameStatsModalProps> = ({
                   );
 
             return (
-              <TabsContent key={category} value={category} className="space-y-4 mt-4">
-                <div className="rounded-md border border-gray-200 dark:border-gray-700 overflow-x-auto">
+              <TabsContent
+                key={category}
+                value={category}
+                className="flex flex-col w-full space-y-4 mt-4"
+              >
+                {/* Add Player Stats Button */}
+                <div className="flex justify-end items-center">
+                  <Button
+                    type="button"
+                    variant={isFormOpen ? "outline" : "default"}
+                    onClick={() => {
+                      if (isFormOpen) {
+                        resetFormState();
+                        return;
+                      }
+                      setIsFormOpen(true);
+                      setEditingEntry(null);
+                      setSelectedPlayer("");
+                      setStatValues(createDefaultStatValues(activeCategory));
+                    }}
+                  >
+                    <Plus className="h-4 w-4 mr-2" />
+                    {isFormOpen ? "Cancel" : "Add Player Stats"}
+                  </Button>
+                </div>
+                <div className="flex flex-col w-full rounded-md border border-gray-200 dark:border-gray-700 overflow-x-auto">
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead className="min-w-[180px]">Player Name</TableHead>
+                        <TableHead className="min-w-[180px]">
+                          Player Name
+                        </TableHead>
                         {fields.map((field) => (
                           <TableHead key={field.key}>{field.label}</TableHead>
                         ))}
-                        <TableHead className="text-right min-w-[120px]">Actions</TableHead>
+                        <TableHead className="text-right min-w-[120px]">
+                          Actions
+                        </TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -351,7 +390,9 @@ export const GameStatsModal: React.FC<GameStatsModalProps> = ({
                       ) : (
                         rows.map((entry) => (
                           <TableRow key={entry.id}>
-                            <TableCell className="font-medium">{entry.playerName}</TableCell>
+                            <TableCell className="font-medium">
+                              {entry.playerName}
+                            </TableCell>
                             {fields.map((field) => (
                               <TableCell key={field.key}>
                                 {entry.stats[field.key] ?? 0}
@@ -390,7 +431,9 @@ export const GameStatsModal: React.FC<GameStatsModalProps> = ({
                                       </AlertDialogDescription>
                                     </AlertDialogHeader>
                                     <AlertDialogFooter>
-                                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                      <AlertDialogCancel>
+                                        Cancel
+                                      </AlertDialogCancel>
                                       <AlertDialogAction
                                         onClick={() => handleDelete(entry)}
                                       >
@@ -408,26 +451,6 @@ export const GameStatsModal: React.FC<GameStatsModalProps> = ({
                   </Table>
                 </div>
 
-                <div className="flex items-center">
-                  <Button
-                    type="button"
-                    variant={isFormOpen ? "outline" : "default"}
-                    onClick={() => {
-                      if (isFormOpen) {
-                        resetFormState();
-                        return;
-                      }
-                      setIsFormOpen(true);
-                      setEditingEntry(null);
-                      setSelectedPlayer("");
-                      setStatValues(createDefaultStatValues(activeCategory));
-                    }}
-                  >
-                    <Plus className="h-4 w-4 mr-2" />
-                    {isFormOpen ? "Cancel" : "Add Player Stats"}
-                  </Button>
-                </div>
-
                 {isFormOpen && (
                   <div className="rounded-md border border-gray-200 dark:border-gray-700 p-4 space-y-4 bg-muted/20">
                     <div className="space-y-2">
@@ -437,7 +460,10 @@ export const GameStatsModal: React.FC<GameStatsModalProps> = ({
                           {editingEntry.playerName}
                         </div>
                       ) : (
-                        <Select value={selectedPlayer} onValueChange={setSelectedPlayer}>
+                        <Select
+                          value={selectedPlayer}
+                          onValueChange={setSelectedPlayer}
+                        >
                           <SelectTrigger>
                             <SelectValue placeholder="Select Player" />
                           </SelectTrigger>
@@ -454,16 +480,19 @@ export const GameStatsModal: React.FC<GameStatsModalProps> = ({
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       {STAT_FIELDS[activeCategory].map((field) => {
-                        const isHalfStep = field.key === "tfl" || field.key === "sacks";
+                        const isHalfStep =
+                          field.key === "tfl" || field.key === "sacks";
                         return (
                           <div key={field.key} className="space-y-2">
-                            <Label htmlFor={`stat-${activeCategory}-${field.key}`}>
+                            <Label
+                              htmlFor={`stat-${activeCategory}-${field.key}`}
+                            >
                               {field.label}
                             </Label>
                             <Input
                               id={`stat-${activeCategory}-${field.key}`}
                               type="number"
-                                                            step={isHalfStep ? 0.5 : 1}
+                              step={isHalfStep ? 0.5 : 1}
                               value={statValues[field.key] ?? 0}
                               onChange={(event) => {
                                 const value = Number(event.target.value);
@@ -483,7 +512,11 @@ export const GameStatsModal: React.FC<GameStatsModalProps> = ({
                         <Save className="h-4 w-4 mr-2" />
                         Save
                       </Button>
-                      <Button type="button" variant="outline" onClick={resetFormState}>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={resetFormState}
+                      >
                         <X className="h-4 w-4 mr-2" />
                         Cancel
                       </Button>
