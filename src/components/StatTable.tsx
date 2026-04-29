@@ -49,6 +49,7 @@ const StatTable: React.FC<StatTableProps> = ({ category, viewType, stats, onAddS
 
   return (
     <Table>
+      {/* Table Header */}
       <TableHeader>
         <TableRow>
           <TableHead>Name</TableHead>
@@ -60,6 +61,7 @@ const StatTable: React.FC<StatTableProps> = ({ category, viewType, stats, onAddS
         </TableRow>
       </TableHeader>
       <TableBody>
+        {/* Existing Stat Rows */}
         {stats.map(stat => (
           <TableRow key={stat.id}>
             <TableCell>{stat.playerName}</TableCell>
@@ -78,6 +80,7 @@ const StatTable: React.FC<StatTableProps> = ({ category, viewType, stats, onAddS
             </TableCell>
           </TableRow>
         ))}
+        {/* New Stat Input Row */}
         <TableRow>
           <TableCell>
             <Input

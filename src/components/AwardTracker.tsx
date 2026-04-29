@@ -225,6 +225,7 @@ const AwardTracker: React.FC = () => {
       {/* Hero Header */}
       <HeroHeader title="Award Tracker" />
 
+      {/* Add/Edit Award Form */}
       <Card className="border-2 border-gray-200 dark:border-gray-700 shadow-xl overflow-hidden">
         <div className="bg-gradient-to-r from-primary to-primary/90 p-6">
           <div className="flex justify-between items-center">
@@ -361,6 +362,7 @@ const AwardTracker: React.FC = () => {
         </CardContent>
       </Card>
 
+      {/* Awards Table */}
       <Card>
         <CardHeader className="text-xl font-semibold">
           <div className="flex justify-between items-center">

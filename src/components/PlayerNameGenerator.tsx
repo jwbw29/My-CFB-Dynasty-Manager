@@ -59,6 +59,7 @@ const PlayerNameGenerator: React.FC = () => {
 
   return (
     <div className="space-y-4">
+      {/* Name Count Input and Generate Button */}
       <div className="space-y-2">
         <div className="flex items-center gap-4">
           <Label htmlFor="numNames" className="whitespace-nowrap">
@@ -83,6 +84,7 @@ const PlayerNameGenerator: React.FC = () => {
         </Button>
       </div>
 
+      {/* Generated Names List */}
       {generatedNames.length > 0 && (
         <div className="space-y-2">
           <h3 className="font-semibold">Generated Names:</h3>
@@ -94,6 +96,7 @@ const PlayerNameGenerator: React.FC = () => {
         </div>
       )}
       
+      {/* Loading State */}
       {firstNames.length === 0 && lastNames.length === 0 && (
         <div className="text-sm text-gray-500">
           Loading name lists... Make sure firstnames.txt and lastnames.txt are in your public folder.

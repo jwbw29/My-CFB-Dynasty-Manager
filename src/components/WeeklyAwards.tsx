@@ -226,6 +226,7 @@ export default function WeeklyAwards() {
 
   return (
     <div className="space-y-6">
+      {/* Week Selector */}
       <div className="flex flex-col sm:flex-row sm:items-center gap-3">
         <p className="text-sm font-medium text-foreground">Week</p>
         <Select
@@ -245,7 +246,9 @@ export default function WeeklyAwards() {
         </Select>
       </div>
 
+      {/* Award Cards */}
       <div className="grid grid-cols-1 gap-4">
+        {/* National Player of the Week */}
         <Card>
           <CardHeader>
             <CardTitle>National Player of the Week</CardTitle>
@@ -258,6 +261,7 @@ export default function WeeklyAwards() {
           </CardContent>
         </Card>
 
+        {/* Conference Player of the Week */}
         <Card>
           <CardHeader>
             <CardTitle>{conference} Player of the Week</CardTitle>
@@ -276,6 +280,7 @@ export default function WeeklyAwards() {
         </Card>
       </div>
 
+      {/* Empty State Hint */}
       {!slotAssignments.nationalOffensive &&
         !slotAssignments.nationalDefensive &&
         !slotAssignments.conferenceOffensive &&

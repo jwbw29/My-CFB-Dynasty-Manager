@@ -67,6 +67,7 @@ export const HeadToHeadRecords: React.FC<HeadToHeadRecordsProps> = ({
       <CardContent>
         {users.length > 0 ? (
           <div className="space-y-2">
+            {/* User Record Buttons */}
             {users.map((user) => {
               const record = records.get(user.id);
               const isSelected = selectedUserId === user.id;

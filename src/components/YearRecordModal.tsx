@@ -349,6 +349,7 @@ const YearRecordModal: React.FC<YearRecordModalProps> = ({ year, onClose }) => {
             onValueChange={setActiveTab}
             className="h-full flex flex-col"
           >
+            {/* Tab Navigation */}
             <TabsList className="grid w-full grid-cols-4 mx-auto px-4">
               <TabsTrigger value="general">Overview</TabsTrigger>
               <TabsTrigger value="schedule">Schedule</TabsTrigger>
@@ -356,6 +357,7 @@ const YearRecordModal: React.FC<YearRecordModalProps> = ({ year, onClose }) => {
               <TabsTrigger value="awards">Awards & Draft</TabsTrigger>
             </TabsList>
 
+            {/* Overview Tab */}
             <TabsContent value="general" className="flex-grow overflow-hidden">
               <ScrollArea className="h-full">
                 <div className="space-y-4 p-4 max-w-6xl mx-auto">
@@ -393,6 +395,7 @@ const YearRecordModal: React.FC<YearRecordModalProps> = ({ year, onClose }) => {
                     </div>
                   </div>
 
+                  {/* Record Stats Cards */}
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                     <Card>
                       <CardContent className="pt-4">
@@ -456,6 +459,7 @@ const YearRecordModal: React.FC<YearRecordModalProps> = ({ year, onClose }) => {
                     </Card>
                   </div>
 
+                  {/* Season Achievements and Stats */}
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                     <Card>
                       <CardHeader className="p-4">
@@ -651,10 +655,12 @@ const YearRecordModal: React.FC<YearRecordModalProps> = ({ year, onClose }) => {
               </ScrollArea>
             </TabsContent>
 
+            {/* Schedule Tab */}
             <TabsContent value="schedule" className="flex-grow overflow-auto">
               {scheduleContent}
             </TabsContent>
 
+            {/* Recruits Tab */}
             <TabsContent value="recruits" className="flex-grow overflow-hidden">
               <ScrollArea className="h-full">
                 <div className="p-4 max-w-7xl mx-auto">
@@ -782,6 +788,7 @@ const YearRecordModal: React.FC<YearRecordModalProps> = ({ year, onClose }) => {
               </ScrollArea>
             </TabsContent>
 
+            {/* Awards and Draft Tab */}
             <TabsContent value="awards" className="flex-grow overflow-hidden">
               <ScrollArea className="h-full">
                 <div className="space-y-4 p-4 max-w-7xl mx-auto">
@@ -924,6 +931,7 @@ const YearRecordModal: React.FC<YearRecordModalProps> = ({ year, onClose }) => {
                     </Card>
                   </div>
 
+                  {/* Championships and Heisman Form */}
                   <Card>
                     <CardHeader className="p-3">
                       <CardTitle className="text-base">
@@ -1028,6 +1036,7 @@ const YearRecordModal: React.FC<YearRecordModalProps> = ({ year, onClose }) => {
                     </CardContent>
                   </Card>
 
+                  {/* Player Awards and NFL Draft Lists */}
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                     <div>
                       <h3 className="text-lg font-bold flex items-center gap-2 mb-2">
@@ -1127,6 +1136,7 @@ const YearRecordModal: React.FC<YearRecordModalProps> = ({ year, onClose }) => {
           </Tabs>
         </div>
 
+        {/* Save and Cancel Footer */}
         <div className="border-t p-3 flex justify-end gap-3 bg-gray-50 dark:bg-gray-800/50">
           <Button variant="outline" onClick={onClose}>
             Cancel

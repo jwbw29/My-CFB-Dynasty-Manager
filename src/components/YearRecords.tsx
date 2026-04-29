@@ -69,6 +69,7 @@ const YearRecords: React.FC = () => {
     <div className="space-y-6">
       <h1 className="text-3xl font-bold text-center">Year Records</h1>
 
+      {/* Add New Record Form */}
       <Card>
         <CardHeader className="text-xl font-semibold">Add New Year Record</CardHeader>
         <CardContent>
@@ -112,6 +113,7 @@ const YearRecords: React.FC = () => {
         </CardContent>
       </Card>
 
+      {/* Records Table */}
       <Card>
         <CardHeader className="text-xl font-semibold">Year Records</CardHeader>
         <CardContent>

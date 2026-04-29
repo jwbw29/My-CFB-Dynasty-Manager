@@ -18,7 +18,9 @@ const Tools: React.FC = () => {
       {/* Hero Header */}
       <HeroHeader title="Dynasty Tools" />
 
+      {/* Tools Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
+        {/* Recruiting Predictor Card */}
         <Card className="border-2 border-gray-200 dark:border-gray-700 shadow-xl overflow-hidden">
           <div className="bg-gradient-to-r from-green-600 to-emerald-600 p-6">
             <h3 className="text-2xl font-black text-white">
@@ -31,6 +33,7 @@ const Tools: React.FC = () => {
           </CardContent>
         </Card>
 
+        {/* Recruiting Calculator Card */}
         <Card className="border-2 border-gray-200 dark:border-gray-700 shadow-xl overflow-hidden">
           <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-6">
             <h3 className="text-2xl font-black text-white">
@@ -43,6 +46,7 @@ const Tools: React.FC = () => {
           </CardContent>
         </Card>
 
+        {/* Player Name Generator Card */}
         <Card className="border-2 border-gray-200 dark:border-gray-700 shadow-xl overflow-hidden">
           <div className="bg-gradient-to-r from-purple-600 to-pink-600 p-6">
             <h3 className="text-2xl font-black text-white">
@@ -55,6 +59,7 @@ const Tools: React.FC = () => {
           </CardContent>
         </Card>
 
+        {/* Import / Export Card */}
         <Card className="border-2 border-gray-200 dark:border-gray-700 shadow-xl overflow-hidden">
           <div className="bg-gradient-to-r from-orange-600 to-amber-600 p-6">
             <h3 className="text-2xl font-black text-white">Import / Export</h3>

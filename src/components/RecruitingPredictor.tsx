@@ -66,6 +66,7 @@ const RecruitPredictor = () => {
 
   return (
     <div className="space-y-4">
+      {/* Position and Star Rating Selectors */}
       <div className="grid grid-cols-2 gap-4">
         <Select value={position} onValueChange={setPosition}>
           <SelectTrigger>
@@ -97,6 +98,7 @@ const RecruitPredictor = () => {
         </Select>
       </div>
 
+      {/* Action Buttons */}
       <div className="flex justify-between items-center">
         <Button onClick={calculatePrediction} className="bg-blue-600 hover:bg-blue-700">
           Calculate
@@ -106,6 +108,7 @@ const RecruitPredictor = () => {
         </Button>
       </div>
 
+      {/* Prediction Result */}
       {result && (
         <Card>
           <CardContent className="pt-6 space-y-2">

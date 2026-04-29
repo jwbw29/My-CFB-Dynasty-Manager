@@ -588,6 +588,7 @@ const DynastyLaunch: React.FC<DynastyLaunchProps> = ({ onDynastySelected }) => {
   return (
     <div className="relative min-h-screen bg-gray-800 flex items-center justify-center p-4 overflow-hidden">
       <div className="w-full max-w-6xl">
+        {/* Page Title */}
         <div className="text-center mb-8">
           <h1 className="text-5xl leading-relaxed md:leading-relaxed font-bold text-white mb-4 flex items-center justify-center gap-3">
             <Trophy className="h-12 w-12 text-yellow-400" />
@@ -597,6 +598,7 @@ const DynastyLaunch: React.FC<DynastyLaunchProps> = ({ onDynastySelected }) => {
             Pave your path to the College Football Championship!
           </p>
         </div>
+        {/* Create and Import Action Buttons */}
         <div className="text-center mb-8 flex justify-center gap-4">
           <Button
             onClick={() => setShowCreateModal(true)}
@@ -616,6 +618,7 @@ const DynastyLaunch: React.FC<DynastyLaunchProps> = ({ onDynastySelected }) => {
             Import Dynasty
           </Button>
         </div>
+        {/* Dynasty Cards Grid */}
         {dynasties.length > 0 ? (
           <div>
             <h2 className="text-3xl font-bold text-white text-center mb-6">
@@ -752,6 +755,7 @@ const DynastyLaunch: React.FC<DynastyLaunchProps> = ({ onDynastySelected }) => {
             </CardContent>
           </Card>
         )}
+        {/* Create Dynasty Dialog */}
         <Dialog open={showCreateModal} onOpenChange={setShowCreateModal}>
           <DialogContent className="sm:max-w-[425px]">
             <DialogHeader>
@@ -836,6 +840,7 @@ const DynastyLaunch: React.FC<DynastyLaunchProps> = ({ onDynastySelected }) => {
             </DialogFooter>
           </DialogContent>
         </Dialog>
+        {/* Import Dynasty Dialog */}
         <Dialog open={showImportModal} onOpenChange={setShowImportModal}>
           <DialogContent className="sm:max-w-[500px]">
             <DialogHeader>

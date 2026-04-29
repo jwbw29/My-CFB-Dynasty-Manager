@@ -48,13 +48,16 @@ const DynastyWrapper: React.FC<DynastyWrapperProps> = ({ children }) => {
 
   return (
     <div className="min-h-screen flex flex-col">
+      {/* Top Navigation Bar */}
       <Navigation 
         onReturnToLaunch={handleReturnToLaunch}
         onManualSave={handleManualSave}
       />
+      {/* Main Content Area */}
       <main className="flex-grow container mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-8">
         {children}
       </main>
+      {/* Footer */}
       <footer className="bg-gray-300 dark:bg-gray-800 shadow">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 text-center">
           <p>© CFB25 Dynasty Manager</p>

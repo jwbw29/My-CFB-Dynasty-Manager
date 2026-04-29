@@ -61,6 +61,7 @@ const TeamOverviewCard: React.FC<TeamOverviewCardProps> = ({
   return (
     <Card>
       <CardContent className="py-6">
+        {/* Team Ratings Grid */}
         <div className="grid grid-cols-4 gap-4">
           <div className="text-center">
             <div className="text-sm text-gray-500 dark:text-gray-400">

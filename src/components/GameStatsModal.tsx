@@ -304,6 +304,7 @@ export const GameStatsModal: React.FC<GameStatsModalProps> = ({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-5xl w-full border-gray-200 dark:border-gray-700 max-h-[90vh] overflow-y-auto">
+        {/* Dialog Header */}
         <DialogHeader>
           <DialogTitle>{`${weekLabel} vs ${opponent} — Player Stats`}</DialogTitle>
           <DialogDescription>
@@ -311,6 +312,7 @@ export const GameStatsModal: React.FC<GameStatsModalProps> = ({
           </DialogDescription>
         </DialogHeader>
 
+        {/* Stats Category Tabs */}
         <Tabs
           value={activeCategory}
           onValueChange={(value) =>
@@ -443,6 +445,7 @@ export const GameStatsModal: React.FC<GameStatsModalProps> = ({
                                     </AlertDialogFooter>
                                   </AlertDialogContent>
                                 </AlertDialog>
+                {/* Stats Table with Actions */}
                               </div>
                             </TableCell>
                           </TableRow>
@@ -454,6 +457,7 @@ export const GameStatsModal: React.FC<GameStatsModalProps> = ({
 
                 {isFormOpen && (
                   <div className="rounded-md border border-gray-200 dark:border-gray-700 p-4 space-y-4 bg-muted/20">
+                {/* Inline Add/Edit Form */}
                     <div className="space-y-2">
                       <Label>Player</Label>
                       {editingEntry ? (

@@ -39,6 +39,7 @@ export const TeamInfoDisplay: React.FC<TeamInfoDisplayProps> = ({
 
   return (
     <div className={className}>
+      {/* Team Name and Custom Badge */}
       <div className="flex items-center gap-2">
         <span className="font-semibold">
           {teamInfo.name}
@@ -55,6 +56,7 @@ export const TeamInfoDisplay: React.FC<TeamInfoDisplayProps> = ({
           </span>
         )}
       </div>
+      {/* Team Details */}
       {teamInfo.nickName && (
         <div className="text-sm text-gray-600">{teamInfo.nickName}</div>
       )}

@@ -499,6 +499,7 @@ const SocialMediaHub: React.FC = () => {
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
+      {/* Page Header */}
       <div className="text-center space-y-2">
         <h1 className="text-3xl font-bold flex items-center justify-center gap-3">
           <Flame className="h-8 w-8 text-orange-500" />
@@ -508,6 +509,7 @@ const SocialMediaHub: React.FC = () => {
           Your dynasty's pulse on social media
         </p>
       </div>
+      {/* Filter Buttons Section */}
       <div className="flex justify-center gap-2 flex-wrap">
         <Button
           variant={filter === "all" ? "default" : "outline"}
@@ -553,6 +555,7 @@ const SocialMediaHub: React.FC = () => {
           Refresh
         </Button>
       </div>
+      {/* Posts Feed */}
       <div className="space-y-4">
         {isGenerating && posts.length === 0 && (
           <p className="text-center text-muted-foreground">

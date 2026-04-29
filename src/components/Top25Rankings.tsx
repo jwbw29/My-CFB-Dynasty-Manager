@@ -329,6 +329,7 @@ const Top25Rankings: React.FC = () => {
       {/* Hero Header */}
       <HeroHeader title="Top 25 Rankings" subtitle={`${currentYear} Season`} />
 
+      {/* Rankings Card Container */}
       <Card className="border-2 border-gray-200 dark:border-gray-700 shadow-xl overflow-hidden">
         <div className="bg-primary p-6">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 w-full">
@@ -363,6 +364,7 @@ const Top25Rankings: React.FC = () => {
             </Button>
           </div>
         </div>
+          {/* Rankings Grid */}
         <CardContent id="RankingsGrid">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-x-8 gap-y-4">
             <div className="space-y-1 border rounded-lg p-2">
@@ -411,6 +413,7 @@ const Top25Rankings: React.FC = () => {
         </CardContent>
       </Card>
 
+      {/* Others Receiving Votes Card */}
       <Card>
         <CardHeader className="font-bold">Others Receiving Votes:</CardHeader>
         <CardContent className="flex flex-col gap-6 pt-0">

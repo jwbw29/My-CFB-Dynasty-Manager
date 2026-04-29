@@ -164,6 +164,7 @@ const RosterImageUpload: React.FC<RosterImageUploadProps> = ({ onProcessComplete
 
   return (
     <div className={`flex flex-col items-center gap-4 ${className}`}>
+      {/* Hidden File Input */}
       <input
         type="file"
         accept="image/*"
@@ -173,6 +174,7 @@ const RosterImageUpload: React.FC<RosterImageUploadProps> = ({ onProcessComplete
         id="roster-image-upload-input-cropper"
       />
 
+      {/* Upload Button */}
       {!isCropping && (
         <Button
           type="button"
@@ -184,6 +186,7 @@ const RosterImageUpload: React.FC<RosterImageUploadProps> = ({ onProcessComplete
         </Button>
       )}
 
+      {/* Image Cropper */}
       {isCropping && imgSrc && (
         <div className="w-full max-w-2xl p-4 border rounded-md shadow-sm bg-card">
           <p className="text-sm text-muted-foreground mb-2 text-center">

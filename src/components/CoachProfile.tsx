@@ -207,6 +207,7 @@ const CoachProfile = () => {
 
   return (
     <>
+      {/* Profile Display Button */}
       <Button
         variant="default"
         size="lg"
@@ -240,12 +241,14 @@ const CoachProfile = () => {
         )}
       </Button>
 
+      {/* Edit Profile Dialog */}
       <Dialog open={isEditing} onOpenChange={setIsEditing}>
         <DialogContent className="sm:max-w-[600px]">
           <DialogHeader>
             <DialogTitle>Edit Profile & School Colors</DialogTitle>
           </DialogHeader>
           <div className="grid gap-6 py-4">
+            {/* Coach Name Field */}
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="coachName" className="text-right">
                 Coach Name
@@ -322,6 +325,7 @@ const CoachProfile = () => {
               />
             </div>
 
+            {/* School Colors Section */}
             <div className="border-t pt-4">
               <Label className="text-lg font-semibold mb-4 flex items-center gap-2">
                 <Palette className="h-4 w-4" />

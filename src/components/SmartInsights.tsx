@@ -316,6 +316,7 @@ const SmartInsights: React.FC<SmartInsightsProps> = ({
 
   return (
     <div className="space-y-4">
+      {/* Header Section with View All Button */}
       {showHeader && (
         <div className="flex items-center justify-between">
           <h2 className="text-xl font-semibold">Smart Insights</h2>
@@ -327,7 +328,9 @@ const SmartInsights: React.FC<SmartInsightsProps> = ({
         </div>
       )}
 
+      {/* Insights Grid */}
       <div className="grid gap-4">
+        {/* Insight Cards */}
         {insights.map(insight => (
           <InsightCard
             key={insight.id}

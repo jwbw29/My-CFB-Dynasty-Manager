@@ -295,6 +295,7 @@ const PlayerStats: React.FC = () => {
 
   return (
     <div className="space-y-6">
+      {/* Header Bar with View Type, Category Selector, and Add Button */}
       <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
         <h1 className="text-3xl font-bold text-center">Player Stats</h1>
         <div className="flex items-center gap-2">
@@ -312,6 +313,7 @@ const PlayerStats: React.FC = () => {
         </div>
       </div>
 
+      {/* Add / Edit Stats Dialog */}
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
         <DialogContent className="sm:max-w-4xl">
           <DialogHeader>
@@ -343,10 +345,12 @@ const PlayerStats: React.FC = () => {
         </DialogContent>
       </Dialog>
 
+      {/* Stats Table */}
       <Card>
         <CardHeader><CardTitle>{viewType} Stats - {selectedCategory}</CardTitle></CardHeader>
         <CardContent>
           <Table>
+            {/* Sortable Column Headers */}
             <TableHeader><TableRow>
               <TableHead>Name</TableHead>
               {displayCategories[selectedCategory].map(stat => (
@@ -357,6 +361,7 @@ const PlayerStats: React.FC = () => {
               ))}
               {viewType === 'Season' && <TableHead className="text-right">Actions</TableHead>}
             </TableRow></TableHeader>
+            {/* Stat Rows */}
             <TableBody>
               {sortedStats.map(stat => (
                 <TableRow key={stat.id}>
@@ -387,6 +392,7 @@ const PlayerStats: React.FC = () => {
               ))}
             </TableBody>
           </Table>
+          {/* Career Stats Pagination */}
           {(hasMoreCareerStats || canShowLess) && (
             <div className="flex justify-center gap-2 mt-4">
               {hasMoreCareerStats && <Button onClick={() => setCareerStatsDisplayCount(p => p + ITEMS_PER_PAGE)} variant="outline" className="flex items-center gap-2"><ChevronDown className="h-4 w-4" />Show More</Button>}
@@ -395,6 +401,7 @@ const PlayerStats: React.FC = () => {
           )}
         </CardContent>
       </Card>
+      {/* Player Card Popup */}
       {selectedPlayer && <PlayerCard player={selectedPlayer} isOpen={isOpen} onClose={closePlayerCard} />}
     </div>
   );

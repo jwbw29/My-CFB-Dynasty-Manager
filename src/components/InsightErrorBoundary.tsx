@@ -27,6 +27,7 @@ class InsightErrorBoundary extends React.Component<
     if (this.state.hasError) {
       return (
         <Card className="border-orange-200 bg-orange-50 dark:bg-orange-950">
+          {/* Error State Message */}
           <CardContent className="pt-6">
             <div className="flex items-center gap-3">
               <AlertTriangle className="h-6 w-6 text-orange-600" />

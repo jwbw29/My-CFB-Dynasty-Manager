@@ -61,6 +61,7 @@ const RecruitingCalculator: React.FC = () => {
 
   return (
     <div className="space-y-4">
+      {/* Grade Selectors */}
       <div className="grid grid-cols-3 gap-4">
         {[
           { value: grade1, setter: setGrade1 },
@@ -86,6 +87,7 @@ const RecruitingCalculator: React.FC = () => {
         ))}
       </div>
 
+      {/* Action Buttons */}
       <div className="flex justify-between items-center">
         
           <Button onClick={calculateResult} className="bg-blue-600 hover:bg-blue-700">
@@ -97,6 +99,7 @@ const RecruitingCalculator: React.FC = () => {
         </div>
 
 
+        {/* Result Display */}
         {result && (
           <Card>
             <CardContent className="pt-6">
