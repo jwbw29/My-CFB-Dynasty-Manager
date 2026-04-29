@@ -445,7 +445,8 @@ export const GameStatsModal: React.FC<GameStatsModalProps> = ({
                                     </AlertDialogFooter>
                                   </AlertDialogContent>
                                 </AlertDialog>
-                {/* Stats Table with Actions */}
+
+                                {/* Stats Table with Actions */}
                               </div>
                             </TableCell>
                           </TableRow>
@@ -457,7 +458,7 @@ export const GameStatsModal: React.FC<GameStatsModalProps> = ({
 
                 {isFormOpen && (
                   <div className="rounded-md border border-gray-200 dark:border-gray-700 p-4 space-y-4 bg-muted/20">
-                {/* Inline Add/Edit Form */}
+                    {/* Inline Add/Edit Form */}
                     <div className="space-y-2">
                       <Label>Player</Label>
                       {editingEntry ? (

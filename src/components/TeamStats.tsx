@@ -46,7 +46,10 @@ import { HeroHeader } from "@/components/ui/HeroHeader";
 import { fbsTeams } from "@/utils/fbsTeams";
 import { positions } from "@/types/playerTypes";
 import { getGameStats, hasGameStatsForYear } from "@/utils/localStorage";
-import { accumulateGameStats, getGamesPlayedByPlayer } from "@/utils/accumulateGameStats";
+import {
+  accumulateGameStats,
+  getGamesPlayedByPlayer,
+} from "@/utils/accumulateGameStats";
 
 // Conference list
 const conferences = [
@@ -1185,7 +1188,8 @@ const TeamStats: React.FC = () => {
             <CardContent className="w-full px-24">
               {hasPerGameStats && (
                 <div className="mb-4 p-3 rounded-lg bg-blue-500/10 border border-blue-500/30 text-blue-400 text-sm">
-                  Team Leaders are automatically calculated from per-game stats entered in the Schedule.
+                  Team Leaders are automatically calculated from per-game stats
+                  entered in the Schedule.
                 </div>
               )}
               <div className="space-y-6">
@@ -1786,7 +1790,10 @@ const TeamStats: React.FC = () => {
                                   {!hasPerGameStats && (
                                     <button
                                       onClick={() =>
-                                        removeLeaderRow("receivingLeaders", index)
+                                        removeLeaderRow(
+                                          "receivingLeaders",
+                                          index,
+                                        )
                                       }
                                       className="text-red-600 hover:text-red-800 text-sm px-2 py-1 rounded"
                                       title="Remove Player"
@@ -1802,7 +1809,9 @@ const TeamStats: React.FC = () => {
                             <TableCell colSpan={7}>
                               {!hasPerGameStats && (
                                 <button
-                                  onClick={() => addLeaderRow("receivingLeaders")}
+                                  onClick={() =>
+                                    addLeaderRow("receivingLeaders")
+                                  }
                                   className="text-blue-600 hover:text-blue-800 text-sm"
                                 >
                                   + Add Player
@@ -1830,7 +1839,8 @@ const TeamStats: React.FC = () => {
             <CardContent className="w-full px-24">
               {hasPerGameStats && (
                 <div className="mb-4 p-3 rounded-lg bg-blue-500/10 border border-blue-500/30 text-blue-400 text-sm">
-                  Team Leaders are automatically calculated from per-game stats entered in the Schedule.
+                  Team Leaders are automatically calculated from per-game stats
+                  entered in the Schedule.
                 </div>
               )}
               <div className="space-y-6">
