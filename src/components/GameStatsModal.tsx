@@ -4,7 +4,7 @@
 
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -134,6 +134,10 @@ export const GameStatsModal: React.FC<GameStatsModalProps> = ({
   const [statValues, setStatValues] = useState<Record<string, number>>(
     createDefaultStatValues("Passing"),
   );
+  const [sortConfig, setSortConfig] = useState<{
+    field: string;
+    direction: "asc" | "desc";
+  }>({ field: "playerName", direction: "asc" });
 
   const weekLabel = useMemo(() => getWeekDisplayName(gameWeek), [gameWeek]);
 
@@ -159,12 +163,34 @@ export const GameStatsModal: React.FC<GameStatsModalProps> = ({
     setEditingEntry(null);
     setSelectedPlayer("");
     setStatValues(createDefaultStatValues(activeCategory));
+    setSortConfig({ field: "playerName", direction: "asc" });
   }, [activeCategory]);
 
   const categoryEntries = useMemo(() => {
     const weekEntries = gameStatsData[gameWeek] || [];
     return weekEntries.filter((entry) => entry.category === activeCategory);
   }, [gameStatsData, gameWeek, activeCategory]);
+
+  const sortedCategoryEntries = useMemo(() => {
+    return [...categoryEntries].sort((a, b) => {
+      if (sortConfig.field === "playerName") {
+        return sortConfig.direction === "asc"
+          ? a.playerName.localeCompare(b.playerName)
+          : b.playerName.localeCompare(a.playerName);
+      }
+      const aVal = a.stats[sortConfig.field] ?? 0;
+      const bVal = b.stats[sortConfig.field] ?? 0;
+      return sortConfig.direction === "asc" ? aVal - bVal : bVal - aVal;
+    });
+  }, [categoryEntries, sortConfig]);
+
+  const requestSort = useCallback((field: string) => {
+    setSortConfig((prev) => ({
+      field,
+      direction:
+        prev.field === field && prev.direction === "desc" ? "asc" : "desc",
+    }));
+  }, []);
 
   const eligiblePlayers = useMemo(() => {
     const allowedPositions = POSITION_FILTERS[activeCategory] || [];
@@ -333,7 +359,7 @@ export const GameStatsModal: React.FC<GameStatsModalProps> = ({
             const fields = STAT_FIELDS[category];
             const rows =
               category === activeCategory
-                ? categoryEntries
+                ? sortedCategoryEntries
                 : (gameStatsData[gameWeek] || []).filter(
                     (entry) => entry.category === category,
                   );
@@ -371,15 +397,115 @@ export const GameStatsModal: React.FC<GameStatsModalProps> = ({
                     )}
                   </Button>
                 </div>
-                <div className="flex flex-col w-full rounded-md border border-gray-200 dark:border-gray-700 overflow-x-auto">
+
+                {/* Add Player Form */}
+                {isFormOpen && (
+                  <div
+                    id="add-player-form"
+                    className="rounded-md border border-gray-200 dark:border-gray-700 p-4 space-y-4 bg-muted/20"
+                  >
+                    {/* Inline Add/Edit Form */}
+                    <div className="space-y-2">
+                      <Label>Player</Label>
+                      {editingEntry ? (
+                        <div className="h-10 px-3 rounded-md border border-input bg-background flex items-center text-sm">
+                          {editingEntry.playerName}
+                        </div>
+                      ) : (
+                        <Select
+                          value={selectedPlayer}
+                          onValueChange={setSelectedPlayer}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select Player" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {eligiblePlayers.map((player) => (
+                              <SelectItem key={player.id} value={player.name}>
+                                {`${player.name} - ${player.position} #${player.jerseyNumber}`}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      )}
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {STAT_FIELDS[activeCategory].map((field) => {
+                        const isHalfStep =
+                          field.key === "tfl" || field.key === "sacks";
+                        return (
+                          <div key={field.key} className="space-y-2">
+                            <Label
+                              htmlFor={`stat-${activeCategory}-${field.key}`}
+                            >
+                              {field.label}
+                            </Label>
+                            <Input
+                              id={`stat-${activeCategory}-${field.key}`}
+                              type="number"
+                              step={isHalfStep ? 0.5 : 1}
+                              value={statValues[field.key] ?? 0}
+                              onChange={(event) => {
+                                const value = Number(event.target.value);
+                                setStatValues((prev) => ({
+                                  ...prev,
+                                  [field.key]: Number.isNaN(value) ? 0 : value,
+                                }));
+                              }}
+                            />
+                          </div>
+                        );
+                      })}
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <Button type="button" onClick={handleSave}>
+                        <Save className="h-4 w-4 mr-2" />
+                        Save
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={resetFormState}
+                      >
+                        <X className="h-4 w-4 mr-2" />
+                        Cancel
+                      </Button>
+                    </div>
+                  </div>
+                )}
+
+                {/* Player Stats Display */}
+                <div
+                  id="player-stats-display"
+                  className="flex flex-col w-full rounded-md border border-gray-200 dark:border-gray-700 overflow-x-auto"
+                >
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead className="min-w-[180px]">
-                          Player Name
+                        <TableHead
+                          className="min-w-[180px] cursor-pointer select-none"
+                          onClick={() => requestSort("playerName")}
+                        >
+                          <div className="flex items-center gap-1">
+                            Player Name
+                            {sortConfig.field === "playerName" &&
+                              (sortConfig.direction === "asc" ? " ▲" : " ▼")}
+                          </div>
                         </TableHead>
                         {fields.map((field) => (
-                          <TableHead key={field.key}>{field.label}</TableHead>
+                          <TableHead
+                            key={field.key}
+                            className="cursor-pointer select-none"
+                            onClick={() => requestSort(field.key)}
+                          >
+                            <div className="flex items-center justify-center gap-1">
+                              {field.label}
+                              {sortConfig.field === field.key &&
+                                (sortConfig.direction === "asc" ? " ▲" : " ▼")}
+                            </div>
+                          </TableHead>
                         ))}
                         <TableHead className="text-right min-w-[120px]">
                           Actions
@@ -461,80 +587,6 @@ export const GameStatsModal: React.FC<GameStatsModalProps> = ({
                     </TableBody>
                   </Table>
                 </div>
-
-                {isFormOpen && (
-                  <div className="rounded-md border border-gray-200 dark:border-gray-700 p-4 space-y-4 bg-muted/20">
-                    {/* Inline Add/Edit Form */}
-                    <div className="space-y-2">
-                      <Label>Player</Label>
-                      {editingEntry ? (
-                        <div className="h-10 px-3 rounded-md border border-input bg-background flex items-center text-sm">
-                          {editingEntry.playerName}
-                        </div>
-                      ) : (
-                        <Select
-                          value={selectedPlayer}
-                          onValueChange={setSelectedPlayer}
-                        >
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select Player" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {eligiblePlayers.map((player) => (
-                              <SelectItem key={player.id} value={player.name}>
-                                {`${player.name} - ${player.position} #${player.jerseyNumber}`}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      )}
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {STAT_FIELDS[activeCategory].map((field) => {
-                        const isHalfStep =
-                          field.key === "tfl" || field.key === "sacks";
-                        return (
-                          <div key={field.key} className="space-y-2">
-                            <Label
-                              htmlFor={`stat-${activeCategory}-${field.key}`}
-                            >
-                              {field.label}
-                            </Label>
-                            <Input
-                              id={`stat-${activeCategory}-${field.key}`}
-                              type="number"
-                              step={isHalfStep ? 0.5 : 1}
-                              value={statValues[field.key] ?? 0}
-                              onChange={(event) => {
-                                const value = Number(event.target.value);
-                                setStatValues((prev) => ({
-                                  ...prev,
-                                  [field.key]: Number.isNaN(value) ? 0 : value,
-                                }));
-                              }}
-                            />
-                          </div>
-                        );
-                      })}
-                    </div>
-
-                    <div className="flex items-center gap-2">
-                      <Button type="button" onClick={handleSave}>
-                        <Save className="h-4 w-4 mr-2" />
-                        Save
-                      </Button>
-                      <Button
-                        type="button"
-                        variant="outline"
-                        onClick={resetFormState}
-                      >
-                        <X className="h-4 w-4 mr-2" />
-                        Cancel
-                      </Button>
-                    </div>
-                  </div>
-                )}
               </TabsContent>
             );
           })}
