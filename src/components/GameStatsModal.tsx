@@ -361,8 +361,14 @@ export const GameStatsModal: React.FC<GameStatsModalProps> = ({
                       setStatValues(createDefaultStatValues(activeCategory));
                     }}
                   >
-                    <Plus className="h-4 w-4 mr-2" />
-                    {isFormOpen ? "Cancel" : "Add Player Stats"}
+                    {isFormOpen ? (
+                      "Cancel"
+                    ) : (
+                      <>
+                        <Plus className="h-4 w-4 mr-2" />
+                        Add Player Stats
+                      </>
+                    )}
                   </Button>
                 </div>
                 <div className="flex flex-col w-full rounded-md border border-gray-200 dark:border-gray-700 overflow-x-auto">
