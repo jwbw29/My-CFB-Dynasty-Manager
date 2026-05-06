@@ -23,7 +23,6 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
   DialogFooter,
 } from "@/components/ui/dialog";
 import {
@@ -33,6 +32,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  MultiSelect,
+  MultiSelectGroup,
+  MultiSelectOption,
+} from "@/components/ui/multi-select";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -165,13 +169,22 @@ const devTraitOrder: { [key: string]: number } = {
   Elite: 3,
 };
 
-const FILTER_ALL = "all";
-const FILTER_OFFENSE = "offense";
-const FILTER_DEFENSE = "defense";
-const FILTER_SPECIAL_TEAMS = "specialTeams";
-const FILTER_OL = "ol";
-
-const offensiveLinePositions = ["OL", "LT", "LG", "C", "RG", "RT"];
+/**
+ * Position group presets used by the roster position multiselect.
+ *
+ * We keep these groups in one constant so the UI's group toggle buttons and
+ * filtering behavior stay in sync as position lists evolve.
+ *
+ * The MultiSelect group action follows a two-way toggle contract:
+ * when every position in a group is selected it deselects that full group,
+ * otherwise it selects every position in the group.
+ */
+const positionGroups: MultiSelectGroup[] = [
+  { label: "Offense", values: offensePositions },
+  { label: "Defense", values: defensivePositions },
+  { label: "Special Teams", values: specialTeamsPositions },
+  { label: "OL", values: ["LT", "LG", "C", "RG", "RT"] },
+];
 
 const initialNewPlayerState: Omit<Player, "id"> = {
   jerseyNumber: "",
@@ -245,7 +258,8 @@ const Roster: React.FC = () => {
     direction: "asc" | "desc";
   }>({ field: "rating", direction: "desc" });
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
-  const [posFilter, setPosFilter] = useState(FILTER_ALL);
+  const [posFilters, setPosFilters] = useState<string[]>([]);
+  const [yearFilters, setYearFilters] = useState<string[]>([]);
   const { selectedPlayer, isOpen, openPlayerCard, closePlayerCard } =
     usePlayerCard();
   const [isFormOpen, setIsFormOpen] = useState(false);
@@ -307,26 +321,44 @@ const Roster: React.FC = () => {
     }
   }, [dataVersion]);
 
+  /**
+   * Applies roster filters using AND semantics across categories:
+   * - Position multiselect narrows by selected positions when non-empty.
+   * - Year multiselect narrows by selected years when non-empty.
+   *
+   * Empty filter arrays intentionally mean "no constraint" so clearing all
+   * selections returns the full roster instead of an empty table.
+   */
   useEffect(() => {
-    if (posFilter === FILTER_ALL) setFilteredPlayers(players);
-    else if (posFilter === FILTER_OFFENSE)
-      setFilteredPlayers(
-        players.filter((p) => offensePositions.includes(p.position)),
-      );
-    else if (posFilter === FILTER_DEFENSE)
-      setFilteredPlayers(
-        players.filter((p) => defensivePositions.includes(p.position)),
-      );
-    else if (posFilter === FILTER_SPECIAL_TEAMS)
-      setFilteredPlayers(
-        players.filter((p) => specialTeamsPositions.includes(p.position)),
-      );
-    else if (posFilter === FILTER_OL)
-      setFilteredPlayers(
-        players.filter((p) => offensiveLinePositions.includes(p.position)),
-      );
-    else setFilteredPlayers(players.filter((p) => p.position === posFilter));
-  }, [posFilter, players]);
+    const nextFilteredPlayers = players.filter((player) => {
+      const matchesPosition =
+        posFilters.length === 0 || posFilters.includes(player.position);
+      const matchesYear =
+        yearFilters.length === 0 || yearFilters.includes(player.year);
+
+      return matchesPosition && matchesYear;
+    });
+
+    setFilteredPlayers(nextFilteredPlayers);
+  }, [players, posFilters, yearFilters]);
+
+  /**
+   * Position options are mapped once to keep rendering logic simple and to
+   * guarantee the MultiSelect receives the expected { value, label } shape.
+   */
+  const positionOptions: MultiSelectOption[] = useMemo(
+    () => positions.map((position) => ({ value: position, label: position })),
+    [],
+  );
+
+  /**
+   * Year options are kept in the same option shape as position options so both
+   * multiselects share the same component contract and behavior.
+   */
+  const yearOptions: MultiSelectOption[] = useMemo(
+    () => years.map((year) => ({ value: year, label: year })),
+    [],
+  );
 
   const handleImportComplete = useCallback(
     (importedPlayers: Partial<Player>[]) => {
@@ -764,29 +796,25 @@ const Roster: React.FC = () => {
 
         {/* Main Roster Content */}
         <CardContent className="bg-gradient-to-br from-gray-50 to-white dark:from-gray-900 dark:to-gray-800">
-          <div className="w-full sm:w-1/2 md:w-1/3 lg:w-1/4 pb-4">
-            <Select
-              value={posFilter}
-              onValueChange={(value) => setPosFilter(value)}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Filter by Position" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value={FILTER_ALL}>All Positions</SelectItem>
-                <SelectItem value={FILTER_OFFENSE}>Offense</SelectItem>
-                <SelectItem value={FILTER_DEFENSE}>Defense</SelectItem>
-                <SelectItem value={FILTER_SPECIAL_TEAMS}>
-                  Special Teams
-                </SelectItem>
-                <SelectItem value={FILTER_OL}>OL</SelectItem>
-                {positions.map((pos) => (
-                  <SelectItem key={pos} value={pos}>
-                    {pos}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+          <div className="flex flex-wrap gap-4 pb-4">
+            <div className="w-full sm:w-1/2 md:w-1/3 lg:w-1/4">
+              <MultiSelect
+                options={positionOptions}
+                selected={posFilters}
+                onChange={setPosFilters}
+                placeholder="Positions"
+                groups={positionGroups}
+              />
+            </div>
+
+            <div className="w-full sm:w-1/2 md:w-1/3 lg:w-1/4">
+              <MultiSelect
+                options={yearOptions}
+                selected={yearFilters}
+                onChange={setYearFilters}
+                placeholder="Years"
+              />
+            </div>
           </div>
           {sortedPlayers.length > 0 ? (
             <div className="overflow-x-auto">
