@@ -6,7 +6,6 @@ import { ChevronDown } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Popover, PopoverTrigger, PopoverContent } from "./popover"
 import { Checkbox } from "./checkbox"
-import { ScrollArea } from "./scroll-area"
 import { Button } from "./button"
 
 /**
@@ -191,8 +190,7 @@ export const MultiSelect: React.FC<MultiSelectProps> = ({
             max-height of 250px prevents the popover from becoming too tall.
             Each row is a clickable label containing a checkbox and text.
           */}
-          <ScrollArea className="max-h-[250px]">
-            <div className="p-2">
+          <div className="max-h-[250px] overflow-y-auto p-2">
               {options.map((option) => {
                 const isChecked = selected.includes(option.value);
                 return (
@@ -208,8 +206,7 @@ export const MultiSelect: React.FC<MultiSelectProps> = ({
                   </label>
                 );
               })}
-            </div>
-          </ScrollArea>
+          </div>
         </div>
       </PopoverContent>
     </Popover>
