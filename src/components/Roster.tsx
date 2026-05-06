@@ -113,6 +113,7 @@ const years = [
   "JR (RS)",
   "SR",
   "SR (RS)",
+  "TR",
 ];
 const devTraits = ["Normal", "Impact", "Star", "Elite"] as const;
 
@@ -161,6 +162,7 @@ const yearOrder: { [key: string]: number } = {
   "JR (RS)": 5,
   SR: 6,
   "SR (RS)": 7,
+  TR: 8,
 };
 const devTraitOrder: { [key: string]: number } = {
   Normal: 0,
