@@ -286,6 +286,21 @@ const RecruitingNeedsTable = React.memo<{
           </React.Fragment>
         );
       })}
+
+      {/* Totals row — view-only accumulation of Need, Signed, and Targeted columns */}
+      <div className="p-2 text-center border-r border-gray-300 bg-gray-200 dark:bg-gray-700 font-bold">
+        TOTAL
+      </div>
+      <div className="p-2 border-r border-gray-300 bg-gray-200 dark:bg-gray-700" />
+      <div className="p-2 text-center border-r border-gray-300 bg-gray-200 dark:bg-gray-700 font-bold">
+        {needs.reduce((sum, n) => sum + n.need, 0)}
+      </div>
+      <div className="p-2 text-center border-r border-gray-300 bg-gray-200 dark:bg-gray-700 font-bold">
+        {needs.reduce((sum, n) => sum + n.signed, 0)}
+      </div>
+      <div className="p-2 text-center bg-gray-200 dark:bg-gray-700 font-bold">
+        {needs.reduce((sum, n) => sum + n.targeted, 0)}
+      </div>
     </div>
   </div>
 ));
@@ -623,6 +638,43 @@ const RecruitingClassTracker: React.FC = () => {
                 updateNeed={updateDefensiveNeed}
                 tableType="defensive"
               />
+
+              {/* Combined totals row — sums both offensive and defensive needs */}
+              <div className="w-full">
+                <div className="bg-gray-800 text-white text-center py-2 font-semibold">
+                  COMBINED TOTALS
+                </div>
+                <div className="grid grid-cols-5 gap-0 border border-gray-300">
+                  <div className="bg-gray-200 dark:bg-gray-700 p-2 text-center font-medium border-r border-gray-300">
+                    Position
+                  </div>
+                  <div className="bg-gray-200 dark:bg-gray-700 p-2 text-center font-medium border-r border-gray-300">
+                    Priority
+                  </div>
+                  <div className="bg-gray-200 dark:bg-gray-700 p-2 text-center font-medium border-r border-gray-300">
+                    Need
+                  </div>
+                  <div className="bg-gray-200 dark:bg-gray-700 p-2 text-center font-medium border-r border-gray-300">
+                    Signed
+                  </div>
+                  <div className="bg-gray-200 dark:bg-gray-700 p-2 text-center font-medium">
+                    Targeted
+                  </div>
+                  <div className="p-2 text-center border-r border-gray-300 bg-gray-100 dark:bg-gray-800 font-bold">
+                    ALL
+                  </div>
+                  <div className="p-2 border-r border-gray-300 bg-gray-100 dark:bg-gray-800" />
+                  <div className="p-2 text-center border-r border-gray-300 bg-gray-100 dark:bg-gray-800 font-bold">
+                    {[...offensiveNeeds, ...defensiveNeeds].reduce((sum, n) => sum + n.need, 0)}
+                  </div>
+                  <div className="p-2 text-center border-r border-gray-300 bg-gray-100 dark:bg-gray-800 font-bold">
+                    {[...offensiveNeeds, ...defensiveNeeds].reduce((sum, n) => sum + n.signed, 0)}
+                  </div>
+                  <div className="p-2 text-center bg-gray-100 dark:bg-gray-800 font-bold">
+                    {[...offensiveNeeds, ...defensiveNeeds].reduce((sum, n) => sum + n.targeted, 0)}
+                  </div>
+                </div>
+              </div>
             </div>
           </CardContent>
         )}
