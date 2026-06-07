@@ -1,13 +1,7 @@
 {
-  "active_plan": "/Users/justin.byrd/Code/Personal_Projects/My-CFB-Dynasty-Manager/.sisyphus/plans/recruiting-needs-totals-row.md",
-  "started_at": "2026-05-22T13:29:10.622Z",
-  "session_ids": [
-    "ses_1b02a0756ffeqWzq5xjpTWHGPS"
-  ],
-  "session_origins": {
-    "ses_1b02a0756ffeqWzq5xjpTWHGPS": "direct"
-  },
-  "plan_name": "recruiting-needs-totals-row",
-  "agent": "atlas",
-  "task_sessions": {}
+  "active_plan": "/Users/justin.byrd/Code/Personal_Projects/My-CFB-Dynasty-Manager/.sisyphus/plans/default-rosters.md",
+  "started_at": "2026-06-07T18:28:10.001Z",
+  "session_ids": ["ses_15d120d98ffeW1MCANOt9YUMSG"],
+  "plan_name": "default-rosters",
+  "worktree_path": "/Users/justin.byrd/Code/Personal_Projects/My-CFB-Dynasty-Manager-dev"
 }
