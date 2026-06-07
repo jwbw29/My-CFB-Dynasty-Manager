@@ -258,11 +258,6 @@ const DynastyLaunch: React.FC<DynastyLaunchProps> = ({ onDynastySelected }) => {
       toast.error("Custom team name required");
       return;
     }
-    if (dynasties.find((d) => d.schoolName === actualSchoolName)) {
-      toast.error("A dynasty already exists for this school");
-      return;
-    }
-
     const newDynastyEntry: Dynasty = {
       id: Date.now().toString(),
       coachName: newDynasty.coachName.trim(),
@@ -437,10 +432,6 @@ const DynastyLaunch: React.FC<DynastyLaunchProps> = ({ onDynastySelected }) => {
       }
 
       const { coachName, schoolName } = snapshot.dynastyData.coachProfile;
-      if (dynasties.find((d) => d.schoolName === schoolName)) {
-        throw new Error(`A dynasty for ${schoolName} already exists.`);
-      }
-
       // Create the new dynasty metadata entry
       const newDynastyEntry: Dynasty = {
         id: Date.now().toString(),
