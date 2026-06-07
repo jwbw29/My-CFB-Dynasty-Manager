@@ -75,6 +75,8 @@ export interface Player {
   isRedshirted: boolean;
   isTransferring: boolean;
   isDrafted: boolean;
+  height?: number;
+  weight?: number;
 }
 
 export interface Recruit {

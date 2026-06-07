@@ -98,6 +98,8 @@ interface Player {
   isRedshirted: boolean;
   isTransferring: boolean;
   isDrafted: boolean;
+  height?: number;
+  weight?: number;
 }
 
 interface DevTraitBadgeProps {

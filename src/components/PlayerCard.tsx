@@ -50,8 +50,8 @@ interface ExtendedPlayer {
   devTrait?: "Normal" | "Impact" | "Star" | "Elite";
   notes?: string;
   isRedshirted?: boolean;
-  height?: string;
-  weight?: string;
+  height?: number;
+  weight?: number;
 }
 
 interface PlayerCardProps {

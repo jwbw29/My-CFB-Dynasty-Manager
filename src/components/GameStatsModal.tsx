@@ -66,6 +66,8 @@ interface RosterPlayer {
   rating: string;
   devTrait?: string;
   notes?: string;
+  height?: number;
+  weight?: number;
 }
 
 interface GameStatsModalProps {
