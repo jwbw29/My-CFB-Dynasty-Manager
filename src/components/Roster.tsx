@@ -64,7 +64,7 @@ import {
   specialTeamsPositions,
 } from "@/types/playerTypes";
 import { notifySuccess, MESSAGES } from "@/utils/notification-utils";
-import { Pencil, Trash2, Download, Shirt, Plus } from "lucide-react";
+import { Pencil, Trash2, Download, Shirt, Plus, RotateCcw } from "lucide-react";
 import { saveAs } from "file-saver";
 import Papa from "papaparse";
 import RosterCSVImport from "./RosterCSVImport";
@@ -73,6 +73,7 @@ import { Badge } from "@/components/ui/badge";
 import { usePlayerCard } from "@/hooks/usePlayerCard";
 import PlayerCard from "./PlayerCard";
 import { v4 as uuidv4 } from "uuid";
+import { formatHeight } from "@/utils/formatHeight";
 import {
   CoachStaff,
   Coach,
@@ -85,6 +86,7 @@ import { getCoachProfile } from "@/utils/localStorage";
 import { useDynasty } from "@/contexts/DynastyContext";
 import { HeroHeader } from "@/components/ui/HeroHeader";
 import clsx from "clsx";
+import { fbsTeams } from "@/utils/fbsTeams";
 
 interface Player {
   id: string;
@@ -153,6 +155,8 @@ type SortField =
   | "name"
   | "position"
   | "year"
+  | "height"
+  | "weight"
   | "rating"
   | "dev. trait";
 const yearOrder: { [key: string]: number } = {
@@ -308,6 +312,19 @@ const Roster: React.FC = () => {
   });
   const [editingCoach, setEditingCoach] = useState<CoachPosition | null>(null);
 
+  /**
+   * Extract current team name from coach profile to determine whether a default
+   * roster exists for this team, allowing users to reset to FBS team defaults.
+   */
+  const coachProfile = getCoachProfile();
+  const currentTeamName = coachProfile?.schoolName || "";
+
+  /**
+   * Check if the current team is an FBS team with a default roster available.
+   * Custom teams won't be found in fbsTeams and can't be reset to default.
+   */
+  const hasDefaultRoster = fbsTeams.some((t) => t.name === currentTeamName);
+
   // Sync HC name with coach profile
   useEffect(() => {
     const coachProfile = getCoachProfile();
@@ -396,6 +413,8 @@ const Roster: React.FC = () => {
       Name: p.name,
       Position: p.position,
       Year: p.year,
+      Height: p.height ? formatHeight(p.height) : "",
+      Weight: p.weight ? `${p.weight}` : "",
       Rating: p.rating,
       "Dev. Trait": p.devTrait,
       "Is Redshirted": p.isRedshirted ? "Yes" : "No",
@@ -421,6 +440,14 @@ const Roster: React.FC = () => {
         return sortConfig.direction === "asc"
           ? yearOrder[a.year] - yearOrder[b.year]
           : yearOrder[b.year] - yearOrder[a.year];
+      if (sortConfig.field === "height")
+        return sortConfig.direction === "asc"
+          ? (a.height ?? 0) - (b.height ?? 0)
+          : (b.height ?? 0) - (a.height ?? 0);
+      if (sortConfig.field === "weight")
+        return sortConfig.direction === "asc"
+          ? (a.weight ?? 0) - (b.weight ?? 0)
+          : (b.weight ?? 0) - (a.weight ?? 0);
       if (sortConfig.field === "rating")
         return sortConfig.direction === "asc"
           ? parseInt(a.rating) - parseInt(b.rating)
@@ -554,6 +581,39 @@ const Roster: React.FC = () => {
     },
     [setPlayers],
   );
+
+  /**
+   * Replaces the entire roster with the team's default roster from default-rosters.json.
+   * 
+   * Fetches the JSON file, looks up the team by currentTeamName, and replaces all players
+   * with fresh UUIDs. This is a destructive operation — all manual changes will be lost.
+   * 
+   * @throws {Error} If the fetch fails or the team is not found in the default roster data
+   */
+  const handleResetToDefault = useCallback(async () => {
+    try {
+      const response = await fetch("/data/default-rosters.json");
+      if (!response.ok) {
+        toast.error("Could not load default roster data.");
+        return;
+      }
+      const rosterData = await response.json();
+      const teamRoster = rosterData.teams?.[currentTeamName];
+      if (!teamRoster || !Array.isArray(teamRoster)) {
+        toast.error("No default roster found for this team.");
+        return;
+      }
+      const resetPlayers: Player[] = teamRoster.map((player: any) => ({
+        ...player,
+        id: uuidv4(),
+      }));
+      setPlayers(resetPlayers);
+      notifySuccess("Roster reset to default successfully!");
+    } catch (error) {
+      console.error("Failed to reset roster:", error);
+      toast.error("Failed to reset roster. Please try again.");
+    }
+  }, [currentTeamName, setPlayers]);
 
   // Coach handling functions
   const handleSaveCoaches = useCallback(() => {
@@ -792,6 +852,38 @@ const Roster: React.FC = () => {
                 <Download className="h-4 w-4 mr-2" />
                 Export CSV
               </Button>
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button
+                    variant="destructive"
+                    disabled={!hasDefaultRoster}
+                    title={
+                      hasDefaultRoster
+                        ? "Reset roster to default"
+                        : "No default roster available for custom teams"
+                    }
+                  >
+                    <RotateCcw className="h-4 w-4 mr-2" />
+                    Reset to Default
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Reset Roster to Default?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      This will replace your entire roster with the default roster
+                      for {currentTeamName}. All manual changes will be lost. This
+                      cannot be undone.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction onClick={handleResetToDefault}>
+                      Reset
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
             </div>
           </div>
         </div>
@@ -830,6 +922,8 @@ const Roster: React.FC = () => {
                       "Name",
                       "Position",
                       "Year",
+                      "Height",
+                      "Weight",
                       "Rating",
                       "Dev. Trait",
                       "Notes",
@@ -900,6 +994,16 @@ const Roster: React.FC = () => {
                             Entering Draft
                           </Badge>
                         )}
+                      </TableCell>
+
+                      {/* Player Height */}
+                      <TableCell className="text-center">
+                        {formatHeight(player.height)}
+                      </TableCell>
+
+                      {/* Player Weight */}
+                      <TableCell className="text-center">
+                        {player.weight ? `${player.weight} lbs` : "—"}
                       </TableCell>
 
                       {/* Player OVR Rating */}
@@ -1117,6 +1221,36 @@ const Roster: React.FC = () => {
               {errors.rating && (
                 <p className="text-red-500 text-xs">{errors.rating}</p>
               )}
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="height">Height (inches)</Label>
+              <Input
+                id="height"
+                type="number"
+                value={newPlayer.height ?? ""}
+                onChange={(e) =>
+                  setNewPlayer((p) => ({
+                    ...p,
+                    height: e.target.value ? parseInt(e.target.value) : undefined,
+                  }))
+                }
+                placeholder="e.g. 74"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="weight">Weight (lbs)</Label>
+              <Input
+                id="weight"
+                type="number"
+                value={newPlayer.weight ?? ""}
+                onChange={(e) =>
+                  setNewPlayer((p) => ({
+                    ...p,
+                    weight: e.target.value ? parseInt(e.target.value) : undefined,
+                  }))
+                }
+                placeholder="e.g. 215"
+              />
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="devTrait">Dev. Trait</Label>

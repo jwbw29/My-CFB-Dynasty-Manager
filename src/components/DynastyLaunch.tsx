@@ -53,6 +53,7 @@ import {
 } from "lucide-react";
 import { TeamLogo } from "@/components/ui/TeamLogo";
 import Papa from "papaparse";
+import { v4 as uuidv4 } from "uuid";
 import {
   clearActiveSessionData,
   getTop25History,
@@ -182,15 +183,18 @@ const DynastyLaunch: React.FC<DynastyLaunchProps> = ({ onDynastySelected }) => {
     };
   }, [loadDynasties]);
 
-  const validateImportedData = (data: any): data is DynastySnapshot => {
-    if (!data || typeof data !== "object") return false;
-    return (
-      data.version &&
-      data.dynastyData &&
-      data.dynastyData.coachProfile &&
-      data.dynastyData.currentYear
-    );
-  };
+  const validateImportedData = useCallback(
+    (data: any): data is DynastySnapshot => {
+      if (!data || typeof data !== "object") return false;
+      return (
+        data.version &&
+        data.dynastyData &&
+        data.dynastyData.coachProfile &&
+        data.dynastyData.currentYear
+      );
+    },
+    []
+  );
 
   const calculateDynastyStatsFromImport = (
     data: ImportedData
@@ -236,7 +240,7 @@ const DynastyLaunch: React.FC<DynastyLaunchProps> = ({ onDynastySelected }) => {
     if (file) setSelectedFile(file);
   };
 
-  const createDynasty = useCallback(() => {
+  const createDynasty = useCallback(async () => {
     if (!newDynasty.coachName.trim()) {
       toast.error("Coach name required");
       return;
@@ -272,7 +276,7 @@ const DynastyLaunch: React.FC<DynastyLaunchProps> = ({ onDynastySelected }) => {
       championships: 0,
     };
 
-    const initializeDynastyData = (d: Dynasty) => {
+    const initializeDynastyData = async (d: Dynasty) => {
       clearActiveSessionData();
       localStorage.setItem("currentDynastyId", d.id);
       const colorData = schoolColorPresets[d.schoolName] || {
@@ -298,9 +302,9 @@ const DynastyLaunch: React.FC<DynastyLaunchProps> = ({ onDynastySelected }) => {
         "yearRecords",
         "allTrophies",
       ];
-      emptyDataKeys.forEach((key) =>
-        localStorage.setItem(key, JSON.stringify([]))
-      );
+      emptyDataKeys.forEach((key) => {
+        localStorage.setItem(key, JSON.stringify([]));
+      });
 
       localStorage.setItem(
         "top25Rankings",
@@ -322,10 +326,38 @@ const DynastyLaunch: React.FC<DynastyLaunchProps> = ({ onDynastySelected }) => {
         JSON.stringify(emptySchedule)
       );
 
+      /**
+       * Load default roster from static JSON for FBS teams.
+       * Custom/TeamBuilder teams get an empty roster since they
+       * have no default data in the pre-built JSON.
+       */
+      let defaultPlayers: any[] = [];
+      try {
+        const response = await fetch("/data/default-rosters.json");
+        if (response.ok) {
+          const rosterData = await response.json();
+          const teamRoster = rosterData.teams?.[d.schoolName];
+          if (teamRoster && Array.isArray(teamRoster)) {
+            defaultPlayers = teamRoster.map((player: any) => ({
+              ...player,
+              id: uuidv4(),
+            }));
+          }
+        }
+      } catch (error) {
+        console.warn(
+          `Could not load default roster for "${d.schoolName}":`,
+          error
+        );
+      }
+
+      // Persist the loaded roster so the Roster tab sees it immediately.
+      localStorage.setItem("players", JSON.stringify(defaultPlayers));
+
       const freshDynastyData = {
         coachProfile,
         currentYear: d.currentYear,
-        players: [],
+        players: defaultPlayers,
         playerStats: [],
         allRecruits: [],
         allTransfers: [],
@@ -339,7 +371,7 @@ const DynastyLaunch: React.FC<DynastyLaunchProps> = ({ onDynastySelected }) => {
       localStorage.setItem(`dynasty_${d.id}`, JSON.stringify(freshDynastyData));
     };
 
-    initializeDynastyData(newDynastyEntry);
+    await initializeDynastyData(newDynastyEntry);
 
     const updatedDynasties = [...dynasties, newDynastyEntry];
     setDynasties(updatedDynasties);
@@ -450,7 +482,7 @@ const DynastyLaunch: React.FC<DynastyLaunchProps> = ({ onDynastySelected }) => {
     } finally {
       setIsImporting(false);
     }
-  }, [selectedFile, dynasties, onDynastySelected, loadDynasty]);
+  }, [selectedFile, dynasties, validateImportedData, loadDynasty]);
 
   const deleteDynasty = (dynastyId: string) => {
     try {
