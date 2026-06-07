@@ -25,7 +25,7 @@ _If you encounter any bugs or issues, please report them so they can be fixed!_
 
 1. First, you need to download [`node.js`](https://nodejs.org/en/download/package-manager/current) on your PC.
 
-2. Download the program [`HERE`](https://github.com/kn1meR/CFB-Dynasty-Manager/releases/tag/CFB26) and extract the folder to your Desktop.
+2. Download the program [`HERE`](https://github.com/kn1meR/CFB-Dynasty-Manager/releases/tag/CFB27) and extract the folder to your Desktop.
 
 3. Run the `Setup.bat` file.
 

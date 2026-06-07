@@ -115,7 +115,7 @@ export const DynastyProvider: React.FC<DynastyProviderProps> = ({
 
       // Calculate the correct active week based on schedule progress
       const currentYear = parseInt(
-        localStorage.getItem("currentYear") || "2025"
+        localStorage.getItem("currentYear") || "2026"
       );
       const schedule = getSchedule(currentYear);
 

@@ -101,7 +101,7 @@ const DynastyLaunch: React.FC<DynastyLaunchProps> = ({ onDynastySelected }) => {
     coachName: "",
     schoolName: "",
     customTeamName: "",
-    currentYear: 2025,
+    currentYear: 2026,
   });
   const [schoolColorPresets, setSchoolColorPresets] = useState<
     Record<string, { primary: string; secondary: string; accent: string }>
@@ -350,7 +350,7 @@ const DynastyLaunch: React.FC<DynastyLaunchProps> = ({ onDynastySelected }) => {
       coachName: "",
       schoolName: "",
       customTeamName: "",
-      currentYear: 2024,
+      currentYear: 2026,
     });
     toast.success("Dynasty created successfully!");
 
@@ -821,10 +821,10 @@ const DynastyLaunch: React.FC<DynastyLaunchProps> = ({ onDynastySelected }) => {
                   onChange={(e) =>
                     setNewDynasty({
                       ...newDynasty,
-                      currentYear: parseInt(e.target.value) || 2024,
+                      currentYear: parseInt(e.target.value) || 2026,
                     })
                   }
-                  min={2024}
+                  min={2025}
                   max={2030}
                 />
               </div>
