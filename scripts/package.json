@@ -1,0 +1,15 @@
+{
+  "name": "cfb-dynasty-roster-extractor",
+  "private": true,
+  "version": "1.0.0",
+  "description": "One-time TeamCrafters roster extraction utility",
+  "main": "extract-rosters.js",
+  "scripts": {
+    "extract": "node extract-rosters.js",
+    "dry-run": "node extract-rosters.js --dry-run"
+  },
+  "dependencies": {
+    "axios": "^1.7.9",
+    "cheerio": "^1.0.0"
+  }
+}
