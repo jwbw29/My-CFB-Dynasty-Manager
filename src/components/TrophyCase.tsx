@@ -150,7 +150,7 @@ const TROPHY_CATEGORIES = {
       "Centennial Cup",
       "Chancellor Spurs",
       "Commander-In-Chief Trophy",
-      "Commonwealth Cup",
+      "Commonwealth Clash",
       "Cy-Hawk Trophy",
       "Don Shula Award",
       "Florida Cup",
