@@ -16,9 +16,9 @@ const axios = require("axios");
 const cheerio = require("cheerio");
 
 const BASE_URL = "https://www.teamcrafters.net";
-const ROSTER_INDEX_URL = `${BASE_URL}/rosters/CFB27/cfb27-beta`;
+const ROSTER_INDEX_URL = `${BASE_URL}/rosters/CFB27/launch-6-30-26`;
 const TEAM_PAGE_URL = (teamId) =>
-  `${BASE_URL}/rosters/CFB27/cfb27-beta/${encodeURIComponent(teamId)}`;
+  `${BASE_URL}/rosters/CFB27/launch-6-30-26/${encodeURIComponent(teamId)}`;
 const OUTPUT_PATH = path.resolve(__dirname, "../public/data/default-rosters.json");
 const FBS_TEAMS_PATH = path.resolve(__dirname, "../src/utils/fbsTeams.ts");
 
@@ -234,9 +234,9 @@ async function loadTeamDirectory() {
   const $ = cheerio.load(html);
   const byId = new Map();
 
-  $("a[href^='/rosters/CFB27/cfb27-beta/']").each((_, element) => {
+  $("a[href^='/rosters/CFB27/launch-6-30-26/']").each((_, element) => {
     const href = $(element).attr("href") || "";
-    const idMatch = href.match(/\/rosters\/CFB27\/cfb27-beta\/(\d+)\/?$/);
+    const idMatch = href.match(/\/rosters\/CFB27\/launch-6-30-26\/(\d+)\/?$/);
     if (!idMatch) {
       return;
     }
