@@ -39,6 +39,7 @@ const TEAM_NAME_ALIASES = {
   "miami oh": "Miami (OH)",
   "mississippi": "Ole Miss",
   "ole miss": "Ole Miss",
+  "sacramento state university": "Sacramento State",
   "southern mississippi": "Southern Miss",
   "south florida": "South Florida",
   "uconn": "UConn",
@@ -53,9 +54,6 @@ const TEAM_NAME_ALIASES = {
  * can lose clean anchor text. Empty by default; easy place for future fixes.
  */
 const TEAM_ID_NAME_OVERRIDES = {
-  // TeamCrafters includes these two placeholders that map to custom-game teams.
-  76: "FCS",
-  89: "JUCO",
   // Uses en-dash format that doesn't directly match our source team string.
   674: "Louisiana-Monroe",
 };

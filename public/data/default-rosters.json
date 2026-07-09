@@ -1,14 +1,14 @@
 {
   "meta": {
     "source": "teamcrafters.net",
-    "extractedAt": "2026-07-07T15:55:56.102Z",
+    "extractedAt": "2026-07-09T14:47:01.337Z",
     "version": "CFB27-Beta"
   },
   "teamIdMappingTable": {
     "26": "Delaware",
     "62": "Missouri State",
-    "76": "FCS",
-    "89": "JUCO",
+    "76": "North Dakota State",
+    "89": "Sacramento State",
     "623": "Air Force",
     "624": "Akron",
     "625": "Alabama",
@@ -83170,7 +83170,7 @@
         "isDrafted": false
       }
     ],
-    "FCS": [
+    "North Dakota State": [
       {
         "name": "Victor Gores",
         "position": "C",
@@ -103096,7 +103096,7 @@
         "isDrafted": false
       }
     ],
-    "JUCO": [
+    "Sacramento State": [
       {
         "name": "Luke Slater",
         "position": "C",
