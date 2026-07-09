@@ -56,6 +56,7 @@ import {
   GameStatEntry,
   GameStatsData,
 } from "@/types/gameStats";
+import { formatDisplayName } from "@/utils";
 
 interface RosterPlayer {
   id: number;
@@ -411,7 +412,7 @@ export const GameStatsModal: React.FC<GameStatsModalProps> = ({
                       <Label>Player</Label>
                       {editingEntry ? (
                         <div className="h-10 px-3 rounded-md border border-input bg-background flex items-center text-sm">
-                          {editingEntry.playerName}
+                          {formatDisplayName(editingEntry.playerName)}
                         </div>
                       ) : (
                         <Select
@@ -424,7 +425,7 @@ export const GameStatsModal: React.FC<GameStatsModalProps> = ({
                           <SelectContent>
                             {eligiblePlayers.map((player) => (
                               <SelectItem key={player.id} value={player.name}>
-                                {`${player.name} - ${player.position} #${player.jerseyNumber}`}
+                                {`${formatDisplayName(player.name)} - ${player.position} #${player.jerseyNumber}`}
                               </SelectItem>
                             ))}
                           </SelectContent>
@@ -528,7 +529,7 @@ export const GameStatsModal: React.FC<GameStatsModalProps> = ({
                         rows.map((entry) => (
                           <TableRow key={entry.id}>
                             <TableCell className="font-medium">
-                              {entry.playerName}
+                              {formatDisplayName(entry.playerName)}
                             </TableCell>
                             {fields.map((field) => (
                               <TableCell key={field.key}>
@@ -561,7 +562,7 @@ export const GameStatsModal: React.FC<GameStatsModalProps> = ({
                                   <AlertDialogContent>
                                     <AlertDialogHeader>
                                       <AlertDialogTitle>
-                                        Delete stats for {entry.playerName}?
+                                        Delete stats for {formatDisplayName(entry.playerName)}?
                                       </AlertDialogTitle>
                                       <AlertDialogDescription>
                                         This action cannot be undone.

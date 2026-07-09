@@ -28,6 +28,7 @@ import {
   getCoachProfile,
   setYearRecord,
 } from "@/utils/localStorage";
+import { formatDisplayName } from "@/utils";
 import {
   notifySuccess,
   notifyError,
@@ -634,7 +635,7 @@ const YearRecordModal: React.FC<YearRecordModalProps> = ({ year, onClose }) => {
                               </div>
                               <div className="flex-1 min-w-0">
                                 <p className="font-semibold truncate text-sm">
-                                  {recruit.name}
+                                  {formatDisplayName(recruit.name)}
                                 </p>
                                 <p className="text-xs text-gray-500">
                                   {recruit.position}
@@ -701,7 +702,7 @@ const YearRecordModal: React.FC<YearRecordModalProps> = ({ year, onClose }) => {
                                 </div>
                                 <div className="flex-1">
                                   <h4 className="font-semibold">
-                                    {recruit.name}
+                                    {formatDisplayName(recruit.name)}
                                   </h4>
                                   <p className="text-sm text-gray-500">
                                     {recruit.position} | Stars: {recruit.stars}
@@ -764,7 +765,7 @@ const YearRecordModal: React.FC<YearRecordModalProps> = ({ year, onClose }) => {
                                   </div>
                                   <div className="flex-1">
                                     <h4 className="font-semibold">
-                                      {transfer.playerName}
+                                      {formatDisplayName(transfer.playerName)}
                                     </h4>
                                     <p className="text-sm text-gray-500">
                                       {transfer.position} | {transfer.school}
@@ -1052,7 +1053,7 @@ const YearRecordModal: React.FC<YearRecordModalProps> = ({ year, onClose }) => {
                             >
                               <Award className="h-4 w-4 mr-2 text-yellow-500" />{" "}
                               <span className="font-semibold">
-                                {award.playerName}
+                                {formatDisplayName(award.playerName)}
                               </span>{" "}
                               - {award.awardName}
                             </div>

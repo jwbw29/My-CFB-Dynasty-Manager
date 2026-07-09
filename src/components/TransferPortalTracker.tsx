@@ -14,7 +14,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import useLocalStorage from "@/hooks/useLocalStorage";
-import { capitalizeName } from "@/utils";
+import { capitalizeName, formatDisplayName } from "@/utils";
 import { fbsTeams } from "@/utils/fbsTeams";
 import { Transfer, Player } from "@/types/playerTypes";
 import { getTransfers, getPlayers, setPlayers } from "@/utils/localStorage";
@@ -526,7 +526,7 @@ const TransferPortalTracker: React.FC = () => {
                   )
                   .map((player) => (
                     <SelectItem key={player.id} value={player.id.toString()}>
-                      {player.name} - {player.position} ({player.rating}⭐)
+                      {formatDisplayName(player.name)} - {player.position} ({player.rating}⭐)
                     </SelectItem>
                   ))}
               </SelectContent>
@@ -589,7 +589,7 @@ const TransferPortalTracker: React.FC = () => {
               {transfersForSelectedYear.map((transfer) => (
                 <tr key={transfer.id}>
                   <td className="text-center">{transfer.stars} ⭐</td>
-                  <td className="text-center">{transfer.playerName}</td>
+                  <td className="text-center">{formatDisplayName(transfer.playerName)}</td>
                   <td className="text-center">{transfer.position}</td>
                   <td className="text-center">
                     <span
@@ -635,7 +635,7 @@ const TransferPortalTracker: React.FC = () => {
                             <AlertDialogTitle>Remove Player</AlertDialogTitle>
                             <AlertDialogDescription>
                               Are you sure you want to remove{" "}
-                              {transfer.playerName}?
+                              {formatDisplayName(transfer.playerName)}?
                               {transfer.transferDirection === "To" &&
                                 " This will restore them to your roster."}
                             </AlertDialogDescription>

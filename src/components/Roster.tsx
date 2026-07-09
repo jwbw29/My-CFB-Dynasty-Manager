@@ -49,7 +49,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import useLocalStorage from "@/hooks/useLocalStorage";
-import { capitalizeName } from "@/utils";
+import { capitalizeName, formatDisplayName } from "@/utils";
 import {
   validateName,
   validateRating,
@@ -733,7 +733,7 @@ const Roster: React.FC = () => {
                           />
                         ) : (
                           <span className={isHC ? "font-semibold" : ""}>
-                            {coach.name ||
+                            {formatDisplayName(coach.name) ||
                               (isHC ? "Head Coach" : `${position} Name`)}
                           </span>
                         )}
@@ -966,7 +966,7 @@ const Roster: React.FC = () => {
                           onClick={() => openPlayerCard(player)}
                           className="hover:underline"
                         >
-                          {player.name}
+                          {formatDisplayName(player.name)}
                         </button>
                       </TableCell>
 
@@ -1087,7 +1087,7 @@ const Roster: React.FC = () => {
                                   Remove Player
                                 </AlertDialogTitle>
                                 <AlertDialogDescription>
-                                  Are you sure you want to remove {player.name}?
+                                  Are you sure you want to remove {formatDisplayName(player.name)}?
                                 </AlertDialogDescription>
                               </AlertDialogHeader>
                               <AlertDialogFooter>

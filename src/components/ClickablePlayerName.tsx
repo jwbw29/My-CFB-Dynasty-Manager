@@ -1,6 +1,7 @@
 // src/components/ClickablePlayerName.tsx
 import React from 'react';
 import { Player } from '@/types/playerTypes';
+import { formatDisplayName } from "@/utils";
 
 interface ClickablePlayerNameProps {
   player: Player;
@@ -19,7 +20,7 @@ const ClickablePlayerName: React.FC<ClickablePlayerNameProps> = ({
       className={`text-left hover:text-blue-600 hover:underline transition-colors cursor-pointer ${className}`}
       type="button"
     >
-      {player.name}
+      {formatDisplayName(player.name)}
     </button>
   );
 };

@@ -32,6 +32,7 @@ import {
   getConferenceTrophiesForYear,
   setPlayers,
 } from "@/utils/localStorage";
+import { formatDisplayName } from "@/utils";
 import {
   YearRecord,
   Game,
@@ -980,7 +981,7 @@ const Records: React.FC = () => {
                                 </div>
                                 <div className="min-w-0 flex-1">
                                   <p className="font-bold text-blue-900 dark:text-blue-200 truncate">
-                                    {player.playerName}
+                                    {formatDisplayName(player.playerName)}
                                   </p>
                                   <p className="text-xs text-blue-600 dark:text-blue-400 font-medium">
                                     Round {player.round}
@@ -1477,7 +1478,7 @@ const Records: React.FC = () => {
                               </div>
                               <div className="flex-1 min-w-0">
                                 <h4 className="font-semibold truncate">
-                                  {recruit.name}
+                                  {formatDisplayName(recruit.name)}
                                 </h4>
                                 <p className="text-sm text-gray-500">
                                   {recruit.position}
@@ -1534,7 +1535,7 @@ const Records: React.FC = () => {
                               </div>
                               <div className="flex-1">
                                 <h4 className="font-semibold">
-                                  {transfer.playerName}
+                                  {formatDisplayName(transfer.playerName)}
                                 </h4>
                                 <p className="text-sm text-gray-500">
                                   {transfer.position} | {transfer.school}
@@ -1795,7 +1796,7 @@ const Records: React.FC = () => {
                             >
                               <Award className="h-4 w-4 mr-2 text-yellow-500" />{" "}
                               <span className="font-semibold">
-                                {award.playerName}
+                                {formatDisplayName(award.playerName)}
                               </span>{" "}
                               - {award.awardName}
                               {award.team && ` (${award.team})`}
@@ -1845,7 +1846,7 @@ const Records: React.FC = () => {
                                   key={player.id}
                                   value={player.id.toString()}
                                 >
-                                  {player.name} - {player.position} (
+                                  {formatDisplayName(player.name)} - {player.position} (
                                   {player.rating}⭐)
                                 </SelectItem>
                               ))}
@@ -1897,7 +1898,7 @@ const Records: React.FC = () => {
                                 </div>
                                 <div className="min-w-0">
                                   <p className="font-semibold text-green-800 dark:text-green-200 truncate">
-                                    {player.playerName || "(Unnamed)"}
+                                    {formatDisplayName(player.playerName) || "(Unnamed)"}
                                   </p>
                                   <p className="text-xs text-green-600 dark:text-green-400">
                                     Round {player.round}

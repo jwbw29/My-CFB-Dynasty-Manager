@@ -45,6 +45,7 @@ import {
 import { AlertDialogFooter, AlertDialogHeader } from "./ui/alert-dialog";
 import { Pencil, Trash2 } from "lucide-react";
 import { HeroHeader } from "@/components/ui/HeroHeader";
+import { formatDisplayName } from "@/utils";
 
 const predefinedAwards = [
   "All-American",
@@ -253,7 +254,7 @@ const AwardTracker: React.FC = () => {
                     )
                     .map((player) => (
                       <SelectItem key={player.id} value={player.name}>
-                        {player.name} - {player.position} #{player.jerseyNumber}
+                        {formatDisplayName(player.name)} - {player.position} #{player.jerseyNumber}
                       </SelectItem>
                     ))}
                 </SelectContent>
@@ -382,7 +383,7 @@ const AwardTracker: React.FC = () => {
               {awardsForSelectedYear.map((award) => (
                 <TableRow key={award.id}>
                   <TableCell className="text-center">
-                    {award.playerName}
+                    {formatDisplayName(award.playerName)}
                   </TableCell>
                   <TableCell className="text-center">
                     {award.awardName.toLowerCase().includes("pre-season") && (

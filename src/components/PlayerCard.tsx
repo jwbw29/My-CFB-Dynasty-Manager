@@ -38,6 +38,7 @@ import {
   isWeeklyAward,
   getWeeklyAwardPriority,
 } from "@/utils/weeklyAwardUtils";
+import { formatDisplayName } from "@/utils";
 
 // Extended Player interface to include optional properties that may exist in roster
 interface ExtendedPlayer {
@@ -309,7 +310,7 @@ const PlayerCard: React.FC<PlayerCardProps> = ({ player, isOpen, onClose }) => {
               </div>
               <div className="flex-1 min-w-0">
                 <h1 className="text-3xl font-bold tracking-wider">
-                  {enhancedPlayer.name.toUpperCase()}
+                  {formatDisplayName(enhancedPlayer.name).toUpperCase()}
                 </h1>
 
                 {/* --- NEW HORIZONTAL INFO ROW --- */}

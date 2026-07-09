@@ -55,6 +55,7 @@ import PlayerCard from "./PlayerCard";
 import { useDynasty } from "@/contexts/DynastyContext";
 import { getTeamData } from "@/utils/fbsTeams";
 import { Trophy, Medal, Star, BarChart2, Calendar } from "lucide-react";
+import { formatDisplayName } from "@/utils";
 
 // --- HELPER INTERFACES ---
 interface LocationRecord {
@@ -895,9 +896,9 @@ const TeamHome: React.FC = () => {
                     {statLeaders.passingLeader ? (
                       <span
                         className="text-left"
-                        title={statLeaders.passingLeader.name}
+                        title={formatDisplayName(statLeaders.passingLeader.name)}
                       >
-                        {statLeaders.passingLeader.name}
+                        {formatDisplayName(statLeaders.passingLeader.name)}
                       </span>
                     ) : (
                       "N/A"
@@ -922,9 +923,9 @@ const TeamHome: React.FC = () => {
                     {statLeaders.rushingLeader ? (
                       <span
                         className="text-left"
-                        title={statLeaders.rushingLeader.name}
+                        title={formatDisplayName(statLeaders.rushingLeader.name)}
                       >
-                        {statLeaders.rushingLeader.name}
+                        {formatDisplayName(statLeaders.rushingLeader.name)}
                       </span>
                     ) : (
                       "N/A"
@@ -949,9 +950,9 @@ const TeamHome: React.FC = () => {
                     {statLeaders.receivingLeader ? (
                       <span
                         className="text-left"
-                        title={statLeaders.receivingLeader.name}
+                        title={formatDisplayName(statLeaders.receivingLeader.name)}
                       >
-                        {statLeaders.receivingLeader.name}
+                        {formatDisplayName(statLeaders.receivingLeader.name)}
                       </span>
                     ) : (
                       "N/A"
@@ -976,9 +977,9 @@ const TeamHome: React.FC = () => {
                     {statLeaders.tacklesLeader ? (
                       <span
                         className="text-left"
-                        title={statLeaders.tacklesLeader.name}
+                        title={formatDisplayName(statLeaders.tacklesLeader.name)}
                       >
-                        {statLeaders.tacklesLeader.name}
+                        {formatDisplayName(statLeaders.tacklesLeader.name)}
                       </span>
                     ) : (
                       "N/A"

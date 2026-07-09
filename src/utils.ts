@@ -1,3 +1,48 @@
+/**
+ * Formats a full player name ("First Last") into abbreviated display format ("Last, F.").
+ * Handles suffixes (Jr., II, III, etc.), single-word names, and edge cases.
+ * Storage format stays "First Last" — this is display-only.
+ */
+export function formatDisplayName(fullName: string): string {
+  if (!fullName || !fullName.trim()) return fullName;
+
+  const parts = fullName.trim().split(/\s+/);
+
+  // Single name — return as-is since we can't split it
+  if (parts.length === 1) return parts[0];
+
+  // Suffixes that should stay attached to the last name
+  const suffixes = new Set([
+    "Jr",
+    "Jr.",
+    "Sr",
+    "Sr.",
+    "II",
+    "III",
+    "IV",
+    "V",
+    "VI",
+    "VII",
+    "VIII",
+  ]);
+
+  const firstName = parts[0];
+  const initial = firstName[0].toUpperCase();
+
+  // Check if the final part is a suffix (e.g., "John Smith III")
+  let lastName: string;
+  let suffix = "";
+
+  if (parts.length > 2 && suffixes.has(parts[parts.length - 1])) {
+    suffix = " " + parts[parts.length - 1];
+    lastName = parts.slice(1, -1).join(" ");
+  } else {
+    lastName = parts.slice(1).join(" ");
+  }
+
+  return `${lastName}${suffix}, ${initial}.`;
+}
+
 export function capitalizeName(name: string): string {
   return name
     .split(" ")

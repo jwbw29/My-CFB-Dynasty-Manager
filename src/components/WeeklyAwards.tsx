@@ -19,6 +19,7 @@ import { useDynasty } from "@/contexts/DynastyContext";
 import { getWeekDisplayName } from "@/utils/weekUtils";
 import { getCoachProfile, getYearAwards, setYearAwards } from "@/utils/localStorage";
 import { getTeamData } from "@/utils/fbsTeams";
+import { formatDisplayName } from "@/utils";
 import {
   buildConferenceAwardName,
   NATIONAL_DEFENSIVE_POTW,
@@ -202,7 +203,7 @@ export default function WeeklyAwards() {
             <SelectContent>
               {sortedPlayers.map((player) => (
                 <SelectItem key={player.id} value={player.name}>
-                  {player.name} - {player.position} #{player.jerseyNumber}
+                  {formatDisplayName(player.name)} - {player.position} #{player.jerseyNumber}
                 </SelectItem>
               ))}
             </SelectContent>

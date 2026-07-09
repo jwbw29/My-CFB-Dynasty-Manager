@@ -27,6 +27,7 @@ import {
   getPlayers,
 } from "@/utils/localStorage";
 import { Badge } from "@/components/ui/badge";
+import { formatDisplayName } from "@/utils";
 
 // --- Types ---
 interface SocialPost {
@@ -207,7 +208,7 @@ const generateGameRecapPosts = (
   const mediaTemplates = isWin
     ? [
         `${teamName} gets a big win over ${game.opponent}, ${game.score}. ${
-          topPerformer?.name || "The offense"
+          (topPerformer ? formatDisplayName(topPerformer.name) : null) || "The offense"
         } was a key factor today.`,
         `Impressive performance by ${teamName} as they defeat ${game.opponent}. Are they a contender in their conference?`,
       ]
@@ -268,7 +269,7 @@ const generatePlayerSpotlightPost = (
       author: official.name,
       authorHandle: official.handle,
       authorType: "official",
-      content: `⭐ PLAYER SPOTLIGHT ⭐\n\n${topPlayer.name} | ${
+      content: `⭐ PLAYER SPOTLIGHT ⭐\n\n${formatDisplayName(topPlayer.name)} | ${
         topPlayer.position
       } | ${topPlayer.rating} OVR\n\n${
         positionPraise[topPlayer.position] ||
@@ -297,12 +298,12 @@ const generateRecruitingPosts = (
 
   let content = ``;
   if (parseInt(topRecruit.stars) === 5) {
-    content = `🚨 BLOCKBUSTER COMMITMENT 🚨\n\n5-star phenom ${topRecruit.name} (${topRecruit.position}) has officially committed to ${teamName}!\n\nA massive, program-altering get for the staff. #Recruiting #BOOM`;
+    content = `🚨 BLOCKBUSTER COMMITMENT 🚨\n\n5-star phenom ${formatDisplayName(topRecruit.name)} (${topRecruit.position}) has officially committed to ${teamName}!\n\nA massive, program-altering get for the staff. #Recruiting #BOOM`;
   } else {
     content = `✍️ New Commit! ${teamName} lands a key piece for their future in ${stars} ${
       topRecruit.position
     } ${
-      topRecruit.name
+      formatDisplayName(topRecruit.name)
     }.\n\nLove the upside here. A player with a very high ceiling. #Go${teamName.replace(
       /\s+/g,
       ""

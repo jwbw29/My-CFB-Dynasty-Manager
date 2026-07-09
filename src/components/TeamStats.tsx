@@ -50,6 +50,7 @@ import {
   accumulateGameStats,
   getGamesPlayedByPlayer,
 } from "@/utils/accumulateGameStats";
+import { formatDisplayName } from "@/utils";
 
 // Conference list
 const conferences = [
@@ -837,7 +838,7 @@ const TeamStats: React.FC = () => {
                       ) : (
                         <>
                           <h4 className="font-bold text-lg">
-                            {displayRecord.playerName}
+                            {formatDisplayName(displayRecord.playerName)}
                           </h4>
                           <div className="text-sm text-muted-foreground space-y-0.5">
                             {displayRecord.position && displayRecord.school ? (
@@ -1300,7 +1301,8 @@ const TeamStats: React.FC = () => {
                                           key={player.id}
                                           value={player.name}
                                         >
-                                          {player.name} - {player.position} #
+                                          {formatDisplayName(player.name)} -{" "}
+                                          {player.position} #
                                           {player.jerseyNumber}
                                         </SelectItem>
                                       ))}
@@ -1514,7 +1516,8 @@ const TeamStats: React.FC = () => {
                                           key={player.id}
                                           value={player.name}
                                         >
-                                          {player.name} - {player.position} #
+                                          {formatDisplayName(player.name)} -{" "}
+                                          {player.position} #
                                           {player.jerseyNumber}
                                         </SelectItem>
                                       ))}
@@ -1720,7 +1723,8 @@ const TeamStats: React.FC = () => {
                                           key={player.id}
                                           value={player.name}
                                         >
-                                          {player.name} - {player.position} #
+                                          {formatDisplayName(player.name)} -{" "}
+                                          {player.position} #
                                           {player.jerseyNumber}
                                         </SelectItem>
                                       ))}
@@ -1923,7 +1927,8 @@ const TeamStats: React.FC = () => {
                                           key={player.id}
                                           value={player.name}
                                         >
-                                          {player.name} - {player.position} #
+                                          {formatDisplayName(player.name)} -{" "}
+                                          {player.position} #
                                           {player.jerseyNumber}
                                         </SelectItem>
                                       ))}
@@ -2057,7 +2062,8 @@ const TeamStats: React.FC = () => {
                                           key={player.id}
                                           value={player.name}
                                         >
-                                          {player.name} - {player.position} #
+                                          {formatDisplayName(player.name)} -{" "}
+                                          {player.position} #
                                           {player.jerseyNumber}
                                         </SelectItem>
                                       ))}
@@ -2191,7 +2197,8 @@ const TeamStats: React.FC = () => {
                                           key={player.id}
                                           value={player.name}
                                         >
-                                          {player.name} - {player.position} #
+                                          {formatDisplayName(player.name)} -{" "}
+                                          {player.position} #
                                           {player.jerseyNumber}
                                         </SelectItem>
                                       ))}
@@ -2328,7 +2335,8 @@ const TeamStats: React.FC = () => {
                                           key={player.id}
                                           value={player.name}
                                         >
-                                          {player.name} - {player.position} #
+                                          {formatDisplayName(player.name)} -{" "}
+                                          {player.position} #
                                           {player.jerseyNumber}
                                         </SelectItem>
                                       ))}

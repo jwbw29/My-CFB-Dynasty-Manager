@@ -4,6 +4,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { PlayerStat, StatCategory } from '@/types/playerStats';
+import { formatDisplayName } from "@/utils";
 
 // Define ViewType to include all possible values
 type ViewType = 'Season' | 'Career' | 'Game';
@@ -64,7 +65,7 @@ const StatTable: React.FC<StatTableProps> = ({ category, viewType, stats, onAddS
         {/* Existing Stat Rows */}
         {stats.map(stat => (
           <TableRow key={stat.id}>
-            <TableCell>{stat.playerName}</TableCell>
+            <TableCell>{formatDisplayName(stat.playerName)}</TableCell>
             {viewType !== 'Game' && <TableCell>{stat.year}</TableCell>}
             {statFields[category]?.map(field => (
               <TableCell key={field}>

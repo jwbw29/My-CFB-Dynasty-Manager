@@ -28,7 +28,7 @@ import {
 } from "@/components/ui/select";
 import useLocalStorage from "@/hooks/useLocalStorage";
 import { useDynasty } from "@/contexts/DynastyContext";
-import { capitalizeName } from "@/utils";
+import { capitalizeName, formatDisplayName } from "@/utils";
 import { Recruit } from "@/types/playerTypes";
 import { generalPositions } from "@/types/playerTypes";
 import {
@@ -829,7 +829,7 @@ const RecruitingClassTracker: React.FC = () => {
             <tbody>
               {recruitsForSelectedYear.map((recruit) => (
                 <tr key={recruit.id}>
-                  <td className="text-center">{recruit.name}</td>
+                  <td className="text-center">{formatDisplayName(recruit.name)}</td>
                   <td className="text-center">{recruit.stars} ⭐</td>
                   <td className="text-center">{recruit.position}</td>
                   <td className="text-center">{recruit.state}</td>
@@ -873,7 +873,7 @@ const RecruitingClassTracker: React.FC = () => {
                           <AlertDialogHeader>
                             <AlertDialogTitle>Remove Player</AlertDialogTitle>
                             <AlertDialogDescription>
-                              Are you sure you want to remove {recruit.name}?
+                              Are you sure you want to remove {formatDisplayName(recruit.name)}?
                             </AlertDialogDescription>
                           </AlertDialogHeader>
                           <AlertDialogFooter>

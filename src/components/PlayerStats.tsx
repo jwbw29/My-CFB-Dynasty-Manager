@@ -52,6 +52,7 @@ import useLocalStorage from "@/hooks/useLocalStorage";
 import { defensivePositions } from "@/types/playerTypes";
 import PlayerCard from "@/components/PlayerCard";
 import { usePlayerCard } from "@/hooks/usePlayerCard";
+import { formatDisplayName } from "@/utils";
 
 // Type definitions (assuming they are in separate files in a real app)
 interface PlayerStat {
@@ -607,7 +608,7 @@ const PlayerStats: React.FC = () => {
                 <SelectContent>
                   {getFilteredPlayers().map((p) => (
                     <SelectItem key={p.id} value={p.name}>
-                      {p.name} - {p.position} #{p.jerseyNumber}
+                      {formatDisplayName(p.name)} - {p.position} #{p.jerseyNumber}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -695,7 +696,7 @@ const PlayerStats: React.FC = () => {
                       className="text-left hover:text-blue-600 hover:underline transition-colors cursor-pointer font-medium"
                       type="button"
                     >
-                      {stat.playerName}
+                      {formatDisplayName(stat.playerName)}
                     </button>
                   </TableCell>
                   {displayCategories[selectedCategory].map((category) => (
