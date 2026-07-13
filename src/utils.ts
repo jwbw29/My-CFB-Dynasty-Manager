@@ -1,12 +1,25 @@
 /**
- * Formats a full player name ("First Last") into abbreviated display format ("Last, F.").
+ * Formats a full player name into abbreviated display format ("Last, F.").
+ * Accepts both "First Last" and "Last, First" input formats.
  * Handles suffixes (Jr., II, III, etc.), single-word names, and edge cases.
- * Storage format stays "First Last" — this is display-only.
+ * Storage format stays as-entered — this is display-only.
  */
 export function formatDisplayName(fullName: string): string {
   if (!fullName || !fullName.trim()) return fullName;
 
-  const parts = fullName.trim().split(/\s+/);
+  const trimmed = fullName.trim();
+
+  // If the name already contains a comma, assume "Last, First" input format.
+  // Normalize to "Last, F." regardless of whether the user typed a full first
+  // name or just an initial after the comma.
+  if (trimmed.includes(",")) {
+    const [lastPart, firstPart] = trimmed.split(",").map((s) => s.trim());
+    if (!firstPart) return lastPart; // Trailing comma only — return the last name
+    const initial = firstPart[0].toUpperCase();
+    return `${lastPart}, ${initial}.`;
+  }
+
+  const parts = trimmed.split(/\s+/);
 
   // Single name — return as-is since we can't split it
   if (parts.length === 1) return parts[0];
