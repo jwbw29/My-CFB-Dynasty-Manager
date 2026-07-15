@@ -508,7 +508,7 @@ function mapPlayer(rawPlayer) {
       pickValue(rawPlayer, ["weight", "Weight", "playerProfile.weight"]) ?? 0
     ),
     devTrait: "Normal",
-    isRedshirted,
+    isRedshirted: false,
     isTransferring: false,
     isDrafted: false,
   };

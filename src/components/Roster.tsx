@@ -606,6 +606,7 @@ const Roster: React.FC = () => {
       const resetPlayers: Player[] = teamRoster.map((player: any) => ({
         ...player,
         id: uuidv4(),
+        isRedshirted: false, // Always start fresh — "(RS)" in year already captures redshirt history
       }));
       setPlayers(resetPlayers);
       notifySuccess("Roster reset to default successfully!");
