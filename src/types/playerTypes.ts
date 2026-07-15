@@ -93,6 +93,8 @@ export interface Recruit {
   // REMOVED: The 'rating' field is no longer needed
   height?: string;
   weight?: string;
+  // CFB 27 update: recruits now verbal commit first, then hard commit later
+  commitStatus?: "verbal" | "hard";
 }
 
 export interface Transfer {

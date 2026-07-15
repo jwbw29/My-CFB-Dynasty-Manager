@@ -43,6 +43,7 @@ import {
   CheckCircle,
   ChevronDown,
   ChevronUp,
+  ShieldCheck,
 } from "lucide-react";
 import {
   AlertDialog,
@@ -442,20 +443,20 @@ const RecruitingClassTracker: React.FC = () => {
 
   const addRecruit = () => {
     const recruitToAdd: Recruit = {
-      id: Date.now().toString(), // Use string ID for consistency
+      id: Date.now().toString(),
       recruitedYear: selectedYear,
       name: capitalizeName(newRecruit.name),
       stars: newRecruit.stars,
       position: newRecruit.position,
       state: newRecruit.state,
       potential: newRecruit.potential,
-      // Convert rank strings to numbers or null if empty
       nationalRank: newRecruit.nationalRank
         ? parseInt(newRecruit.nationalRank, 10)
         : null,
       stateRank: newRecruit.stateRank
         ? parseInt(newRecruit.stateRank, 10)
         : null,
+      commitStatus: "verbal",
     };
     setAllRecruits([...allRecruits, recruitToAdd]);
     resetForm();
@@ -480,7 +481,6 @@ const RecruitingClassTracker: React.FC = () => {
     setAllRecruits(
       allRecruits.map((r) => {
         if (r.id !== editingId) return r;
-        // Create the updated recruit object that matches the Recruit type
         return {
           id: r.id,
           recruitedYear: selectedYear,
@@ -495,6 +495,7 @@ const RecruitingClassTracker: React.FC = () => {
           stateRank: newRecruit.stateRank
             ? parseInt(newRecruit.stateRank, 10)
             : null,
+          commitStatus: r.commitStatus ?? "verbal",
         };
       }),
     );
@@ -511,6 +512,15 @@ const RecruitingClassTracker: React.FC = () => {
   const removeRecruit = (id: string) => {
     setAllRecruits(allRecruits.filter((recruit) => recruit.id !== id));
     notifySuccess(MESSAGES.SAVE_SUCCESS);
+  };
+
+  const toggleCommitStatus = (id: string) => {
+    setAllRecruits(
+      allRecruits.map((r) =>
+        r.id === id ? { ...r, commitStatus: "hard" as const } : r,
+      ),
+    );
+    notifySuccess("Recruit marked as hard commit");
   };
 
   const offensiveArchetypes = [
@@ -823,6 +833,7 @@ const RecruitingClassTracker: React.FC = () => {
                 <th className="text-center">Nat. Rank</th>
                 <th className="text-center">State Rank</th>
                 <th className="text-center">Dev. Trait</th>
+                <th className="text-center">Status</th>
                 <th className="text-center">Actions</th>
               </tr>
             </thead>
@@ -847,6 +858,26 @@ const RecruitingClassTracker: React.FC = () => {
                           | "Normal"
                       }
                     />
+                  </td>
+                  <td className="text-center">
+                    {(recruit.commitStatus ?? "verbal") === "verbal" ? (
+                      <button
+                        onClick={() => toggleCommitStatus(recruit.id)}
+                        className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold border-2 border-dashed border-amber-400 bg-amber-50 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300 dark:border-amber-500 hover:bg-amber-100 dark:hover:bg-amber-900/50 transition-colors cursor-pointer"
+                        title="Click to mark as hard commit"
+                      >
+                        <span className="relative flex h-2 w-2">
+                          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                          <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span>
+                        </span>
+                        Verbal
+                      </button>
+                    ) : (
+                      <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold border-2 border-solid border-green-500 bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-300 dark:border-green-400">
+                        <ShieldCheck className="h-3.5 w-3.5" />
+                        Hard Commit
+                      </span>
+                    )}
                   </td>
                   <td className="text-center">
                     <div className="flex items-center gap-1 justify-center">
