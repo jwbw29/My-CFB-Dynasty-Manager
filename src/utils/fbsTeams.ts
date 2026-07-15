@@ -1266,6 +1266,24 @@ export const fbsTeams: Team[] = [
     stadium: "War Memorial Stadium",
     abbrev: "WYO",
   },
+  {
+    name: "FCS",
+    nickName: "FCS",
+    city: "",
+    state: "",
+    conference: "Independents",
+    stadium: "",
+    abbrev: "FCS",
+  },
+  {
+    name: "JUCO",
+    nickName: "JUCO",
+    city: "",
+    state: "",
+    conference: "Independents",
+    stadium: "",
+    abbrev: "JUCO",
+  },
 
 ];
 
