@@ -456,7 +456,16 @@ const Roster: React.FC = () => {
         return sortConfig.direction === "asc"
           ? devTraitOrder[a.devTrait] - devTraitOrder[b.devTrait]
           : devTraitOrder[b.devTrait] - devTraitOrder[a.devTrait];
-      const field = sortConfig.field as "name" | "position";
+      // Sort player names by last name using the "Last, F." display format
+      // so the sort order matches the visible column content.
+      if (sortConfig.field === "name") {
+        const aDisplay = formatDisplayName(a.name);
+        const bDisplay = formatDisplayName(b.name);
+        return sortConfig.direction === "asc"
+          ? aDisplay.localeCompare(bDisplay)
+          : bDisplay.localeCompare(aDisplay);
+      }
+      const field = sortConfig.field as "position";
       return sortConfig.direction === "asc"
         ? a[field].localeCompare(b[field])
         : b[field].localeCompare(a[field]);

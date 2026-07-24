@@ -429,9 +429,11 @@ const TeamStats: React.FC = () => {
           bVal = b[sortField as keyof PlayerLeaderStat];
         }
 
+        // Sort player names by last name using the "Last, F." display format
+        // so the sort order matches the visible column content.
         if (sortField === "name") {
-          const aStr = (aVal as string) || "";
-          const bStr = (bVal as string) || "";
+          const aStr = formatDisplayName((aVal as string) || "");
+          const bStr = formatDisplayName((bVal as string) || "");
           return direction === "asc"
             ? aStr.localeCompare(bStr)
             : bStr.localeCompare(aStr);
