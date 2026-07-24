@@ -29,12 +29,12 @@ import {
   Select,
   SelectContent,
   SelectItem,
+  SelectSeparator,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
 import {
   MultiSelect,
-  MultiSelectGroup,
   MultiSelectOption,
 } from "@/components/ui/multi-select";
 import {
@@ -58,10 +58,7 @@ import {
 import { toast } from "react-hot-toast";
 import RosterImageUpload from "./RosterImageUpload";
 import {
-  defensivePositions,
-  offensePositions,
   positions,
-  specialTeamsPositions,
 } from "@/types/playerTypes";
 import { notifySuccess, MESSAGES } from "@/utils/notification-utils";
 import { Pencil, Trash2, Download, Shirt, Plus, RotateCcw } from "lucide-react";
@@ -177,21 +174,20 @@ const devTraitOrder: { [key: string]: number } = {
   Elite: 3,
 };
 
-/**
- * Position group presets used by the roster position multiselect.
- *
- * We keep these groups in one constant so the UI's group toggle buttons and
- * filtering behavior stay in sync as position lists evolve.
- *
- * The MultiSelect group action follows a two-way toggle contract:
- * when every position in a group is selected it deselects that full group,
- * otherwise it selects every position in the group.
- */
-const positionGroups: MultiSelectGroup[] = [
-  { label: "Offense", values: offensePositions },
-  { label: "Defense", values: defensivePositions },
-  { label: "Special Teams", values: specialTeamsPositions },
-  { label: "OL", values: ["LT", "LG", "C", "RG", "RT"] },
+const positionGroupMap: Record<string, string[]> = {
+  OL: ["LT", "LG", "C", "RG", "RT", "OL"],
+  OLB: ["WILL", "SAM"],
+  LB: ["WILL", "SAM", "MIKE", "LB"],
+  Safeties: ["FS", "SS", "S"],
+  ST: ["K", "P"],
+};
+
+const positionGroupLabels: { value: string; label: string }[] = [
+  { value: "OL", label: "OL" },
+  { value: "OLB", label: "OLB" },
+  { value: "LB", label: "LB" },
+  { value: "Safeties", label: "Safeties" },
+  { value: "ST", label: "Special Teams" },
 ];
 
 const initialNewPlayerState: Omit<Player, "id"> = {
@@ -266,7 +262,7 @@ const Roster: React.FC = () => {
     direction: "asc" | "desc";
   }>({ field: "rating", direction: "desc" });
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
-  const [posFilters, setPosFilters] = useState<string[]>([]);
+  const [posFilter, setPosFilter] = useState<string>("");
   const [yearFilters, setYearFilters] = useState<string[]>([]);
   const { selectedPlayer, isOpen, openPlayerCard, closePlayerCard } =
     usePlayerCard();
@@ -353,7 +349,10 @@ const Roster: React.FC = () => {
   useEffect(() => {
     const nextFilteredPlayers = players.filter((player) => {
       const matchesPosition =
-        posFilters.length === 0 || posFilters.includes(player.position);
+        posFilter === "" ||
+        (posFilter in positionGroupMap
+          ? positionGroupMap[posFilter].includes(player.position)
+          : posFilter === player.position);
       const matchesYear =
         yearFilters.length === 0 || yearFilters.includes(player.year);
 
@@ -361,16 +360,7 @@ const Roster: React.FC = () => {
     });
 
     setFilteredPlayers(nextFilteredPlayers);
-  }, [players, posFilters, yearFilters]);
-
-  /**
-   * Position options are mapped once to keep rendering logic simple and to
-   * guarantee the MultiSelect receives the expected { value, label } shape.
-   */
-  const positionOptions: MultiSelectOption[] = useMemo(
-    () => positions.map((position) => ({ value: position, label: position })),
-    [],
-  );
+  }, [players, posFilter, yearFilters]);
 
   /**
    * Year options are kept in the same option shape as position options so both
@@ -902,15 +892,31 @@ const Roster: React.FC = () => {
 
         {/* Main Roster Content */}
         <CardContent className="bg-gradient-to-br from-gray-50 to-white dark:from-gray-900 dark:to-gray-800">
-          <div className="flex flex-wrap gap-4 pb-4">
+          <div className="flex flex-wrap items-center gap-4 pb-4">
             <div className="w-full sm:w-1/2 md:w-1/3 lg:w-1/4">
-              <MultiSelect
-                options={positionOptions}
-                selected={posFilters}
-                onChange={setPosFilters}
-                placeholder="Positions"
-                groups={positionGroups}
-              />
+              <Select
+                value={posFilter || "all"}
+                onValueChange={(v) => setPosFilter(v === "all" ? "" : v)}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="All Positions" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Positions</SelectItem>
+                  <SelectSeparator />
+                  {positions.map((position) => (
+                    <SelectItem key={position} value={position}>
+                      {position}
+                    </SelectItem>
+                  ))}
+                  <SelectSeparator />
+                  {positionGroupLabels.map((group) => (
+                    <SelectItem key={group.value} value={group.value}>
+                      {group.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
             <div className="w-full sm:w-1/2 md:w-1/3 lg:w-1/4">
@@ -920,6 +926,19 @@ const Roster: React.FC = () => {
                 onChange={setYearFilters}
                 placeholder="Years"
               />
+            </div>
+
+            {/* Roster count relative to NCAA scholarship limit */}
+            <div className="ml-auto flex items-center gap-2">
+              <span
+                className={`text-sm font-semibold tabular-nums ${
+                  players.length > 85
+                    ? "text-red-600 dark:text-red-400"
+                    : "text-muted-foreground"
+                }`}
+              >
+                {players.length} / 85
+              </span>
             </div>
           </div>
           {sortedPlayers.length > 0 ? (
