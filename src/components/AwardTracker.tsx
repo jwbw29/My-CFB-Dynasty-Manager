@@ -70,6 +70,7 @@ const predefinedAwards = [
   "Lou Groza Award",
   "Maxwell Award",
   "Outland Trophy",
+  "Paul Hornung Award",
   "Ray Guy Award",
   "Returner of the Year",
   "Rimington Trophy",
@@ -254,7 +255,8 @@ const AwardTracker: React.FC = () => {
                     )
                     .map((player) => (
                       <SelectItem key={player.id} value={player.name}>
-                        {formatDisplayName(player.name)} - {player.position} #{player.jerseyNumber}
+                        {formatDisplayName(player.name)} - {player.position} #
+                        {player.jerseyNumber}
                       </SelectItem>
                     ))}
                 </SelectContent>
@@ -309,15 +311,26 @@ const AwardTracker: React.FC = () => {
                 </SelectGroup>
                 <SelectGroup>
                   <SelectLabel>Pre-Season Awards</SelectLabel>
-                  <SelectItem value="Pre-Season All-American">Pre-Season All-American</SelectItem>
-                  <SelectItem value="Pre-Season All-Conference">Pre-Season All-Conference</SelectItem>
+                  <SelectItem value="Pre-Season All-American">
+                    Pre-Season All-American
+                  </SelectItem>
+                  <SelectItem value="Pre-Season All-Conference">
+                    Pre-Season All-Conference
+                  </SelectItem>
                 </SelectGroup>
                 <SelectGroup>
                   <SelectLabel>Named Awards</SelectLabel>
                   {predefinedAwards
                     .filter(
                       (award) =>
-                        !["All-American", "All-Conference", "Pre-Season All-American", "Pre-Season All-Conference", "Bear Bryant Coach of the Year Award", "Broyles Award"].includes(award)
+                        ![
+                          "All-American",
+                          "All-Conference",
+                          "Pre-Season All-American",
+                          "Pre-Season All-Conference",
+                          "Bear Bryant Coach of the Year Award",
+                          "Broyles Award",
+                        ].includes(award),
                     )
                     .map((award) => (
                       <SelectItem key={award} value={award}>
@@ -327,7 +340,9 @@ const AwardTracker: React.FC = () => {
                 </SelectGroup>
                 <SelectGroup>
                   <SelectLabel>Coaching Awards</SelectLabel>
-                  <SelectItem value="Bear Bryant Coach of the Year Award">Bear Bryant Coach of the Year Award</SelectItem>
+                  <SelectItem value="Bear Bryant Coach of the Year Award">
+                    Bear Bryant Coach of the Year Award
+                  </SelectItem>
                   <SelectItem value="Broyles Award">Broyles Award</SelectItem>
                 </SelectGroup>
               </SelectContent>
