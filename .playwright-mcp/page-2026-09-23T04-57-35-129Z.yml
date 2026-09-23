@@ -1,0 +1,177 @@
+- generic:
+  - alert
+  - generic [aria-hidden]:
+    - generic:
+      - generic:
+        - heading [level=1]: CFB Dynasty Manager
+        - paragraph: Pave your path to the College Football Championship!
+      - generic:
+        - button: Create New Dynasty
+        - button: Import Dynasty
+      - generic:
+        - generic:
+          - heading [level=3]: Start Your Dynasty
+          - paragraph: Create your first dynasty or import an existing one to begin.
+  - dialog [aria-hidden]:
+    - generic:
+      - heading [level=2]: Create New Dynasty
+    - generic:
+      - generic:
+        - text: Coach Name
+        - textbox:
+          - /placeholder: Enter your name
+          - text: Test Coach
+      - generic:
+        - text: School
+        - combobox [expanded]:
+          - generic: Select a school
+      - generic:
+        - text: Starting Year
+        - spinbutton: "2026"
+    - generic:
+      - button: Cancel
+      - button: Create Dynasty
+    - button:
+      - generic: Close
+  - listbox [ref=e52]:
+    - option "Custom/TeamBuilder Team" [active] [ref=e53]
+    - option "Air Force (MWC)" [ref=e56]
+    - option "Akron (MAC)" [ref=e59]
+    - option "Alabama (SEC)" [ref=e62]
+    - option "Appalachian State (Sun Belt)" [ref=e65]
+    - option "Arizona (Big 12)" [ref=e68]
+    - option "Arizona State (Big 12)" [ref=e71]
+    - option "Arkansas (SEC)" [ref=e74]
+    - option "Arkansas State (Sun Belt)" [ref=e77]
+    - option "Army (AAC)" [ref=e80]
+    - option "Auburn (SEC)" [ref=e83]
+    - option "Ball State (MAC)" [ref=e86]
+    - option "Baylor (Big 12)" [ref=e89]
+    - option "Boise State (Pac-12)" [ref=e92]
+    - option "Boston College (ACC)" [ref=e95]
+    - option "Bowling Green (MAC)" [ref=e98]
+    - option "Buffalo (MAC)" [ref=e101]
+    - option "BYU (Big 12)" [ref=e104]
+    - option "California (ACC)" [ref=e107]
+    - option "Central Michigan (MAC)" [ref=e110]
+    - option "Charlotte (AAC)" [ref=e113]
+    - option "Cincinnati (Big 12)" [ref=e116]
+    - option "Clemson (ACC)" [ref=e119]
+    - option "Coastal Carolina (Sun Belt)" [ref=e122]
+    - option "Colorado (Big 12)" [ref=e125]
+    - option "Colorado State (Pac-12)" [ref=e128]
+    - option "Delaware (C-USA)" [ref=e131]
+    - option "Duke (ACC)" [ref=e134]
+    - option "East Carolina (AAC)" [ref=e137]
+    - option "Eastern Michigan (MAC)" [ref=e140]
+    - option "FIU (C-USA)" [ref=e143]
+    - option "Florida (SEC)" [ref=e146]
+    - option "Florida Atlantic (AAC)" [ref=e149]
+    - option "Florida State (ACC)" [ref=e152]
+    - option "Fresno State (Pac-12)" [ref=e155]
+    - option "Georgia (SEC)" [ref=e158]
+    - option "Georgia Southern (Sun Belt)" [ref=e161]
+    - option "Georgia State (Sun Belt)" [ref=e164]
+    - option "Georgia Tech (ACC)" [ref=e167]
+    - option "Hawaii (MWC)" [ref=e170]
+    - option "Houston (Big 12)" [ref=e173]
+    - option "Illinois (Big Ten)" [ref=e176]
+    - option "Indiana (Big Ten)" [ref=e179]
+    - option "Iowa (Big Ten)" [ref=e182]
+    - option "Iowa State (Big 12)" [ref=e185]
+    - option "Jacksonville State (C-USA)" [ref=e188]
+    - option "James Madison (Sun Belt)" [ref=e191]
+    - option "kansas (Big 12)" [ref=e194]
+    - option "Kansas State (Big 12)" [ref=e197]
+    - option "Kennesaw State (C-USA)" [ref=e200]
+    - option "Kent State (MAC)" [ref=e203]
+    - option "Kentucky (SEC)" [ref=e206]
+    - option "Liberty (C-USA)" [ref=e209]
+    - option "Louisiana (Sun Belt)" [ref=e212]
+    - option "Louisiana Tech (Sun Belt)" [ref=e215]
+    - option "Louisiana-Monroe (Sun Belt)" [ref=e218]
+    - option "Louisville (ACC)" [ref=e221]
+    - option "LSU (SEC)" [ref=e224]
+    - option "Marshall (Sun Belt)" [ref=e227]
+    - option "Maryland (Big Ten)" [ref=e230]
+    - option "Memphis (AAC)" [ref=e233]
+    - option "Miami (FL) (ACC)" [ref=e236]
+    - option "Miami (OH) (MAC)" [ref=e239]
+    - option "Michigan (Big Ten)" [ref=e242]
+    - option "Michigan State (Big Ten)" [ref=e245]
+    - option "Middle Tennessee (C-USA)" [ref=e248]
+    - option "Minnesota (Big Ten)" [ref=e251]
+    - option "Mississippi State (SEC)" [ref=e254]
+    - option "Missouri (SEC)" [ref=e257]
+    - option "Missouri State (C-USA)" [ref=e260]
+    - option "Navy (AAC)" [ref=e263]
+    - option "NC State (ACC)" [ref=e266]
+    - option "Nebraska (Big Ten)" [ref=e269]
+    - option "Nevada (MWC)" [ref=e272]
+    - option "New Mexico (MWC)" [ref=e275]
+    - option "New Mexico State (C-USA)" [ref=e278]
+    - option "North Carolina (ACC)" [ref=e281]
+    - option "North Dakota State (MWC)" [ref=e284]
+    - option "North Texas (AAC)" [ref=e287]
+    - option "Northern Illinois (MWC)" [ref=e290]
+    - option "Northwestern (Big Ten)" [ref=e293]
+    - option "Notre Dame (Independents)" [ref=e296]
+    - option "Ohio (MAC)" [ref=e299]
+    - option "Ohio State (Big Ten)" [ref=e302]
+    - option "Oklahoma (SEC)" [ref=e305]
+    - option "Oklahoma State (Big 12)" [ref=e308]
+    - option "Old Dominion (Sun Belt)" [ref=e311]
+    - option "Ole Miss (SEC)" [ref=e314]
+    - option "Oregon (Big Ten)" [ref=e317]
+    - option "Oregon State (Pac-12)" [ref=e320]
+    - option "Penn State (Big Ten)" [ref=e323]
+    - option "Pittsburgh (ACC)" [ref=e326]
+    - option "Purdue (Big Ten)" [ref=e329]
+    - option "Rice (AAC)" [ref=e332]
+    - option "Rutgers (Big Ten)" [ref=e335]
+    - option "Sacramento State (MAC)" [ref=e338]
+    - option "Sam Houston (C-USA)" [ref=e341]
+    - option "San Diego State (Pac-12)" [ref=e344]
+    - option "San Jose State (MWC)" [ref=e347]
+    - option "SMU (ACC)" [ref=e350]
+    - option "South Alabama (Sun Belt)" [ref=e353]
+    - option "South Carolina (SEC)" [ref=e356]
+    - option "South Florida (AAC)" [ref=e359]
+    - option "Southern Miss (Sun Belt)" [ref=e362]
+    - option "Stanford (ACC)" [ref=e365]
+    - option "Syracuse (ACC)" [ref=e368]
+    - option "TCU (Big 12)" [ref=e371]
+    - option "Temple (AAC)" [ref=e374]
+    - option "Tennessee (SEC)" [ref=e377]
+    - option "Texas (SEC)" [ref=e380]
+    - option "Texas A&M (SEC)" [ref=e383]
+    - option "Texas State (Pac-12)" [ref=e386]
+    - option "Texas Tech (Big 12)" [ref=e389]
+    - option "Toledo (MAC)" [ref=e392]
+    - option "Troy (Sun Belt)" [ref=e395]
+    - option "Tulane (AAC)" [ref=e398]
+    - option "Tulsa (AAC)" [ref=e401]
+    - option "UAB (AAC)" [ref=e404]
+    - option "UCF (Big 12)" [ref=e407]
+    - option "UCLA (Big Ten)" [ref=e410]
+    - option "UConn (Independents)" [ref=e413]
+    - option "UMass (Independents)" [ref=e416]
+    - option "UNLV (MWC)" [ref=e419]
+    - option "USC (Big Ten)" [ref=e422]
+    - option "UTEP (MWC)" [ref=e425]
+    - option "UTSA (AAC)" [ref=e428]
+    - option "Utah (Big 12)" [ref=e431]
+    - option "Utah State (Pac-12)" [ref=e434]
+    - option "Vanderbilt (SEC)" [ref=e437]
+    - option "Virginia (ACC)" [ref=e440]
+    - option "Virginia Tech (ACC)" [ref=e443]
+    - option "Wake Forest (ACC)" [ref=e446]
+    - option "Washington (Big Ten)" [ref=e449]
+    - option "Washington State (Pac-12)" [ref=e452]
+    - option "West Virginia (Big 12)" [ref=e455]
+    - option "Western Kentucky (C-USA)" [ref=e458]
+    - option "Western Michigan (MAC)" [ref=e461]
+    - option "Wisconsin (Big Ten)" [ref=e464]
+    - option "Wyoming (MWC)" [ref=e467]
+    - option "FCS (Independents)" [ref=e470]
+    - option "JUCO (Independents)" [ref=e473]

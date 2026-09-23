@@ -35,7 +35,10 @@ import {
   setPlayers,
 } from "@/utils/localStorage";
 import { formatDisplayName } from "@/utils";
-import { accumulateGameStats, computeTeamStatsFromGameData } from "@/utils/accumulateGameStats";
+import {
+  accumulateGameStats,
+  computeTeamStatsFromGameData,
+} from "@/utils/accumulateGameStats";
 import {
   YearRecord,
   Game,
@@ -280,7 +283,10 @@ const Records: React.FC = () => {
 
       // Load team stats and trophies for historical records if dynasty ID is available
       if (recordForDisplay && currentDynastyId) {
-        const historicalLeaders = hasGameStatsForYear(currentDynastyId, selectedYear)
+        const historicalLeaders = hasGameStatsForYear(
+          currentDynastyId,
+          selectedYear,
+        )
           ? accumulateGameStats(getGameStats(currentDynastyId, selectedYear))
           : getTeamLeaders(currentDynastyId, selectedYear);
 
@@ -400,6 +406,32 @@ const Records: React.FC = () => {
     handleFieldChange("heisman", newHeismanStr);
   };
 
+  // Write-through persistence for the drafted-players list.
+  //
+  // WHY: `handleFieldChange` only updates in-memory `activeRecord` state and
+  // relies on the user clicking "Save Changes" to call `setYearRecord`. But
+  // `addDraftedPlayer`/`removeDraftedPlayer` also flip the roster's
+  // `isDrafted` flag via `setPlayers`, which writes straight to localStorage
+  // immediately. If `activeRecord` gets rebuilt before the user hits Save
+  // (e.g. `dataVersion` ticks from an unrelated action elsewhere in the app,
+  // or the user navigates away and back), the unsaved `playersDrafted`
+  // entries are discarded while the roster's `isDrafted` flags remain set
+  // forever - so the roster shows more drafted players than the "NFL Draft
+  // Class" list ever displays. Persisting immediately here keeps both pieces
+  // of state atomic with each other.
+  const persistDraftedPlayers = (updatedPlayersDrafted: DraftedPlayer[]) => {
+    if (!activeRecord) return;
+    const updatedRecord = {
+      ...activeRecord,
+      playersDrafted: updatedPlayersDrafted,
+    };
+    setActiveRecord(updatedRecord);
+    setYearRecord(updatedRecord.year, updatedRecord);
+    setAllRecords((prev) =>
+      prev.map((r) => (r.year === updatedRecord.year ? updatedRecord : r)),
+    );
+  };
+
   const addDraftedPlayer = () => {
     if (!activeRecord) return;
     const selectedPlayer = players.find(
@@ -418,10 +450,7 @@ const Records: React.FC = () => {
       round: newDraftPlayer.round,
       year: selectedYear!,
     };
-    handleFieldChange("playersDrafted", [
-      ...(activeRecord.playersDrafted || []),
-      newPlayer,
-    ]);
+    persistDraftedPlayers([...(activeRecord.playersDrafted || []), newPlayer]);
 
     // Mark player as drafted on the roster
     const updatedPlayers = players.map((p) =>
@@ -434,6 +463,9 @@ const Records: React.FC = () => {
 
     // Reset the form
     setNewDraftPlayer({ playerId: "", round: 1 });
+    toast.success(
+      `${formatDisplayName(selectedPlayer.name)} added to the draft class`,
+    );
   };
 
   const removeDraftedPlayer = (id: string) => {
@@ -455,8 +487,7 @@ const Records: React.FC = () => {
       setPlayers(updatedPlayers);
     }
 
-    handleFieldChange(
-      "playersDrafted",
+    persistDraftedPlayers(
       (activeRecord.playersDrafted || []).filter((p) => p.id !== id),
     );
   };
@@ -1012,7 +1043,7 @@ const Records: React.FC = () => {
                             Players Drafted
                           </p>
                         </div>
-                        <div className="space-y-2 max-h-96 overflow-y-auto pr-2">
+                        <div className="space-y-2 max-h-[500px] overflow-y-auto pr-2">
                           {(activeRecord.playersDrafted || [])
                             .filter((p) => p.playerName.trim())
                             .sort((a, b) => a.round - b.round)
@@ -1602,9 +1633,10 @@ const Records: React.FC = () => {
           </TabsContent>
 
           {/* Awards & Draft */}
-          <TabsContent value="awards" className="mt-6">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
-              <div className="flex flex-col gap-6">
+          <TabsContent value="awards" className="flex h-fit mt-6">
+            <div className="flex w-full gap-6">
+              {/* Left Column */}
+              <div className="flex flex-col w-full gap-6">
                 <Card>
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
@@ -1822,16 +1854,19 @@ const Records: React.FC = () => {
                   </CardContent>
                 </Card>
               </div>
-              <div className="flex flex-col gap-6">
-                <Card className="flex-1 flex flex-col">
+
+              {/* Right Column */}
+              <div className="flex flex-col w-full gap-6">
+                {/* Team Awards Card */}
+                <Card className="flex flex-col h-[500px]">
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                       <Award className="text-yellow-500" />
                       Team Awards
                     </CardTitle>
                   </CardHeader>
-                  <CardContent className="flex-grow">
-                    <ScrollArea className="h-48 pr-3">
+                  <CardContent className="flex overflow-hidden max-h-fit w-full">
+                    <ScrollArea className="flex w-full pr-3">
                       <div className="space-y-2">
                         {(activeRecord.playerAwards || []).length > 0 ? (
                           (activeRecord.playerAwards || []).map((award) => (
@@ -1856,7 +1891,9 @@ const Records: React.FC = () => {
                     </ScrollArea>
                   </CardContent>
                 </Card>
-                <Card className="flex-1 flex flex-col">
+
+                {/* NFL Draft Class Card */}
+                <Card className="flex flex-col h-[750px]">
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                       <ShieldCheck className="text-green-600" />
@@ -1864,7 +1901,7 @@ const Records: React.FC = () => {
                       {(activeRecord.playersDrafted || []).length})
                     </CardTitle>
                   </CardHeader>
-                  <CardContent className="flex-grow space-y-4">
+                  <CardContent className="flex flex-col gap-6 overflow-hidden max-h-fit w-full">
                     {/* Add Drafted Player Form */}
                     {selectedYear === currentYear && (
                       <div className="grid grid-cols-[1fr,auto,auto] gap-2 items-end">
@@ -1882,17 +1919,30 @@ const Records: React.FC = () => {
                           </SelectTrigger>
                           <SelectContent>
                             {players
-                              .filter(
-                                (player) =>
-                                  !player.isDrafted && !player.isTransferring,
-                              )
+                              .filter((player) => {
+                                // Membership in this year's list (not the
+                                // roster's isDrafted flag) is the source of
+                                // truth for whether a player still needs a
+                                // draft entry, so a player whose flag is set
+                                // but who has no matching entry remains
+                                // selectable instead of being permanently
+                                // unreachable.
+                                const alreadyInThisYearsList = (
+                                  activeRecord.playersDrafted || []
+                                ).some((d) => d.playerName === player.name);
+                                return (
+                                  !player.isTransferring &&
+                                  !alreadyInThisYearsList
+                                );
+                              })
                               .map((player) => (
                                 <SelectItem
                                   key={player.id}
                                   value={player.id.toString()}
                                 >
-                                  {formatDisplayName(player.name)} - {player.position} (
-                                  {player.rating}⭐)
+                                  {formatDisplayName(player.name)} -{" "}
+                                  {player.position} ({player.rating}⭐)
+                                  {player.isDrafted && " - needs draft entry"}
                                 </SelectItem>
                               ))}
                           </SelectContent>
@@ -1926,7 +1976,7 @@ const Records: React.FC = () => {
                     )}
 
                     {/* Drafted Players List */}
-                    <ScrollArea className="h-48 pr-3">
+                    <ScrollArea className="flex w-full pr-3">
                       <div className="space-y-2">
                         {(activeRecord.playersDrafted || [])
                           .sort((a, b) => a.round - b.round)
@@ -1943,7 +1993,8 @@ const Records: React.FC = () => {
                                 </div>
                                 <div className="min-w-0">
                                   <p className="font-semibold text-green-800 dark:text-green-200 truncate">
-                                    {formatDisplayName(player.playerName) || "(Unnamed)"}
+                                    {formatDisplayName(player.playerName) ||
+                                      "(Unnamed)"}
                                   </p>
                                   <p className="text-xs text-green-600 dark:text-green-400">
                                     Round {player.round}

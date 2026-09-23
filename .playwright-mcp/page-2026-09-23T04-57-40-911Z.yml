@@ -1,0 +1,33 @@
+- generic:
+  - alert
+  - generic [aria-hidden]:
+    - generic:
+      - generic:
+        - heading [level=1]: CFB Dynasty Manager
+        - paragraph: Pave your path to the College Football Championship!
+      - generic:
+        - button: Create New Dynasty
+        - button: Import Dynasty
+      - generic:
+        - generic:
+          - heading [level=3]: Start Your Dynasty
+          - paragraph: Create your first dynasty or import an existing one to begin.
+  - dialog [ref=e32]:
+    - heading "Create New Dynasty" [level=2] [ref=e34]
+    - generic [ref=e35]:
+      - generic [ref=e36]:
+        - text: Coach Name
+        - textbox "Coach Name" [ref=e37]:
+          - /placeholder: Enter your name
+          - text: Test Coach
+      - generic [ref=e38]:
+        - text: School
+        - combobox [active] [ref=e39] [cursor=pointer]:
+          - generic: Missouri State (C-USA)
+      - generic [ref=e42]:
+        - text: Starting Year
+        - spinbutton "Starting Year" [ref=e43]: "2026"
+    - generic [ref=e44]:
+      - button "Cancel" [ref=e45] [cursor=pointer]
+      - button "Create Dynasty" [ref=e46] [cursor=pointer]
+    - button "Close" [ref=e47] [cursor=pointer]

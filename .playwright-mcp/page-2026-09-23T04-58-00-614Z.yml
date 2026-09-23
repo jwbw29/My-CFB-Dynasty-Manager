@@ -1,0 +1,26 @@
+- generic [active] [ref=f2e1]:
+  - alert [ref=f2e2]
+  - generic [ref=f2e4]:
+    - generic [ref=f2e5]:
+      - heading "CFB Dynasty Manager" [level=1] [ref=f2e6]
+      - paragraph [ref=f2e13]: Pave your path to the College Football Championship!
+    - generic [ref=f2e14]:
+      - button "Create New Dynasty" [ref=f2e15] [cursor=pointer]
+      - button "Import Dynasty" [ref=f2e17] [cursor=pointer]
+    - generic [ref=f2e21]:
+      - heading "Your Dynasties" [level=2] [ref=f2e22]
+      - generic [ref=f2e24]:
+        - heading [level=3] [ref=f2e26]:
+          - img "Missouri State logo" [ref=f2e28]
+          - generic [ref=f2e29]:
+            - text: Missouri State
+            - paragraph [ref=f2e30]: Coach Test Coach • C-USA
+        - generic [ref=f2e31]:
+          - generic [ref=f2e32]: "Year: 2026"
+          - generic [ref=f2e36]: "Seasons: 0"
+          - generic [ref=f2e41]: "Record: 0-0"
+          - generic [ref=f2e43]: "Last Played: 9/22/2026, 11:57:43 PM"
+          - generic [ref=f2e45]: "Ready to Advance: No"
+          - generic [ref=f2e50]:
+            - button "Load" [ref=f2e51] [cursor=pointer]
+            - button [ref=f2e54] [cursor=pointer]

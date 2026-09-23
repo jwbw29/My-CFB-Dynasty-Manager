@@ -1,0 +1,109 @@
+- generic [ref=f3e1]:
+  - alert [ref=f3e2]
+  - generic [ref=f3e64]:
+    - navigation [ref=f3e65]:
+      - generic [ref=f3e66]:
+        - button "Return to Dynasty Selection" [ref=f3e68] [cursor=pointer]
+        - generic [ref=f3e73]:
+          - link "Team Home" [ref=f3e4836] [cursor=pointer]:
+            - /url: /
+          - link "Schedule" [ref=f3e4837] [cursor=pointer]:
+            - /url: /schedule/
+          - link "Top 25" [ref=f3e4838] [cursor=pointer]:
+            - /url: /top25/
+          - link "User Teams" [ref=f3e4839] [cursor=pointer]:
+            - /url: /user-teams/
+          - link "Roster" [ref=f3e4840] [cursor=pointer]:
+            - /url: /roster/
+          - link "Recruiting" [ref=f3e4841] [cursor=pointer]:
+            - /url: /recruiting/
+          - link "Transfers" [ref=f3e4842] [cursor=pointer]:
+            - /url: /transfers/
+          - link "Stats & Records" [ref=f3e4843] [cursor=pointer]:
+            - /url: /team-stats/
+          - link "Player Awards" [ref=f3e4844] [cursor=pointer]:
+            - /url: /awards/
+          - link "Season History" [ref=f3e4845] [cursor=pointer]:
+            - /url: /records/
+          - link "Trophy Case" [ref=f3e4846] [cursor=pointer]:
+            - /url: /trophy-case/
+          - link "Social Media" [ref=f3e4847] [cursor=pointer]:
+            - /url: /social/
+          - link "Tools" [ref=f3e4848] [cursor=pointer]:
+            - /url: /tools/
+        - generic [ref=f3e87]:
+          - button "Test Coach Missouri State 2026" [ref=f3e89] [cursor=pointer]:
+            - generic [ref=f3e90]: Test Coach
+            - generic [ref=f3e95]: Missouri State
+            - generic [ref=f3e102]: "2026"
+          - button "Save" [ref=f3e110] [cursor=pointer]
+          - button [ref=f3e117] [cursor=pointer]
+    - main [ref=f3e120]:
+      - generic [ref=f3e4851]:
+        - generic [ref=f3e4852]:
+          - heading "Season History" [level=1] [ref=f3e4853]
+          - combobox [ref=f3e4855] [cursor=pointer]:
+            - generic: 2026 Season (Current)
+        - generic [ref=f3e4858]:
+          - tablist [ref=f3e4859]:
+            - tab "Overview" [ref=f3e4860] [cursor=pointer]
+            - tab "Schedule" [ref=f3e4861] [cursor=pointer]
+            - tab "Recruits & Transfers" [ref=f3e4862] [cursor=pointer]
+            - tab "Awards & Draft" [selected] [ref=f3e4863] [cursor=pointer]
+          - tabpanel "Awards & Draft" [ref=f3e4864]:
+            - generic [ref=f3e4865]:
+              - generic [ref=f3e4866]:
+                - generic [ref=f3e4867]:
+                  - heading "Season Results" [level=3] [ref=f3e4869]
+                  - generic [ref=f3e4871]:
+                    - generic [ref=f3e4872]:
+                      - text: Overall Record
+                      - textbox "12-1" [ref=f3e4873]: 0-0
+                    - generic [ref=f3e4874]:
+                      - text: Conference Record
+                      - textbox "8-1" [ref=f3e4875]: 0-0
+                    - generic [ref=f3e4876]:
+                      - text: Final Rank
+                      - textbox "#5" [ref=f3e4877]
+                    - generic [ref=f3e4878]:
+                      - text: Conference Finish
+                      - textbox "1st" [ref=f3e4879]
+                    - generic [ref=f3e4880]:
+                      - text: Bowl Game
+                      - textbox "Rose Bowl" [ref=f3e4881]
+                    - generic [ref=f3e4882]:
+                      - text: Bowl Result
+                      - combobox [ref=f3e4883] [cursor=pointer]
+                - generic [ref=f3e4886]:
+                  - heading "Major Awards" [level=3] [ref=f3e4888]
+                  - generic [ref=f3e4895]:
+                    - generic [ref=f3e4896]:
+                      - text: National Champion
+                      - combobox [ref=f3e4897] [cursor=pointer]
+                    - generic [ref=f3e4900]:
+                      - text: Heisman Winner
+                      - generic [ref=f3e4901]:
+                        - textbox "Player Name" [ref=f3e4902]
+                        - combobox [ref=f3e4903] [cursor=pointer]:
+                          - generic: Pos
+                        - combobox [ref=f3e4906] [cursor=pointer]:
+                          - generic: Class
+                        - combobox [ref=f3e4909] [cursor=pointer]:
+                          - generic: School
+              - generic [ref=f3e4912]:
+                - generic [ref=f3e4913]:
+                  - heading "Team Awards" [level=3] [ref=f3e4915]
+                  - paragraph [ref=f3e4924]: No team awards recorded.
+                - generic [ref=f3e4925]:
+                  - heading "NFL Draft Class (0)" [level=3] [ref=f3e4927]
+                  - generic [ref=f3e4931]:
+                    - generic [ref=f3e4932]:
+                      - combobox [active] [ref=f3e4933] [cursor=pointer]:
+                        - generic: Scrivner, L. - C (66⭐) - needs draft entry
+                      - generic [ref=f3e4936]:
+                        - generic [ref=f3e4937]: "Rd:"
+                        - spinbutton [ref=f3e4938]: "1"
+                      - button "Add" [ref=f3e4939] [cursor=pointer]
+                    - paragraph [ref=f3e4944]: No players drafted yet.
+    - contentinfo [ref=f3e2469]:
+      - paragraph [ref=f3e2471]: © CFB25 Dynasty Manager

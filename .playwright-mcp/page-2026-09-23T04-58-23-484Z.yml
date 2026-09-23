@@ -1,0 +1,109 @@
+- generic [ref=f2e1]:
+  - alert [ref=f2e2]
+  - generic [ref=f2e64]:
+    - navigation [ref=f2e65]:
+      - generic [ref=f2e66]:
+        - button "Return to Dynasty Selection" [ref=f2e68] [cursor=pointer]
+        - generic [ref=f2e73]:
+          - link "Team Home" [ref=f2e74] [cursor=pointer]:
+            - /url: /
+          - link "Schedule" [ref=f2e75] [cursor=pointer]:
+            - /url: /schedule/
+          - link "Top 25" [ref=f2e76] [cursor=pointer]:
+            - /url: /top25/
+          - link "User Teams" [ref=f2e77] [cursor=pointer]:
+            - /url: /user-teams/
+          - link "Roster" [ref=f2e78] [cursor=pointer]:
+            - /url: /roster/
+          - link "Recruiting" [ref=f2e79] [cursor=pointer]:
+            - /url: /recruiting/
+          - link "Transfers" [ref=f2e80] [cursor=pointer]:
+            - /url: /transfers/
+          - link "Stats & Records" [ref=f2e81] [cursor=pointer]:
+            - /url: /team-stats/
+          - link "Player Awards" [ref=f2e82] [cursor=pointer]:
+            - /url: /awards/
+          - link "Season History" [ref=f2e83] [cursor=pointer]:
+            - /url: /records/
+          - link "Trophy Case" [ref=f2e84] [cursor=pointer]:
+            - /url: /trophy-case/
+          - link "Social Media" [ref=f2e85] [cursor=pointer]:
+            - /url: /social/
+          - link "Tools" [ref=f2e86] [cursor=pointer]:
+            - /url: /tools/
+        - generic [ref=f2e87]:
+          - button "Test Coach Missouri State 2026" [ref=f2e89] [cursor=pointer]:
+            - generic [ref=f2e90]: Test Coach
+            - generic [ref=f2e95]: Missouri State
+            - generic [ref=f2e102]: "2026"
+          - button "Save" [ref=f2e110] [cursor=pointer]
+          - button [ref=f2e117] [cursor=pointer]
+    - main [ref=f2e120]:
+      - generic [ref=f2e121]:
+        - generic [ref=f2e122]:
+          - heading "Season History" [level=1] [ref=f2e123]
+          - combobox [ref=f2e125] [cursor=pointer]:
+            - generic: 2026 Season (Current)
+        - generic [ref=f2e128]:
+          - tablist [ref=f2e129]:
+            - tab "Overview" [ref=f2e130] [cursor=pointer]
+            - tab "Schedule" [ref=f2e131] [cursor=pointer]
+            - tab "Recruits & Transfers" [ref=f2e132] [cursor=pointer]
+            - tab "Awards & Draft" [active] [selected] [ref=f2e133] [cursor=pointer]
+          - tabpanel "Awards & Draft" [ref=f2e332]:
+            - generic [ref=f2e333]:
+              - generic [ref=f2e334]:
+                - generic [ref=f2e335]:
+                  - heading "Season Results" [level=3] [ref=f2e337]
+                  - generic [ref=f2e339]:
+                    - generic [ref=f2e340]:
+                      - text: Overall Record
+                      - textbox "12-1" [ref=f2e341]: 0-0
+                    - generic [ref=f2e342]:
+                      - text: Conference Record
+                      - textbox "8-1" [ref=f2e343]: 0-0
+                    - generic [ref=f2e344]:
+                      - text: Final Rank
+                      - textbox "#5" [ref=f2e345]
+                    - generic [ref=f2e346]:
+                      - text: Conference Finish
+                      - textbox "1st" [ref=f2e347]
+                    - generic [ref=f2e348]:
+                      - text: Bowl Game
+                      - textbox "Rose Bowl" [ref=f2e349]
+                    - generic [ref=f2e350]:
+                      - text: Bowl Result
+                      - combobox [ref=f2e351] [cursor=pointer]
+                - generic [ref=f2e354]:
+                  - heading "Major Awards" [level=3] [ref=f2e356]
+                  - generic [ref=f2e363]:
+                    - generic [ref=f2e364]:
+                      - text: National Champion
+                      - combobox [ref=f2e365] [cursor=pointer]
+                    - generic [ref=f2e368]:
+                      - text: Heisman Winner
+                      - generic [ref=f2e369]:
+                        - textbox "Player Name" [ref=f2e370]
+                        - combobox [ref=f2e371] [cursor=pointer]:
+                          - generic: Pos
+                        - combobox [ref=f2e374] [cursor=pointer]:
+                          - generic: Class
+                        - combobox [ref=f2e377] [cursor=pointer]:
+                          - generic: School
+              - generic [ref=f2e380]:
+                - generic [ref=f2e381]:
+                  - heading "Team Awards" [level=3] [ref=f2e383]
+                  - paragraph [ref=f2e392]: No team awards recorded.
+                - generic [ref=f2e393]:
+                  - heading "NFL Draft Class (0)" [level=3] [ref=f2e395]
+                  - generic [ref=f2e399]:
+                    - generic [ref=f2e400]:
+                      - combobox [ref=f2e401] [cursor=pointer]:
+                        - generic: Select Player
+                      - generic [ref=f2e404]:
+                        - generic [ref=f2e405]: "Rd:"
+                        - spinbutton [ref=f2e406]: "1"
+                      - button "Add" [ref=f2e407] [cursor=pointer]
+                    - paragraph [ref=f2e412]: No players drafted yet.
+    - contentinfo [ref=f2e329]:
+      - paragraph [ref=f2e331]: © CFB25 Dynasty Manager

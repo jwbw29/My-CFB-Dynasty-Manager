@@ -1,0 +1,153 @@
+- generic [active] [ref=e1]:
+  - status [ref=e484]: Dynasty created successfully!
+  - alert [ref=e2]
+  - generic [ref=e485]:
+    - navigation [ref=e486]:
+      - generic [ref=e487]:
+        - button "Return to Dynasty Selection" [ref=e489] [cursor=pointer]
+        - generic [ref=e494]:
+          - link "Team Home" [ref=e495] [cursor=pointer]:
+            - /url: /
+          - link "Schedule" [ref=e496] [cursor=pointer]:
+            - /url: /schedule/
+          - link "Top 25" [ref=e497] [cursor=pointer]:
+            - /url: /top25/
+          - link "User Teams" [ref=e498] [cursor=pointer]:
+            - /url: /user-teams/
+          - link "Roster" [ref=e499] [cursor=pointer]:
+            - /url: /roster/
+          - link "Recruiting" [ref=e500] [cursor=pointer]:
+            - /url: /recruiting/
+          - link "Transfers" [ref=e501] [cursor=pointer]:
+            - /url: /transfers/
+          - link "Stats & Records" [ref=e502] [cursor=pointer]:
+            - /url: /team-stats/
+          - link "Player Awards" [ref=e503] [cursor=pointer]:
+            - /url: /awards/
+          - link "Season History" [ref=e504] [cursor=pointer]:
+            - /url: /records/
+          - link "Trophy Case" [ref=e505] [cursor=pointer]:
+            - /url: /trophy-case/
+          - link "Social Media" [ref=e506] [cursor=pointer]:
+            - /url: /social/
+          - link "Tools" [ref=e507] [cursor=pointer]:
+            - /url: /tools/
+        - generic [ref=e508]:
+          - button "Test Coach Missouri State 2026" [ref=e510] [cursor=pointer]:
+            - generic [ref=e511]: Test Coach
+            - generic [ref=e516]: Missouri State
+            - generic [ref=e523]: "2026"
+          - button "Save" [ref=e531] [cursor=pointer]
+          - button [ref=e538] [cursor=pointer]
+    - main [ref=e541]:
+      - generic [ref=e542]:
+        - generic [ref=e547]:
+          - img "Missouri State logo" [ref=e549]
+          - generic [ref=e550]:
+            - heading "Missouri State" [level=1] [ref=e551]
+            - paragraph [ref=e552]: 2026 Season
+            - generic [ref=e553]:
+              - img "C-USA logo" [ref=e554]
+              - generic [ref=e555]: C-USA
+        - generic [ref=e556]:
+          - heading "Advance Schedule" [level=3] [ref=e558]
+          - generic [ref=e562]:
+            - generic [ref=e564]:
+              - checkbox "Ready to Advance" [ref=e565]
+              - generic [ref=e566] [cursor=pointer]: Ready to Advance
+            - generic [ref=e567]:
+              - text: Next Advance Date
+              - textbox "Next Advance Date" [ref=e568]
+        - generic [ref=e571]:
+          - generic [ref=e572]:
+            - generic [ref=e573]: Team Overall
+            - generic [ref=e574]: "78"
+          - generic [ref=e575]:
+            - generic [ref=e576]: Offense
+            - generic [ref=e577]: "77"
+          - generic [ref=e578]:
+            - generic [ref=e579]: Defense
+            - generic [ref=e580]: "78"
+          - generic [ref=e581]:
+            - generic [ref=e582]: Special Teams
+            - generic [ref=e583]: "81"
+        - generic [ref=e584]:
+          - generic [ref=e585]:
+            - heading "Team Record" [level=3] [ref=e587]
+            - generic [ref=e595]:
+              - generic [ref=e600]:
+                - generic [ref=e601]: 0-0
+                - generic [ref=e602]: ".000"
+              - generic [ref=e603]:
+                - generic [ref=e604]: Conference
+                - generic [ref=e605]: 0-0
+              - generic [ref=e606]:
+                - generic [ref=e607]:
+                  - generic [ref=e608]: Home
+                  - generic [ref=e609]: 0-0
+                - generic [ref=e610]:
+                  - generic [ref=e611]: Away
+                  - generic [ref=e612]: 0-0
+                - generic [ref=e613]:
+                  - generic [ref=e614]: Neutral
+                  - generic [ref=e615]: 0-0
+          - generic [ref=e616]:
+            - heading "Upcoming Games" [level=3] [ref=e618]
+            - paragraph [ref=e623]: No upcoming games scheduled.
+          - generic [ref=e624]:
+            - heading "Recent Results" [level=3] [ref=e626]
+            - paragraph [ref=e635]: No games played yet.
+          - generic [ref=e636]:
+            - heading "Current Week" [level=3] [ref=e638]
+            - generic [ref=e647]:
+              - generic [ref=e648]: 0 / 21
+              - generic [ref=e649]: Weeks Completed
+          - generic [ref=e650]:
+            - heading "Team Stats Summary" [level=3] [ref=e652]
+            - generic [ref=e655]:
+              - generic [ref=e656]:
+                - generic [ref=e657]: Points Per Game
+                - generic [ref=e658]: "0.0"
+              - generic [ref=e659]:
+                - generic [ref=e660]: Points Allowed
+                - generic [ref=e661]: "0.0"
+              - generic [ref=e662]:
+                - generic [ref=e663]: Point Differential
+                - generic [ref=e664]: "+0.0"
+              - generic [ref=e665]:
+                - generic [ref=e666]: Conference Win %
+                - generic [ref=e667]: 0.0%
+          - generic [ref=e668]:
+            - heading "Stat Leaders" [level=3] [ref=e670]
+            - generic [ref=e674]:
+              - generic [ref=e675]:
+                - generic [ref=e676]:
+                  - generic [ref=e677]: Passing
+                  - generic [ref=e678]: N/A
+                - generic [ref=e679]:
+                  - generic [ref=e680]: "-"
+                  - generic [ref=e681]: YPG
+              - generic [ref=e682]:
+                - generic [ref=e683]:
+                  - generic [ref=e684]: Rushing
+                  - generic [ref=e685]: N/A
+                - generic [ref=e686]:
+                  - generic [ref=e687]: "-"
+                  - generic [ref=e688]: YPG
+              - generic [ref=e689]:
+                - generic [ref=e690]:
+                  - generic [ref=e691]: Receiving
+                  - generic [ref=e692]: N/A
+                - generic [ref=e693]:
+                  - generic [ref=e694]: "-"
+                  - generic [ref=e695]: YPG
+              - generic [ref=e696]:
+                - generic [ref=e697]:
+                  - generic [ref=e698]: Tackles
+                  - generic [ref=e699]: N/A
+                - generic [ref=e700]:
+                  - generic [ref=e701]: "-"
+                  - generic [ref=e702]: TPG
+        - button "End 2026 Season" [ref=e704] [cursor=pointer]
+    - contentinfo [ref=e705]:
+      - paragraph [ref=e707]: © CFB25 Dynasty Manager

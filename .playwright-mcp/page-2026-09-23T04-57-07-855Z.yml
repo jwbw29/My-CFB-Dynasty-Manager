@@ -1,0 +1,12 @@
+- generic [active] [ref=e1]:
+  - alert [ref=e2]
+  - generic [ref=e4]:
+    - generic [ref=e5]:
+      - heading "CFB Dynasty Manager" [level=1] [ref=e6]
+      - paragraph [ref=e13]: Pave your path to the College Football Championship!
+    - generic [ref=e14]:
+      - button "Create New Dynasty" [ref=e15] [cursor=pointer]
+      - button "Import Dynasty" [ref=e17] [cursor=pointer]
+    - generic [ref=e22]:
+      - heading "Start Your Dynasty" [level=3] [ref=e29]
+      - paragraph [ref=e30]: Create your first dynasty or import an existing one to begin.

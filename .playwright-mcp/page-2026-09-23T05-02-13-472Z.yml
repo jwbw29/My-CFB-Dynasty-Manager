@@ -1,0 +1,235 @@
+- generic:
+  - alert
+  - generic [aria-hidden]:
+    - navigation:
+      - generic:
+        - generic:
+          - button
+        - generic:
+          - generic:
+            - link:
+              - /url: /
+              - text: Team Home
+            - link:
+              - /url: /schedule/
+              - text: Schedule
+            - link:
+              - /url: /top25/
+              - text: Top 25
+            - link:
+              - /url: /user-teams/
+              - text: User Teams
+            - link:
+              - /url: /roster/
+              - text: Roster
+            - link:
+              - /url: /recruiting/
+              - text: Recruiting
+            - link:
+              - /url: /transfers/
+              - text: Transfers
+            - link:
+              - /url: /team-stats/
+              - text: Stats & Records
+            - link:
+              - /url: /awards/
+              - text: Player Awards
+            - link:
+              - /url: /records/
+              - text: Season History
+            - link:
+              - /url: /trophy-case/
+              - text: Trophy Case
+            - link:
+              - /url: /social/
+              - text: Social Media
+            - link:
+              - /url: /tools/
+              - text: Tools
+        - generic:
+          - generic:
+            - button:
+              - generic: Test Coach
+              - generic: Missouri State
+              - generic: "2026"
+          - button:
+            - generic: Save
+          - button
+    - main:
+      - generic:
+        - generic:
+          - heading [level=1]: Season History
+          - generic:
+            - combobox:
+              - generic: 2026 Season (Current)
+        - generic:
+          - tablist:
+            - tab: Overview
+            - tab: Schedule
+            - tab: Recruits & Transfers
+            - tab [selected]: Awards & Draft
+          - tabpanel:
+            - generic:
+              - generic:
+                - generic:
+                  - generic:
+                    - heading [level=3]: Season Results
+                  - generic:
+                    - generic:
+                      - text: Overall Record
+                      - textbox:
+                        - /placeholder: 12-1
+                        - text: 0-0
+                    - generic:
+                      - text: Conference Record
+                      - textbox:
+                        - /placeholder: 8-1
+                        - text: 0-0
+                    - generic:
+                      - text: Final Rank
+                      - textbox:
+                        - /placeholder: "#5"
+                    - generic:
+                      - text: Conference Finish
+                      - textbox:
+                        - /placeholder: 1st
+                    - generic:
+                      - text: Bowl Game
+                      - textbox:
+                        - /placeholder: Rose Bowl
+                    - generic:
+                      - text: Bowl Result
+                      - combobox
+                - generic:
+                  - generic:
+                    - heading [level=3]: Major Awards
+                  - generic:
+                    - generic:
+                      - text: National Champion
+                      - combobox
+                    - generic:
+                      - text: Heisman Winner
+                      - generic:
+                        - textbox:
+                          - /placeholder: Player Name
+                        - combobox:
+                          - generic: Pos
+                        - combobox:
+                          - generic: Class
+                        - combobox:
+                          - generic: School
+              - generic:
+                - generic:
+                  - generic:
+                    - heading [level=3]: Team Awards
+                  - generic:
+                    - generic:
+                      - generic:
+                        - generic:
+                          - generic:
+                            - paragraph: No team awards recorded.
+                - generic:
+                  - generic:
+                    - heading [level=3]: NFL Draft Class (0)
+                  - generic:
+                    - generic:
+                      - combobox [expanded]:
+                        - generic: Select Player
+                      - generic:
+                        - generic: "Rd:"
+                        - spinbutton: "1"
+                      - button: Add
+                    - generic:
+                      - generic:
+                        - generic:
+                          - generic:
+                            - paragraph: No players drafted yet.
+    - contentinfo:
+      - generic:
+        - paragraph: © CFB25 Dynasty Manager
+  - listbox [ref=f3e4945]:
+    - option "Meitz, S. - C (59⭐)" [active] [ref=f3e4946]
+    - option "Scrivner, L. - C (66⭐) - needs draft entry" [ref=f3e4949]
+    - option "Ujkashi, A. - C (69⭐)" [ref=f3e4952]
+    - option "Ganaway, M. - CB (64⭐)" [ref=f3e4955]
+    - option "Taylor, D. - CB (66⭐)" [ref=f3e4958]
+    - option "McBride, G. - CB (67⭐)" [ref=f3e4961]
+    - option "Williams, F. - CB (68⭐)" [ref=f3e4964]
+    - option "Kpassou, J. - CB (69⭐)" [ref=f3e4967]
+    - option "Rutherford, D. - CB (70⭐)" [ref=f3e4970]
+    - option "Boamah, J. - CB (72⭐)" [ref=f3e4973]
+    - option "Barrett, N. - CB (72⭐)" [ref=f3e4976]
+    - option "Dixson, D. - CB (73⭐)" [ref=f3e4979]
+    - option "Williams, C. - CB (73⭐)" [ref=f3e4982]
+    - option "McGee, J. - DT (66⭐)" [ref=f3e4985]
+    - option "Jones, K. - DT (66⭐)" [ref=f3e4988]
+    - option "Igbinedion, B. - DT (68⭐)" [ref=f3e4991]
+    - option "Osei-Bonsu, M. - DT (68⭐)" [ref=f3e4994]
+    - option "Brantley Jr., T. - DT (71⭐)" [ref=f3e4997]
+    - option "Davis, J. - DT (72⭐)" [ref=f3e5000]
+    - option "Madison, M. - DT (73⭐)" [ref=f3e5003]
+    - option "Tchio, G. - DT (74⭐)" [ref=f3e5006]
+    - option "Chapman, M. - DT (75⭐)" [ref=f3e5009]
+    - option "Gainwell, M. - FB (68⭐)" [ref=f3e5012]
+    - option "Smith, A. - FS (67⭐)" [ref=f3e5015]
+    - option "Michel, X. - FS (69⭐)" [ref=f3e5018]
+    - option "Caston, H. - FS (69⭐)" [ref=f3e5021]
+    - option "Ford, C. - FS (77⭐)" [ref=f3e5024]
+    - option "Davis, K. - HB (75⭐)" [ref=f3e5027]
+    - option "Lair, C. - HB (75⭐)" [ref=f3e5030]
+    - option "Joyner, J. - HB (76⭐)" [ref=f3e5033]
+    - option "Dubar, B. - HB (80⭐)" [ref=f3e5036]
+    - option "Green Jr., R. - HB (80⭐)" [ref=f3e5039]
+    - option "Deal, J. - K (74⭐)" [ref=f3e5042]
+    - option "Obeid, Y. - K (75⭐)" [ref=f3e5045]
+    - option "Wiest, C. - LE (66⭐)" [ref=f3e5048]
+    - option "Brooks, D. - LE (75⭐)" [ref=f3e5051]
+    - option "Lukusa, J. - LE (76⭐)" [ref=f3e5054]
+    - option "Anderson, D. - LG (57⭐)" [ref=f3e5057]
+    - option "Ewell, M. - LG (63⭐)" [ref=f3e5060]
+    - option "Greene, M. - LG (78⭐)" [ref=f3e5063]
+    - option "Booker, B. - LOLB (56⭐)" [ref=f3e5066]
+    - option "Yelder, A. - LOLB (63⭐)" [ref=f3e5069]
+    - option "Roy, C. - LOLB (70⭐)" [ref=f3e5072]
+    - option "Gueye, M. - LT (67⭐)" [ref=f3e5075]
+    - option "Liedtke, B. - LT (68⭐)" [ref=f3e5078]
+    - option "Dixon, W. - LT (69⭐)" [ref=f3e5081]
+    - option "Cutchlow, G. - MLB (63⭐)" [ref=f3e5084]
+    - option "Blackmon, M. - MLB (65⭐)" [ref=f3e5087]
+    - option "Shufelt, S. - MLB (70⭐)" [ref=f3e5090]
+    - option "Lloyd, J. - MLB (75⭐)" [ref=f3e5093]
+    - option "McDonald, S. - P (66⭐)" [ref=f3e5096]
+    - option "Leonard, E. - QB (59⭐)" [ref=f3e5099]
+    - option "Feuerbacher, C. - QB (66⭐)" [ref=f3e5102]
+    - option "Belin IV, H. - QB (72⭐)" [ref=f3e5105]
+    - option "Locklear, S. - QB (74⭐)" [ref=f3e5108]
+    - option "McCuller, B. - RE (66⭐)" [ref=f3e5111]
+    - option "Elliott, J. - RE (69⭐)" [ref=f3e5114]
+    - option "Lindstrom, K. - RE (73⭐)" [ref=f3e5117]
+    - option "Blake, J. - RG (55⭐)" [ref=f3e5120]
+    - option "Mitchell, R. - RG (63⭐)" [ref=f3e5123]
+    - option "Villanueva, I. - RG (67⭐)" [ref=f3e5126]
+    - option "Olabode, C. - ROLB (62⭐)" [ref=f3e5129]
+    - option "Cooper, J. - ROLB (66⭐)" [ref=f3e5132]
+    - option "Malone, H. - ROLB (66⭐)" [ref=f3e5135]
+    - option "Thompson, B. - RT (65⭐)" [ref=f3e5138]
+    - option "Espinoza, S. - RT (68⭐)" [ref=f3e5141]
+    - option "Large, K. - RT (69⭐)" [ref=f3e5144]
+    - option "Mattison, A. - SS (66⭐)" [ref=f3e5147]
+    - option "O'Neal, J. - SS (74⭐)" [ref=f3e5150]
+    - option "Coleman, T. - TE (67⭐)" [ref=f3e5153]
+    - option "Kallas, A. - TE (67⭐)" [ref=f3e5156]
+    - option "Rexroat, J. - TE (68⭐)" [ref=f3e5159]
+    - option "Hipp, D. - TE (71⭐)" [ref=f3e5162]
+    - option "Askren, J. - TE (78⭐)" [ref=f3e5165]
+    - option "Dorsey, B. - WR (67⭐)" [ref=f3e5168]
+    - option "Reese, S. - WR (68⭐)" [ref=f3e5171]
+    - option "McQueen, B. - WR (68⭐)" [ref=f3e5174]
+    - option "McMorris, I. - WR (69⭐)" [ref=f3e5177]
+    - option "Manuel, J. - WR (69⭐)" [ref=f3e5180]
+    - option "Whetsell, A. - WR (70⭐)" [ref=f3e5183]
+    - option "Edwards, W. - WR (74⭐)" [ref=f3e5186]
+    - option "Cope, M. - WR (75⭐)" [ref=f3e5189]
+    - option "Myers, I. - WR (75⭐)" [ref=f3e5192]
+    - option "Miller, M. - WR (76⭐)" [ref=f3e5195]
+    - option "Robinson, J. - WR (84⭐)" [ref=f3e5198]
