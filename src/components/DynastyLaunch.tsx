@@ -59,7 +59,10 @@ import {
   getTop25History,
   restoreDynastyFromSnapshot,
 } from "@/utils/localStorage";
-import { DynastySnapshot } from "@/utils/dynasty-export";
+import type {
+  AllDynastiesBundleSnapshot,
+  DynastySnapshot,
+} from "@/utils/dynasty-export";
 import { RankedTeam } from "@/hooks/useTop25Rankings";
 
 interface Dynasty {
@@ -89,6 +92,19 @@ interface ImportedData {
   allTrophies?: any[];
   top25History?: any;
   schedulesAndStats?: Record<string, any>;
+}
+
+type ImportableDynastySnapshot = DynastySnapshot | AllDynastiesBundleSnapshot;
+
+type BundleDynastyMetadata = Record<string, unknown> & { id: string };
+
+interface SingleDynastyData {
+  coachProfile: {
+    coachName: string;
+    schoolName: string;
+  };
+  currentYear: number;
+  yearRecords?: ReadonlyArray<unknown>;
 }
 
 const DynastyLaunch: React.FC<DynastyLaunchProps> = ({ onDynastySelected }) => {
@@ -183,17 +199,68 @@ const DynastyLaunch: React.FC<DynastyLaunchProps> = ({ onDynastySelected }) => {
     };
   }, [loadDynasties]);
 
-  const validateImportedData = useCallback(
-    (data: any): data is DynastySnapshot => {
-      if (!data || typeof data !== "object") return false;
+  const isRecord = useCallback(
+    (value: unknown): value is Record<string, unknown> =>
+      typeof value === "object" && value !== null && !Array.isArray(value),
+    []
+  );
+
+  const isSingleDynastyData = useCallback(
+    (value: unknown): value is SingleDynastyData => {
+      if (!isRecord(value)) {
+        return false;
+      }
+
+      const coachProfile = value.coachProfile;
       return (
-        data.version &&
-        data.dynastyData &&
-        data.dynastyData.coachProfile &&
-        data.dynastyData.currentYear
+        isRecord(coachProfile) &&
+        typeof coachProfile.coachName === "string" &&
+        typeof coachProfile.schoolName === "string" &&
+        typeof value.currentYear === "number"
       );
     },
-    []
+    [isRecord]
+  );
+
+  const isSingleDynastyImportSnapshot = useCallback(
+    (data: unknown): data is DynastySnapshot => {
+      if (!isRecord(data) || !isSingleDynastyData(data.dynastyData)) {
+        return false;
+      }
+
+      return (
+        typeof data.version === "string" &&
+        typeof data.exportedAt === "string"
+      );
+    },
+    [isRecord, isSingleDynastyData]
+  );
+
+  const isAllDynastiesBundleImport = useCallback(
+    (data: unknown): data is AllDynastiesBundleSnapshot => {
+      if (!isRecord(data)) {
+        return false;
+      }
+
+      return (
+        data.kind === "all-dynasties-bundle" &&
+        Array.isArray(data.dynasties) &&
+        isRecord(data.snapshots)
+      );
+    },
+    [isRecord]
+  );
+
+  const isBundleDynastyMetadata = useCallback(
+    (value: unknown): value is BundleDynastyMetadata =>
+      isRecord(value) && typeof value.id === "string",
+    [isRecord]
+  );
+
+  const validateImportedData = useCallback(
+    (data: unknown): data is ImportableDynastySnapshot =>
+      isSingleDynastyImportSnapshot(data) || isAllDynastiesBundleImport(data),
+    [isSingleDynastyImportSnapshot, isAllDynastiesBundleImport]
   );
 
   const calculateDynastyStatsFromImport = (
@@ -425,11 +492,90 @@ const DynastyLaunch: React.FC<DynastyLaunchProps> = ({ onDynastySelected }) => {
     setIsImporting(true);
     try {
       const text = await selectedFile.text();
-      const snapshot: DynastySnapshot = JSON.parse(text);
+      const parsedSnapshot = JSON.parse(text) as unknown;
 
-      if (!validateImportedData(snapshot)) {
+      if (!validateImportedData(parsedSnapshot)) {
         throw new Error("Invalid or corrupted dynasty snapshot file.");
       }
+
+      if (isAllDynastiesBundleImport(parsedSnapshot)) {
+        let importedCount = 0;
+        let skippedCount = 0;
+
+        parsedSnapshot.dynasties.forEach((entry, index) => {
+          if (!isBundleDynastyMetadata(entry)) {
+            skippedCount += 1;
+            toast.error(`Skipped dynasty #${index + 1}: metadata is invalid.`);
+            return;
+          }
+
+          const sourceSnapshot = parsedSnapshot.snapshots[entry.id];
+          if (!isRecord(sourceSnapshot)) {
+            skippedCount += 1;
+            const dynastyLabel =
+              typeof entry.schoolName === "string"
+                ? entry.schoolName
+                : `dynasty ${entry.id}`;
+            // Partial success is safer for restores because one damaged record should not block valid backups.
+            toast.error(`Skipped ${dynastyLabel}: snapshot data is missing from this bundle.`);
+            return;
+          }
+
+          // Regenerate ids to avoid collisions with existing dynasty_<id> keys already on this device.
+          const newDynastyId = `${Date.now().toString()}_${index}`;
+          localStorage.setItem(
+            `dynasty_${newDynastyId}`,
+            JSON.stringify(sourceSnapshot)
+          );
+
+          const remappedMetadata: Record<string, unknown> = {
+            ...entry,
+            id: newDynastyId,
+          };
+
+          // We always append/merge instead of replacing so imports can never delete dynasties
+          // that are not present in the backup file.
+          const existingDynastiesRaw = localStorage.getItem("dynasties");
+          const existingDynasties = existingDynastiesRaw
+            ? (JSON.parse(existingDynastiesRaw) as unknown)
+            : [];
+          const existingDynastiesList = Array.isArray(existingDynasties)
+            ? existingDynasties
+            : [];
+
+          localStorage.setItem(
+            "dynasties",
+            JSON.stringify([...existingDynastiesList, remappedMetadata])
+          );
+          importedCount += 1;
+        });
+
+        if (importedCount === 0) {
+          throw new Error("No dynasties were imported from this bundle.");
+        }
+
+        setShowImportModal(false);
+        setSelectedFile(null);
+        if (fileInputRef.current) fileInputRef.current.value = "";
+
+        loadDynasties();
+
+        if (skippedCount > 0) {
+          toast.error(
+            `${skippedCount} dynast${
+              skippedCount === 1 ? "y was" : "ies were"
+            } skipped because their snapshots were missing or invalid.`
+          );
+        }
+        toast.success(
+          `${importedCount} dynast${
+            importedCount === 1 ? "y" : "ies"
+          } imported successfully.`
+        );
+        return;
+      }
+
+      const snapshot = parsedSnapshot;
 
       const { coachName, schoolName } = snapshot.dynastyData.coachProfile;
       // Create the new dynasty metadata entry
@@ -473,7 +619,16 @@ const DynastyLaunch: React.FC<DynastyLaunchProps> = ({ onDynastySelected }) => {
     } finally {
       setIsImporting(false);
     }
-  }, [selectedFile, dynasties, validateImportedData, loadDynasty]);
+  }, [
+    selectedFile,
+    dynasties,
+    validateImportedData,
+    isAllDynastiesBundleImport,
+    isBundleDynastyMetadata,
+    isRecord,
+    loadDynasties,
+    loadDynasty,
+  ]);
 
   const deleteDynasty = (dynastyId: string) => {
     try {
