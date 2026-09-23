@@ -62,7 +62,9 @@
           ]
         }
       ],
-      "publisherName": "KN1ME"
+      "signtoolOptions": {
+        "publisherName": "KN1ME"
+      }
     },
     "linux": {
       "icon": "public/favicon.ico",
