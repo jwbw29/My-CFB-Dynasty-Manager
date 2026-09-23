@@ -33,6 +33,29 @@ _If you encounter any bugs or issues, please report them so they can be fixed!_
 
 5. When you're done using the app, make sure you save and close the app. End the process by pressing `ctrl+c` in the Command Prompt.
 
+## Desktop App (macOS)
+
+The app can also run as a real double-clickable macOS app (`Dynasty Manager.app`) instead of through the dev server.
+
+**Rebuilding after code changes:** This is a manual, on-demand build, the app does not auto-update itself. To rebuild and reinstall:
+
+```bash
+CSC_IDENTITY_AUTO_DISCOVERY=false npm run dist
+rm -rf "/Applications/Dynasty Manager.app" && cp -R "dist/mac-arm64/Dynasty Manager.app" "/Applications/Dynasty Manager.app"
+```
+
+**Storage is separate from dev mode:** The packaged app has its own app identity and its own storage folder, completely separate from `npm run dev`, `RunCFBDM.sh`, and `npm run electron-dev`. This means the first time you launch the packaged app, it will start with an empty dynasty list. That's expected, not a bug, it's simply a fresh, isolated storage location.
+
+**Bringing your existing dynasty data over:** To move dynasties from your dev-mode app into the packaged app:
+
+1. In the OLD/dev-mode app, go to the Tools/Data page and use **Export Current Dynasty** (for a single dynasty) or **Export All Dynasties** (to back up every saved dynasty into one file).
+2. Save the downloaded JSON file somewhere you can find it.
+3. Open the NEW packaged app and use **Import Dynasty** on the launch screen. It automatically detects whether the file is a single-dynasty export or an all-dynasties bundle, so either export works with the same import flow.
+
+**The dev workflow is unchanged:** Keep using `RunCFBDM.sh` / `npm run electron-dev` to write and test code as you always have. The packaged `.app` is just a separate, on-demand build for daily use once you're happy with a set of changes.
+
+**Technical FYI for maintainers:** The packaged app serves its Next.js static export through a local loopback HTTP server on a fixed port rather than via `file://` URLs (the static export's root-absolute asset paths don't resolve under `file://`, which produced a blank screen). It also sets its own app name so macOS gives it a separate `Application Support` storage folder from the dev-mode app. Both were fixes required specifically for packaging and aren't incidental implementation details.
+
 <ins>**SCREENSHOTS:**</ins>
 
 ![2](/public/screenshots/dynastyHome.png)
