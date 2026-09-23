@@ -5,6 +5,10 @@ node_modules
 # Next
 /.next/
 /out/
+/dist/
+
+# Playwright MCP debug/trace output (not source, not official plan evidence - that lives in .omo/evidence/)
+.playwright-mcp/
 
 # Opencode agent files
 .sisyphus
