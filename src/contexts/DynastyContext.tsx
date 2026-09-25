@@ -263,6 +263,10 @@ export const DynastyProvider: React.FC<DynastyProviderProps> = ({
       // This ensures the most up-to-date version is saved, preventing data loss.
       dynastyData.top25History = top25History;
 
+      // Persist the source dynasty id inside each snapshot so imports can remap
+      // dynasty-id-scoped localStorage keys when the app assigns a new id.
+      dynastyData.dynastyId = currentDynastyId;
+
       // 3.1. Add advance schedule fields, others receiving votes, user controlled teams, and users
       dynastyData.readyToAdvance = readyToAdvance;
       dynastyData.nextAdvance = nextAdvance;

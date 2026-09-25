@@ -461,7 +461,22 @@ export const getAllAwards = (): Award[] => {
 };
 // MODIFICATION END
 
-export const clearActiveSessionData = (): void => {
+/**
+ * Clears session data for a dynasty switch. When previousDynastyId is provided,
+ * only clears the leaving dynasty's scoped keys (records_, teamStats_, etc.).
+ * Without it, skips dynasty-scoped deletion entirely to avoid accidentally
+ * clearing the wrong dynasty's data.
+ *
+ * WHY: Dynasty-scoped keys embed the dynasty id in the key name (e.g., records_ABC123).
+ * When switching dynasties, we must delete ONLY the old dynasty's data to avoid
+ * wiping Dynasty B's records when leaving Dynasty A. Year-scoped keys (schedule_,
+ * yearStats_, userTeamMappings_) are cleared unconditionally; they're not
+ * dynasty-scoped and are left as a separate concern for future refactoring.
+ *
+ * @param previousDynastyId - The dynasty id being left. REQUIRED to scope deletions safely.
+ *   If omitted, no dynasty-scoped keys are deleted (safer than guessing).
+ */
+export const clearActiveSessionData = (previousDynastyId?: string): void => {
   console.log("Clearing active session data from localStorage...");
 
   const keysToRemove = [
@@ -481,25 +496,38 @@ export const clearActiveSessionData = (): void => {
   keysToRemove.forEach((key) => safeLocalStorage.removeItem(key));
 
   // Also remove any dynamic schedule, year stats, recruiting needs, and dynasty-specific keys from the previous session
-  // IMPORTANT: Dynasty-specific keys (records_, teamStats_, teamLeaders_) are cleared here
-  // to prevent old dynasty data from lingering when switching dynasties
+  // Dynasty-specific keys (records_, teamStats_, teamLeaders_, gameStats_, offensiveNeeds_, defensiveNeeds_)
+  // must be scoped to the SPECIFIC dynasty being left to prevent accidentally deleting Dynasty B's data
+  // when switching from Dynasty A to Dynasty B.
+  // Year-scoped keys (schedule_, yearStats_, userTeamMappings_) are cleared unconditionally as they're
+  // not dynasty-specific (separate concern for future refactoring).
   if (typeof window !== "undefined") {
     const keysToDelete: string[] = [];
     for (let i = 0; i < localStorage.length; i++) {
       const key = localStorage.key(i);
-      if (
-        key &&
-        (key.startsWith("schedule_") ||
+      if (key) {
+        // Unconditionally clear year-scoped keys (not dynasty-specific, safe to always clear)
+        if (
+          key.startsWith("schedule_") ||
           key.startsWith("yearStats_") ||
-          key.startsWith("offensiveNeeds_") ||
-          key.startsWith("defensiveNeeds_") ||
-          key.startsWith("records_") ||
-          key.startsWith("teamStats_") ||
-          key.startsWith("teamLeaders_") ||
-          key.startsWith("gameStats_") ||
-          key.startsWith("userTeamMappings_"))
-      ) {
-        keysToDelete.push(key);
+          key.startsWith("userTeamMappings_")
+        ) {
+          keysToDelete.push(key);
+        }
+        // Dynasty-scoped keys: only clear if previousDynastyId is provided and key belongs to it
+        else if (previousDynastyId) {
+          if (
+            key.startsWith(`offensiveNeeds_${previousDynastyId}`) ||
+            key.startsWith(`defensiveNeeds_${previousDynastyId}`) ||
+            key.startsWith(`records_${previousDynastyId}`) ||
+            key.startsWith(`teamStats_${previousDynastyId}`) ||
+            key.startsWith(`teamLeaders_${previousDynastyId}`) ||
+            key.startsWith(`gameStats_${previousDynastyId}`)
+          ) {
+            keysToDelete.push(key);
+          }
+        }
+        // If previousDynastyId is not provided, dynasty-scoped keys are left untouched
       }
     }
     keysToDelete.forEach((key) => safeLocalStorage.removeItem(key));
@@ -867,8 +895,61 @@ export const prepareNextSeason = (year: number): void => {
  * Wipes all active session data and replaces it with the contents of a dynasty data object.
  * This is the core function for loading a dynasty.
  * @param data - The complete data object for a dynasty.
+ * @param targetDynastyId - The dynasty id we are restoring into on this device.
  */
-export const restoreDynastyFromSnapshot = (data: Record<string, any>): void => {
+export const restoreDynastyFromSnapshot = (
+  data: Record<string, any>,
+  targetDynastyId?: string,
+): void => {
+  const sourceDynastyId = data.dynastyId;
+
+  // These key families embed dynasty ids directly in the localStorage key name.
+  // Imports intentionally mint a new dynasty id to avoid collisions, so we remap
+  // just the key names to keep reads aligned with the new id while preserving values.
+  const dynastyScopedKeyPrefixes = [
+    "records_",
+    "teamStats_",
+    "teamLeaders_",
+    "gameStats_",
+    "offensiveNeeds_",
+    "defensiveNeeds_",
+  ];
+
+  const shouldRemapDynastyScopedKeys =
+    typeof sourceDynastyId === "string" &&
+    sourceDynastyId.length > 0 &&
+    !!targetDynastyId &&
+    sourceDynastyId !== targetDynastyId;
+
+  // Older exports (pre-fix) do not include snapshot metadata for source dynasty id,
+  // so they cannot be remapped safely; preserve legacy behavior for compatibility.
+  const snapshotDataToRestore = Object.keys(data).reduce<Record<string, any>>(
+    (acc, key) => {
+      if (key === "dynastyId") {
+        return acc;
+      }
+
+      const value = data[key];
+      if (value === undefined || value === null) {
+        return acc;
+      }
+
+      if (
+        shouldRemapDynastyScopedKeys &&
+        dynastyScopedKeyPrefixes.some(
+          (prefix) => key.startsWith(prefix) && key.includes(sourceDynastyId),
+        )
+      ) {
+        acc[key.replace(sourceDynastyId, targetDynastyId)] = value;
+        return acc;
+      }
+
+      acc[key] = value;
+      return acc;
+    },
+    {},
+  );
+
   // CRITICAL: Back up records before clearing to prevent data loss
   // Records should NEVER be lost - they persist for the life of the dynasty
   const recordsBackup: Record<string, string> = {};
@@ -885,11 +966,14 @@ export const restoreDynastyFromSnapshot = (data: Record<string, any>): void => {
   }
 
   // 1. Clear out all potentially conflicting keys from the previous session.
-  clearActiveSessionData();
+  // Capture the current (soon-to-be-previous) dynasty id before clearing so we only delete
+  // that specific dynasty's scoped data, not the incoming dynasty's data.
+  const previousDynastyId = safeLocalStorage.getItem("currentDynastyId");
+  clearActiveSessionData(previousDynastyId || undefined);
 
-  // 2. Iterate over the imported data and set each item in localStorage.
-  Object.keys(data).forEach((key) => {
-    const value = data[key];
+  // 2. Iterate over snapshot data and set each item in localStorage.
+  Object.keys(snapshotDataToRestore).forEach((key) => {
+    const value = snapshotDataToRestore[key];
     if (key && value !== undefined && value !== null) {
       try {
         safeLocalStorage.setItem(key, JSON.stringify(value));
@@ -903,12 +987,28 @@ export const restoreDynastyFromSnapshot = (data: Record<string, any>): void => {
   // restore them from backup. This prevents records from being lost if an older dynasty
   // save file doesn't include records yet.
   Object.keys(recordsBackup).forEach((key) => {
-    // Only restore if the key is not in the snapshot data
-    if (!data[key]) {
+    // When imports remap dynasty-scoped keys to a new id, the records backup guard
+    // must also check the remapped key name so it doesn't mistakenly restore an
+    // "old id" records key beside the newly remapped one.
+    const remappedRecordsKey =
+      shouldRemapDynastyScopedKeys &&
+      key.startsWith("records_") &&
+      key.includes(sourceDynastyId)
+        ? key.replace(sourceDynastyId, targetDynastyId)
+        : key;
+
+    // Only restore if neither the original nor remapped key is present in the snapshot data.
+    if (
+      !Object.prototype.hasOwnProperty.call(snapshotDataToRestore, key) &&
+      !Object.prototype.hasOwnProperty.call(
+        snapshotDataToRestore,
+        remappedRecordsKey,
+      )
+    ) {
       console.warn(
-        `Records key "${key}" was missing from dynasty snapshot. Restoring from backup.`,
+        `Records key "${remappedRecordsKey}" was missing from dynasty snapshot. Restoring from backup.`,
       );
-      safeLocalStorage.setItem(key, recordsBackup[key]);
+      safeLocalStorage.setItem(remappedRecordsKey, recordsBackup[key]);
     }
   });
 };
