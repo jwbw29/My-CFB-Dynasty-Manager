@@ -339,7 +339,9 @@ const DynastyLaunch: React.FC<DynastyLaunchProps> = ({ onDynastySelected }) => {
     };
 
     const initializeDynastyData = async (d: Dynasty) => {
-      clearActiveSessionData();
+      // Capture the current dynasty id before clearing so we only delete that specific dynasty's data
+      const previousDynastyId = localStorage.getItem("currentDynastyId");
+      clearActiveSessionData(previousDynastyId || undefined);
       localStorage.setItem("currentDynastyId", d.id);
       const colorData = schoolColorPresets[d.schoolName] || {
         primary: "#3B82F6",
@@ -468,8 +470,9 @@ const DynastyLaunch: React.FC<DynastyLaunchProps> = ({ onDynastySelected }) => {
 
         const dataToLoad = JSON.parse(dynastyDataString);
 
-        // The restore function is now perfectly matched with the data structure
-        restoreDynastyFromSnapshot(dataToLoad);
+        // Pass the active dynasty id so snapshot restore can remap any
+        // dynasty-id-scoped keys if this save came from an imported dynasty.
+        restoreDynastyFromSnapshot(dataToLoad, dynasty.id);
 
         localStorage.setItem("currentDynastyId", dynasty.id);
 
