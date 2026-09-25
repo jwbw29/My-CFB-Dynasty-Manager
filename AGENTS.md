@@ -18,3 +18,11 @@ Automated tests are not yet committed; include targeted coverage when introducin
 
 ## Commit & Pull Request Guidelines
 Align with the concise, Title Case history already in `git log` (e.g., `Update Team Rank Retrieval`). Keep subject lines under ~72 characters and use additional bullet context in the body when needed. Pull requests should explain the user-facing impact, list commands run, and attach screenshots or GIFs for UI changes. Link related issues or discussions and call out follow-up work so it can be tracked.
+
+## Desktop App (macOS) Workflow
+The user runs two independent copies of this app side by side: dev mode (`RunCFBDM.sh`/`npm run electron-dev`, live source) and a packaged, double-clickable `/Applications/Dynasty Manager.app` (a frozen snapshot, separate storage, no auto-update). After completing any feature or fix, ask the user whether to also rebuild and reinstall the packaged app so it doesn't silently drift out of date:
+```bash
+CSC_IDENTITY_AUTO_DISCOVERY=false npm run dist
+rm -rf "/Applications/Dynasty Manager.app" && cp -R "dist/mac-arm64/Dynasty Manager.app" "/Applications/Dynasty Manager.app"
+```
+See the "Desktop App (macOS)" section in `README.md` for the full migration/rebuild context.
