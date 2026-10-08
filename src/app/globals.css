@@ -329,3 +329,45 @@
     display: none; /* Chrome, Safari and Opera */
   }
 }
+
+/* --- Cmd+F / Ctrl+F in-page find (cmdf-page-search) --- */
+/* Matches painted via the CSS Custom Highlight API (src/utils/findInPage.ts).
+   Unlike a class-based `.dark` override, `::highlight()` cannot be nested
+   under an ancestor selector in the usual cascade sense for a CUSTOM
+   property swap, but a plain `.dark ::highlight(...)` compound selector IS
+   valid CSS and Chromium (the only runtime this app ships on - dev browser
+   and Electron are both Chromium-based) accepts it, so we use two explicit
+   rule sets (light default + `.dark` override) rather than CSS custom
+   properties, keeping this consistent with the rest of this file's
+   class-based dark-mode convention (next-themes, not prefers-color-scheme). */
+::highlight(find-match) {
+  background-color: theme("colors.yellow.300");
+  color: theme("colors.gray.900");
+}
+
+.dark ::highlight(find-match) {
+  background-color: theme("colors.yellow.600");
+  color: theme("colors.gray.100");
+}
+
+/* Active match gets a visually distinct color (orange vs. yellow) so the
+   user can tell which of the N matches is currently focused/scrolled-to. */
+::highlight(find-active) {
+  background-color: theme("colors.orange.400");
+  color: theme("colors.gray.900");
+}
+
+.dark ::highlight(find-active) {
+  background-color: theme("colors.orange.500");
+  color: theme("colors.gray.100");
+}
+
+/* Keeps scrollIntoView() targets clear of this app's two stacked fixed
+   headers (Navigation at z-50, pt-24 = 96px per DynastyWrapper, and
+   FindBar at z-[60]) so an active match never scrolls to a point hidden
+   behind either bar. Applied at the html level so it covers the native
+   window-level scroll used by `getActiveMatchElement(...).scrollIntoView()`
+   without requiring manual scroll-offset math in the find hook. */
+html {
+  scroll-padding-top: 6rem;
+}
