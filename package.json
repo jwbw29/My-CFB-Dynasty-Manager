@@ -16,6 +16,7 @@
     "build-electron": "next build && electron-builder",
     "dist": "next build && electron-builder --publish=never",
     "dist-all": "next build && electron-builder -mwl",
+    "rebuild-app": "bash scripts/rebuild-mac-app.sh",
     "postinstall": "electron-builder install-app-deps"
   },
   "build": {

@@ -40,6 +40,12 @@ The app can also run as a real double-clickable macOS app (`Dynasty Manager.app`
 **Rebuilding after code changes:** This is a manual, on-demand build, the app does not auto-update itself. To rebuild and reinstall:
 
 ```bash
+npm run rebuild-app
+```
+
+This wraps the build + reinstall steps below into one command (see `scripts/rebuild-mac-app.sh`). Equivalent manual steps, if you need them:
+
+```bash
 CSC_IDENTITY_AUTO_DISCOVERY=false npm run dist
 rm -rf "/Applications/Dynasty Manager.app" && cp -R "dist/mac-arm64/Dynasty Manager.app" "/Applications/Dynasty Manager.app"
 ```
