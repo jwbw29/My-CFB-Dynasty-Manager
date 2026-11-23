@@ -204,6 +204,7 @@ const TROPHY_CATEGORIES = {
       "TechMo Bowl",
       "Territorial Cup",
       "Textile Bowl",
+      "The Axe (The Big Game)",
       "The Bell",
       "The Bones",
       "The Saddle",
